@@ -14,7 +14,7 @@ void LogStartMsg()
 	GetExecutePath(lpExePath, MAX_PATH);
 
 	WriteLog(NORMAL_LOG, L"──── ━━\n");
-	WriteLog(NORMAL_LOG, L"Ehnd :: 엔드 - VER. %s :: COMPILE AT %s, %s\n", WIDEN(EHND_VER), WIDEN(__DATE__), WIDEN(__TIME__));
+	WriteLog(NORMAL_LOG, L"Ehnd :: 엔드 - VER. %s :: COMPILE AT %s, %s\n", EHND_VER, _T(__DATE__), _T(__TIME__));
 	WriteLog(NORMAL_LOG, L"──── ━━ Ehnd -- sokcuri.neko.kr --\n");
 	WriteLog(NORMAL_LOG, L"\n");
 	WriteLog(NORMAL_LOG, L"- 제작자 : %s\n", L"소쿠릿");
@@ -172,7 +172,7 @@ DWORD WINAPI LogThreadMain(LPVOID lpParam)
 	HINSTANCE hInst = g_hInst;
 	wchar_t wszTitle[255];
 
-	wsprintf(wszTitle, L"Ehnd Log Window :: VER. %s (%s, %s)", WIDEN(EHND_VER), WIDEN(__DATE__), WIDEN(__TIME__));
+	wsprintf(wszTitle, L"Ehnd Log Window :: VER. %s (%s, %s)", EHND_VER, _T(__DATE__), _T(__TIME__));
 
 	hLogWin = CreateWindowEx(0, L"EhndLogWin", wszTitle, WS_OVERLAPPEDWINDOW, 64, 64, 640, 480, 0, 0, hInst, 0);
 	if (!hLogWin)

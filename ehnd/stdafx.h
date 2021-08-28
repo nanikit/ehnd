@@ -6,7 +6,6 @@
 #pragma once
 
 #include "targetver.h"
-#define EHND_VER "V3.20"
 
 #pragma warning(disable: 4838)
 
@@ -17,6 +16,9 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <Psapi.h>
+#include <tchar.h>
+
+constexpr auto EHND_VER = _T("V3.20");
 
 #include <iostream>
 #include <vector>
@@ -64,12 +66,5 @@ extern int mb2wc_type;
 
 extern HMODULE hEzt, hMsv;
 extern BOOL initOnce;
-
-#ifdef _UNICODE
-#define WIDEN2(x) L ## x
-#define WIDEN(x) WIDEN2(x)
-#else
-#define WIDEN(x)
-#endif
 
 #define D(x) deformatted_string(x).c_str()

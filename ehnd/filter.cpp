@@ -916,13 +916,13 @@ bool filter::cmd(wstring &wsText)
 	if (wsText[0] != L'/') return false;
 	if (!wsText.compare(L"/ver") || !wsText.compare(L"/version"))
 	{
-		wsText += L" : Ehnd ";
-		wsText += WIDEN(EHND_VER);
-		wsText += L", ";
-		wsText += WIDEN(__DATE__);
-		wsText += L", ";
-		wsText += WIDEN(__TIME__);
-		wsText += L"\r\n";
+    wsText += L" : Ehnd ";
+    wsText += EHND_VER;
+    wsText += L", ";
+    wsText += _T(__DATE__);
+    wsText += L", ";
+    wsText += _T(__TIME__);
+    wsText += L"\r\n";
 
 		SetLogText(wsText.c_str(), RGB(168, 25, 25), RGB(255, 255, 255));
 		return true;
