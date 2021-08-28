@@ -19,7 +19,6 @@ constexpr auto EHND_VER = _T("V3.20");
 // C++ standard libraries
 #include <algorithm>
 #include <array>
-#include <boost/format.hpp>
 #include <boost/regex.hpp>
 #include <chrono>
 #include <cstdarg>
