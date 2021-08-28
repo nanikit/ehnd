@@ -77,7 +77,7 @@ DWORD watch::_NotifyThread(LPVOID lpParam)
 				memcpy(temp, pfni->FileName, pfni->FileNameLength);
 				temp[pfni->FileNameLength / 2] = 0;
 				std::wstring filename(temp);
-				transform(filename.begin(), filename.end(), filename.begin(), tolower);
+				transform(filename.begin(), filename.end(), filename.begin(), towlower);
 
 				if (fileList_Temp.begin() == fileList_Temp.end())
 				{

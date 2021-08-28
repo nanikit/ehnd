@@ -1,30 +1,31 @@
-// stdafx.h : 자주 사용하지만 자주 변경되지는 않는
+﻿// stdafx.h : 자주 사용하지만 자주 변경되지는 않는
 // 표준 시스템 포함 파일 및 프로젝트 관련 포함 파일이
 // 들어 있는 포함 파일입니다.
 //
 
 #pragma once
 
+typedef struct IUnknown IUnknown;
 #include "targetver.h"
 
-#pragma warning(disable: 4838)
-
-// Windows 헤더 파일:
-#include <windows.h>
-#include <WinBase.h>
-#include <windef.h>
-#include <stdarg.h>
-#include <stdlib.h>
+// Additional windows headers
+#include <Windows.h>
 #include <Psapi.h>
+#include <Richedit.h>
 #include <tchar.h>
 
 constexpr auto EHND_VER = _T("V3.20");
 
-#include <iostream>
-#include <vector>
+// C++ standard libraries
+#include <algorithm>
+#include <array>
 #include <boost/format.hpp>
 #include <boost/regex.hpp>
 #include <chrono>
+#include <cstdarg>
+#include <cstdlib>
+#include <iostream>
+#include <vector>
 using namespace std;
 using namespace boost;
 using namespace chrono;
