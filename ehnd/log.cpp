@@ -13,12 +13,12 @@ void LogStartMsg()
 	GetLoadPath(lpEztPath, MAX_PATH);
 	GetExecutePath(lpExePath, MAX_PATH);
 
-	WriteLog(NORMAL_LOG, L"¦¡¦¡¦¡¦¡ ¦¬¦¬\n");
-	WriteLog(NORMAL_LOG, L"Ehnd :: ¿£µå - VER. %s :: COMPILE AT %s, %s\n", WIDEN(EHND_VER), WIDEN(__DATE__), WIDEN(__TIME__));
-	WriteLog(NORMAL_LOG, L"¦¡¦¡¦¡¦¡ ¦¬¦¬ Ehnd -- sokcuri.neko.kr --\n");
+	WriteLog(NORMAL_LOG, L"â”€â”€â”€â”€ â”â”\n");
+	WriteLog(NORMAL_LOG, L"Ehnd :: ì—”ë“œ - VER. %s :: COMPILE AT %s, %s\n", WIDEN(EHND_VER), WIDEN(__DATE__), WIDEN(__TIME__));
+	WriteLog(NORMAL_LOG, L"â”€â”€â”€â”€ â”â” Ehnd -- sokcuri.neko.kr --\n");
 	WriteLog(NORMAL_LOG, L"\n");
-	WriteLog(NORMAL_LOG, L"- Á¦ÀÛÀÚ : %s\n", L"¼ÒÄí¸´");
-	WriteLog(NORMAL_LOG, L"¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡-£ª\n");
+	WriteLog(NORMAL_LOG, L"- ì œì‘ì : %s\n", L"ì†Œì¿ ë¦¿");
+	WriteLog(NORMAL_LOG, L"â”â”â”â”â”â”â”â”â”â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€-ï¼Š\n");
 	WriteLog(NORMAL_LOG, L"EzTransPath : %s\n", lpEztPath);
 	WriteLog(NORMAL_LOG, L"ExecutePath : %s\n", lpExePath);
 	return;
@@ -28,7 +28,7 @@ void CheckLogSize()
 {
 	FILE *fp;
 
-	// ·Î±× »ç¿ë¾ÈÇÒ¶§ ²ô±â
+	// ë¡œê·¸ ì‚¬ìš©ì•ˆí• ë•Œ ë„ê¸°
 	if (!pConfig->GetFileLogSwitch()) return;
 
 	wchar_t lpFileName[MAX_PATH];
@@ -162,7 +162,7 @@ bool CreateLogWin(HINSTANCE hInst)
 		WriteLog(ERROR_LOG, L"CreateLogWin : Log Thread Create Error");
 	}
 
-	// ·Î±× À©µµ¿ì°¡ ÃÊ±âÈ­µÉ¶§±îÁö ±â´Ù¸²
+	// ë¡œê·¸ ìœˆë„ìš°ê°€ ì´ˆê¸°í™”ë ë•Œê¹Œì§€ ê¸°ë‹¤ë¦¼
 	WaitForSingleObject(hLogEvent, INFINITE);
 	return 0;
 }
@@ -194,7 +194,7 @@ DWORD WINAPI LogThreadMain(LPVOID lpParam)
 	cf.crBackColor = RGB(255, 255, 255);
 	cf.yHeight = 12 * 20;
 
-	wcscpy_s(cf.szFaceName, L"±¼¸²");
+	wcscpy_s(cf.szFaceName, L"êµ´ë¦¼");
 	cf.dwEffects = CFE_BOLD;
 	SendMessage(hLogRes, EM_SETCHARFORMAT, SCF_ALL, (LPARAM)&cf);
 	SendMessage(hLogRes, EM_REPLACESEL, TRUE, (LPARAM)L"");
@@ -204,7 +204,7 @@ DWORD WINAPI LogThreadMain(LPVOID lpParam)
 	MSG msg;
 	BOOL bRet;
 	
-	// ¾²·¹µå ÃÊ±âÈ­ ¿Ï·á
+	// ì“°ë ˆë“œ ì´ˆê¸°í™” ì™„ë£Œ
 	SetEvent(hLogEvent);
 
 	while ((bRet = GetMessage(&msg, NULL, 0, 0)) != 0)

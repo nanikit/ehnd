@@ -70,7 +70,7 @@ public:
 	const int GetDicLine(int idx) { return UserDic[idx].line; }
 	const wchar_t *GetDicJPN(int idx) { return UserDic[idx]._jpn; }
 	const wchar_t *GetDicKOR(int idx) { return UserDic[idx]._kor; }
-	const wchar_t *GetDicTYPE(int idx) { return (UserDic[idx]._type == USERDIC_NOUN ? L"Έν»η" : (UserDic[idx]._type == USERDIC_COMM ? L"»σΏλΎξ±Έ" : L"Unknown")); }
+	const wchar_t *GetDicTYPE(int idx) { return (UserDic[idx]._type == USERDIC_NOUN ? L"λª…μ‚¬" : (UserDic[idx]._type == USERDIC_COMM ? L"μƒμ©μ–΄κµ¬" : L"Unknown")); }
 	const wchar_t *GetDicATTR(int idx) { return UserDic[idx]._attr; }
 
 private:

@@ -1,4 +1,4 @@
-// ehnd.cpp : DLL ¿¿øÎ «¡∑Œ±◊∑•¿ª ¿ß«ÿ ≥ª∫∏≥Ω «‘ºˆ∏¶ ¡§¿««’¥œ¥Ÿ.
+// ehnd.cpp : DLL ÏùëÏö© ÌîÑÎ°úÍ∑∏Îû®ÏùÑ ÏúÑÌï¥ ÎÇ¥Î≥¥ÎÇ∏ Ìï®ÏàòÎ•º Ï†ïÏùòÌï©ÎãàÎã§.
 //
 
 #include "stdafx.h"
@@ -9,14 +9,14 @@ FARPROC apfnMsv[100];
 
 bool EhndInit(void)
 {
-	// ¡ﬂ∫π √ ±‚»≠ πÊ¡ˆ
+	// Ï§ëÎ≥µ Ï¥àÍ∏∞Ìôî Î∞©ÏßÄ
 	if (initOnce) return false;
 	else initOnce = true;
 
-	// º≥¡§ ∑ŒµÂ
+	// ÏÑ§Ï†ï Î°úÎìú
 	pConfig->LoadConfig();
 
-	// ±‚¡∏ ∑Œ±◊ ªË¡¶
+	// Í∏∞Ï°¥ Î°úÍ∑∏ ÏÇ≠Ï†ú
 	if (pConfig->GetFileLogStartupClear())
 	{
 		wchar_t lpFileName[MAX_PATH];
@@ -39,23 +39,23 @@ bool EhndInit(void)
 	if (!hook_userdict2()) return false;
 	if (!hook_getwordinfo()) return false;
 
-	WriteLog(NORMAL_LOG, L"HookUserDict : ªÁøÎ¿⁄ªÁ¿¸ æÀ∞Ì∏Æ¡Ú √÷¿˚»≠.\n");
+	WriteLog(NORMAL_LOG, L"HookUserDict : ÏÇ¨Ïö©ÏûêÏÇ¨Ï†Ñ ÏïåÍ≥†Î¶¨Ï¶ò ÏµúÏ†ÅÌôî.\n");
 
-	// ø£µÂ ¿”Ω√∆ƒ¿œ ªË¡¶
+	// ÏóîÎìú ÏûÑÏãúÌååÏùº ÏÇ≠Ï†ú
 	pFilter->ehnddic_cleanup();
 
 	pFilter->load();
 	return true;
 }
 
-// ¿Ã¡ˆ∆Æ∑£Ω∫ API
+// Ïù¥ÏßÄÌä∏ÎûúÏä§ API
 __declspec(naked) void J2K_Initialize(void)
 {
 	__asm JMP apfnEzt[4 * 0];
 }
 void __stdcall J2K_InitializeEx(int data0, LPSTR key)
 {
-	SetLogText(L"J2K_InitializeEx : ¿Ã¡ˆ∆Æ∑£Ω∫ √ ±‚»≠\n");
+	SetLogText(L"J2K_InitializeEx : Ïù¥ÏßÄÌä∏ÎûúÏä§ Ï¥àÍ∏∞Ìôî\n");
 
 	EhndInit();
 	__asm
@@ -156,15 +156,15 @@ void *__stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn)
 	wsOriginal = szIn;
 	wsText = szIn;
 
-	// ∑Œ±◊ ≈©±‚ √º≈©
+	// Î°úÍ∑∏ ÌÅ¨Í∏∞ Ï≤¥ÌÅ¨
 	CheckLogSize();
 
-	// ƒ‹º÷ ∂Û¿Œ √º≈©
+	// ÏΩòÏÜî ÎùºÏù∏ Ï≤¥ÌÅ¨
 	CheckConsoleLine();
 
 	if (wsText.length()) WriteLog(NORMAL_LOG, L"[REQUEST] %s\n\n", D(wsText));
 
-	// ≥—æÓø¬ πÆ¿⁄ø≠¿« ±Ê¿Ã∞° 0¿Ã∞≈≥™ ∏Ì∑…æÓ¿œ∂ß π¯ø™ «¡∑ŒººΩ∫ Ω∫≈µ
+	// ÎÑòÏñ¥Ïò® Î¨∏ÏûêÏó¥Ïùò Í∏∏Ïù¥Í∞Ä 0Ïù¥Í±∞ÎÇò Î™ÖÎ†πÏñ¥ÏùºÎïå Î≤àÏó≠ ÌîÑÎ°úÏÑ∏Ïä§ Ïä§ÌÇµ
 	if (wcslen(szIn) && !pFilter->cmd(wsText))
 	{
 		pFilter->pre(wsText);
@@ -180,7 +180,7 @@ void *__stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn)
 		}
 		_WideCharToMultiByte(932, 0, wsText.c_str(), -1, szJPN, i_len, NULL, NULL);
 
-		if (!pConfig->GetUserDicSwitch()) WriteLog(NORMAL_LOG, L"UserDic : ªÁøÎ¿⁄ ªÁ¿¸¿Ã ≤®¡Æ ¿÷Ω¿¥œ¥Ÿ.\n");
+		if (!pConfig->GetUserDicSwitch()) WriteLog(NORMAL_LOG, L"UserDic : ÏÇ¨Ïö©Ïûê ÏÇ¨Ï†ÑÏù¥ Í∫ºÏ†∏ ÏûàÏäµÎãàÎã§.\n");
 
 		dwStart = GetTickCount();
 
@@ -253,7 +253,7 @@ void *__stdcall J2K_TranslateMMNT(int data0, LPCSTR szIn)
 	
 	lpKOR = (LPWSTR)J2K_TranslateMMNTW(data0, wsText.c_str());
 
-	// cp949 ≥ª∫∏≥ª±‚ 
+	// cp949 ÎÇ¥Î≥¥ÎÇ¥Í∏∞ 
 	i_len = _WideCharToMultiByte(949, 0, lpKOR, -1, NULL, NULL, NULL, NULL);
 	szOut = (LPSTR)msvcrt_malloc((i_len + 1) * 3);
 	if (szOut == NULL)

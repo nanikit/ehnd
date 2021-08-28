@@ -70,15 +70,15 @@ bool filter::pre_load()
 
 	} while (FindNextFile(hFind, &FindFileData));
 
-	// Á¤·Ä
+	// ì •ë ¬
 	sort(Filter.begin(), Filter.end());
-	//WriteLog(NORMAL_LOG, L"PreFilterRead : ÇÊÅÍ Á¤·ÄÀ» ¿Ï·áÇß½À´Ï´Ù.\n");
+	//WriteLog(NORMAL_LOG, L"PreFilterRead : í•„í„° ì •ë ¬ì„ ì™„ë£Œí–ˆìŠµë‹ˆë‹¤.\n");
 
-	// ÇÊÅÍ ´ëÃ¼
+	// í•„í„° ëŒ€ì²´
 	PreFilter = Filter;
-	WriteLog(NORMAL_LOG, L"PreFilterRead : ÃÑ %d°³ÀÇ ÀüÃ³¸® ÇÊÅÍ¸¦ ÀĞ¾ú½À´Ï´Ù.\n", PreFilter.size());
+	WriteLog(NORMAL_LOG, L"PreFilterRead : ì´ %dê°œì˜ ì „ì²˜ë¦¬ í•„í„°ë¥¼ ì½ì—ˆìŠµë‹ˆë‹¤.\n", PreFilter.size());
 
-	// ¼Ò¿ä½Ã°£ °è»ê
+	// ì†Œìš”ì‹œê°„ ê³„ì‚°
 	dwEnd = GetTickCount();
 	WriteLog(TIME_LOG, L"PreFilterRead : --- Elasped Time : %dms ---\n", dwEnd - dwStart);
 	return true;
@@ -117,15 +117,15 @@ bool filter::post_load()
 
 	} while (FindNextFile(hFind, &FindFileData));
 
-	// Á¤·Ä
+	// ì •ë ¬
 	sort(Filter.begin(), Filter.end());
-	//WriteLog(NORMAL_LOG, L"PostFilterRead : ÇÊÅÍ Á¤·ÄÀ» ¿Ï·áÇß½À´Ï´Ù.\n");
+	//WriteLog(NORMAL_LOG, L"PostFilterRead : í•„í„° ì •ë ¬ì„ ì™„ë£Œí–ˆìŠµë‹ˆë‹¤.\n");
 
-	// ÇÊÅÍ ´ëÃ¼
+	// í•„í„° ëŒ€ì²´
 	PostFilter = Filter;
-	WriteLog(NORMAL_LOG, L"PostFilterRead : ÃÑ %d°³ÀÇ ÈÄÃ³¸® ÇÊÅÍ¸¦ ÀĞ¾ú½À´Ï´Ù.\n", PostFilter.size());
+	WriteLog(NORMAL_LOG, L"PostFilterRead : ì´ %dê°œì˜ í›„ì²˜ë¦¬ í•„í„°ë¥¼ ì½ì—ˆìŠµë‹ˆë‹¤.\n", PostFilter.size());
 
-	// ¼Ò¿ä½Ã°£ °è»ê
+	// ì†Œìš”ì‹œê°„ ê³„ì‚°
 	dwEnd = GetTickCount();
 	WriteLog(TIME_LOG, L"PostFilterRead : --- Elasped Time : %dms ---\n", dwEnd - dwStart);
 	return true;
@@ -164,15 +164,15 @@ bool filter::skiplayer_load()
 
 	} while (FindNextFile(hFind, &FindFileData));
 
-	// Á¤·Ä
+	// ì •ë ¬
 	sort(_SkipLayer.begin(), _SkipLayer.end());
-	//WriteLog(NORMAL_LOG, L"SkipLayerRead : ½ºÅµ·¹ÀÌ¾î Á¤·ÄÀ» ¿Ï·áÇß½À´Ï´Ù.\n");
+	//WriteLog(NORMAL_LOG, L"SkipLayerRead : ìŠ¤í‚µë ˆì´ì–´ ì •ë ¬ì„ ì™„ë£Œí–ˆìŠµë‹ˆë‹¤.\n");
 
-	// ½ºÅµ·¹ÀÌ¾î ´ëÃ¼
+	// ìŠ¤í‚µë ˆì´ì–´ ëŒ€ì²´
 	SkipLayer = _SkipLayer;
-	WriteLog(NORMAL_LOG, L"SkipLayerRead : ÃÑ %d°³ÀÇ ½ºÅµ·¹ÀÌ¾î¸¦ ÀĞ¾ú½À´Ï´Ù.\n", SkipLayer.size());
+	WriteLog(NORMAL_LOG, L"SkipLayerRead : ì´ %dê°œì˜ ìŠ¤í‚µë ˆì´ì–´ë¥¼ ì½ì—ˆìŠµë‹ˆë‹¤.\n", SkipLayer.size());
 
-	// ¼Ò¿ä½Ã°£ °è»ê
+	// ì†Œìš”ì‹œê°„ ê³„ì‚°
 	dwEnd = GetTickCount();
 	WriteLog(TIME_LOG, L"SkipLayerRead : --- Elasped Time : %dms ---\n", dwEnd - dwStart);
 	return true;
@@ -214,17 +214,17 @@ bool filter::userdic_load()
 
 	} while (FindNextFile(hFind, &FindFileData));
 
-	// Á¤·Ä
+	// ì •ë ¬
 	sort(UserDic.begin(), UserDic.end());
-	//WriteLog(NORMAL_LOG, L"UserDicRead : »ç¿ëÀÚ »çÀü Á¤·ÄÀ» ¿Ï·áÇß½À´Ï´Ù.\n");
+	//WriteLog(NORMAL_LOG, L"UserDicRead : ì‚¬ìš©ì ì‚¬ì „ ì •ë ¬ì„ ì™„ë£Œí–ˆìŠµë‹ˆë‹¤.\n");
 
-	WriteLog(NORMAL_LOG, L"UserDicRead : ÃÑ %d°³ÀÇ »ç¿ëÀÚ »çÀü ÆÄÀÏÀ» ÀĞ¾ú½À´Ï´Ù.\n", UserDic.size());
+	WriteLog(NORMAL_LOG, L"UserDicRead : ì´ %dê°œì˜ ì‚¬ìš©ì ì‚¬ì „ íŒŒì¼ì„ ì½ì—ˆìŠµë‹ˆë‹¤.\n", UserDic.size());
 
-	// ¼Ò¿ä½Ã°£ °è»ê
+	// ì†Œìš”ì‹œê°„ ê³„ì‚°
 	dwEnd = GetTickCount();
 	WriteLog(TIME_LOG, L"UserDicRead : --- Elasped Time : %dms ---\n", dwEnd - dwStart);
 
-	// ¿£µå ÀÓ½ÃÆÄÀÏ »ı¼º
+	// ì—”ë“œ ì„ì‹œíŒŒì¼ ìƒì„±
 	ehnddic_create();
 	return true;
 }
@@ -248,9 +248,9 @@ bool filter::jkdic_load(int &g_line)
 
 	if (_wfopen_s(&fp, Path.c_str(), L"rb") != 0)
 	{
-		WriteLog(NORMAL_LOG, L"JkDicLoad : DAT »ç¿ëÀÚ »çÀü ÆÄÀÏ \"UserDict.jk\"ÀÌ ¾ø½À´Ï´Ù.\n");
+		WriteLog(NORMAL_LOG, L"JkDicLoad : DAT ì‚¬ìš©ì ì‚¬ì „ íŒŒì¼ \"UserDict.jk\"ì´ ì—†ìŠµë‹ˆë‹¤.\n");
 
-		// userdict.jk ÆÄÀÏÀÌ ¾øÀ¸¸é ºó ÆÄÀÏ ¸¸µê
+		// userdict.jk íŒŒì¼ì´ ì—†ìœ¼ë©´ ë¹ˆ íŒŒì¼ ë§Œë“¦
 		if (_wfopen_s(&fp, Path.c_str(), L"wb") == 0) fclose(fp);
 		return false;
 	}
@@ -315,9 +315,9 @@ bool filter::jkdic_load(int &g_line)
 	}
 	fclose(fp);
 
-	WriteLog(NORMAL_LOG, L"JkDicRead : %d°³ÀÇ DAT »ç¿ëÀÚ »çÀü \"UserDict.jk\"¸¦ ÀĞ¾ú½À´Ï´Ù.\n", line-1);
+	WriteLog(NORMAL_LOG, L"JkDicRead : %dê°œì˜ DAT ì‚¬ìš©ì ì‚¬ì „ \"UserDict.jk\"ë¥¼ ì½ì—ˆìŠµë‹ˆë‹¤.\n", line-1);
 
-	// ¼Ò¿ä½Ã°£ °è»ê
+	// ì†Œìš”ì‹œê°„ ê³„ì‚°
 	dwEnd = GetTickCount();
 	WriteLog(TIME_LOG, L"JkDicRead : --- Elasped Time : %dms ---\n", dwEnd - dwStart);
 	return true;
@@ -360,7 +360,7 @@ bool filter::ehnddic_cleanup()
 
 	} while (FindNextFile(hFind, &FindFileData));
 
-	// ¼Ò¿ä½Ã°£ °è»ê
+	// ì†Œìš”ì‹œê°„ ê³„ì‚°
 	dwEnd = GetTickCount();
 	WriteLog(TIME_LOG, L"EhndDicCleanUp : --- Elasped Time : %dms ---\n", dwEnd - dwStart);
 
@@ -384,11 +384,11 @@ bool filter::ehnddic_create()
 	Path += L".ehnd";
 
 	if (_wfopen_s(&fp, Path.c_str(), L"wb") != 0)
-		WriteLog(NORMAL_LOG, L"EhndDicCreate : »ç¿ëÀÚ»çÀü ¹ÙÀÌ³Ê¸® \"UserDict_%s.ehnd\" ÆÄÀÏÀ» »ı¼ºÇÏ´Âµ¥ ½ÇÆĞÇß½À´Ï´Ù.\n", lpText);
+		WriteLog(NORMAL_LOG, L"EhndDicCreate : ì‚¬ìš©ìì‚¬ì „ ë°”ì´ë„ˆë¦¬ \"UserDict_%s.ehnd\" íŒŒì¼ì„ ìƒì„±í•˜ëŠ”ë° ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤.\n", lpText);
 
 	for (UINT i = 0; i < UserDic.size(); i++)
 	{
-		// °ø¹é Á¦°Å
+		// ê³µë°± ì œê±°
 		if (UserDic[i]._jpn == 0) continue;
 
 		memset(Jpn, 0, sizeof(Jpn));
@@ -397,7 +397,7 @@ bool filter::ehnddic_create()
 
 		int len;
 
-		// À¯´ÏÄÚµå -> 932/949
+		// ìœ ë‹ˆì½”ë“œ -> 932/949
 		len = _WideCharToMultiByte(932, 0, UserDic[i]._jpn, -1, NULL, NULL, NULL, NULL);
 		_WideCharToMultiByte(932, 0, UserDic[i]._jpn, -1, Jpn, len, NULL, NULL);
 		len = _WideCharToMultiByte(949, 0, UserDic[i]._kor, -1, NULL, NULL, NULL, NULL);
@@ -405,7 +405,7 @@ bool filter::ehnddic_create()
 		len = _WideCharToMultiByte(949, 0, UserDic[i]._attr, -1, NULL, NULL, NULL, NULL);
 		_WideCharToMultiByte(949, 0, UserDic[i]._attr, -1, Attr, len, NULL, NULL);
 
-		// ´Ü¾î Å¸ÀÔ
+		// ë‹¨ì–´ íƒ€ì…
 		if (UserDic[i]._type == USERDIC_COMM)
 			strcpy_s(Part, "A9D0");
 		else strcpy_s(Part, "I110");
@@ -416,15 +416,15 @@ bool filter::ehnddic_create()
 		fwrite(Part, sizeof(char), 5, fp);
 		fwrite(Attr, sizeof(char), 37, fp);
 
-		// UserDic_Log ±¸ÇöÀ» À§ÇØ NULL+attr ³¡ ³×ÀÚ¸®¸¦ È°¿ë
-		// ±âÁ¸ attr ¹è¿­Àº 42ÀÚ±îÁö Çã¿ëµÇ¾úÀ¸³ª ³¡ÀÚ¸®¸¦ »ç¿ëÇÏ´Â °ü°è·Î 36ÀÚ±îÁö¸¸ Çã¿ë (1ÀÚ´Â ¿©À¯)
+		// UserDic_Log êµ¬í˜„ì„ ìœ„í•´ NULL+attr ë ë„¤ìë¦¬ë¥¼ í™œìš©
+		// ê¸°ì¡´ attr ë°°ì—´ì€ 42ìê¹Œì§€ í—ˆìš©ë˜ì—ˆìœ¼ë‚˜ ëìë¦¬ë¥¼ ì‚¬ìš©í•˜ëŠ” ê´€ê³„ë¡œ 36ìê¹Œì§€ë§Œ í—ˆìš© (1ìëŠ” ì—¬ìœ )
 		fwrite(L"", sizeof(char), 1, fp);
 		fwrite(&i, sizeof(char), 4, fp);
 	}
-	WriteLog(NORMAL_LOG, L"EhndDicCreate : »ç¿ëÀÚ»çÀü ¹ÙÀÌ³Ê¸® \"UserDict_%s.ehnd\" »ı¼º.\n", lpText);
+	WriteLog(NORMAL_LOG, L"EhndDicCreate : ì‚¬ìš©ìì‚¬ì „ ë°”ì´ë„ˆë¦¬ \"UserDict_%s.ehnd\" ìƒì„±.\n", lpText);
 	fclose(fp);
 
-	// ¼Ò¿ä½Ã°£ °è»ê
+	// ì†Œìš”ì‹œê°„ ê³„ì‚°
 	dwEnd = GetTickCount();
 	WriteLog(TIME_LOG, L"EhndDicCreate : --- Elasped Time : %dms ---\n", dwEnd - dwStart);
 	return true;
@@ -442,10 +442,10 @@ bool filter::skiplayer_load2(vector<SKIPLAYERSTRUCT> &SkipLayer, LPCWSTR lpPath,
 
 	if (_wfopen_s(&fp, Path.c_str(), L"rt,ccs=UTF-8") != 0)
 	{
-		WriteLog(NORMAL_LOG, L"SkipLayerRead : ½ºÅµ·¹ÀÌ¾î %s ·Îµå ½ÇÆĞ.\n", D(lpFileName));
+		WriteLog(NORMAL_LOG, L"SkipLayerRead : ìŠ¤í‚µë ˆì´ì–´ %s ë¡œë“œ ì‹¤íŒ¨.\n", D(lpFileName));
 		return false;
 	}
-	//WriteLog(NORMAL_LOG, L"SkipLayerRead : ½ºÅµ·¹ÀÌ¾î %s ·Îµå.\n", lpFileName);
+	//WriteLog(NORMAL_LOG, L"SkipLayerRead : ìŠ¤í‚µë ˆì´ì–´ %s ë¡œë“œ.\n", lpFileName);
 	
 	for (int line = 0; fgetws(Buffer, 1000, fp) != NULL; line++, g_line++)
 	{
@@ -498,7 +498,7 @@ bool filter::skiplayer_load2(vector<SKIPLAYERSTRUCT> &SkipLayer, LPCWSTR lpPath,
 			int len = _MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
 			_MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
 
-			WriteLog(ERROR_LOG, L"SkipLayerRead : Á¤±Ô½Ä ¿À·ù! : [%s:%d] %s | %s | %s\n", L"SkipLayer.txt", line, D(ss.wtype), D(ss.wlayer), D(ss.cond));
+			WriteLog(ERROR_LOG, L"SkipLayerRead : ì •ê·œì‹ ì˜¤ë¥˜! : [%s:%d] %s | %s | %s\n", L"SkipLayer.txt", line, D(ss.wtype), D(ss.wlayer), D(ss.cond));
 
 			continue;
 		}
@@ -506,7 +506,7 @@ bool filter::skiplayer_load2(vector<SKIPLAYERSTRUCT> &SkipLayer, LPCWSTR lpPath,
 		SkipLayer.push_back(ss);
 	}
 	fclose(fp);
-	WriteLog(NORMAL_LOG, L"SkipLayerRead : %d°³ÀÇ ½ºÅµ·¹ÀÌ¾î %s¸¦ ÀĞ¾ú½À´Ï´Ù.\n", vaild_line, D(lpFileName));
+	WriteLog(NORMAL_LOG, L"SkipLayerRead : %dê°œì˜ ìŠ¤í‚µë ˆì´ì–´ %së¥¼ ì½ì—ˆìŠµë‹ˆë‹¤.\n", vaild_line, D(lpFileName));
 	return true;
 }
 
@@ -522,20 +522,20 @@ bool filter::filter_load(vector<FILTERSTRUCT> &Filter, LPCWSTR lpPath, LPCWSTR l
 
 	if (_wfopen_s(&fp, Path.c_str(), L"rt,ccs=UTF-8") != 0)
 	{
-		if (FilterType == PREFILTER) WriteLog(NORMAL_LOG, L"PreFilterRead : ÀüÃ³¸® ÇÊÅÍ '%s' ·Îµå ½ÇÆĞ!\n", D(lpFileName));
-		if (FilterType == POSTFILTER) WriteLog(NORMAL_LOG, L"PostFilterRead : ÈÄÃ³¸® ÇÊÅÍ '%s' ·Îµå ½ÇÆĞ!\n", D(lpFileName));
+		if (FilterType == PREFILTER) WriteLog(NORMAL_LOG, L"PreFilterRead : ì „ì²˜ë¦¬ í•„í„° '%s' ë¡œë“œ ì‹¤íŒ¨!\n", D(lpFileName));
+		if (FilterType == POSTFILTER) WriteLog(NORMAL_LOG, L"PostFilterRead : í›„ì²˜ë¦¬ í•„í„° '%s' ë¡œë“œ ì‹¤íŒ¨!\n", D(lpFileName));
 		return false;
 	}
 
 	/*
-	if (FilterType == PREFILTER && IsUnicode) WriteLog(NORMAL_LOG, L"PreFilterRead : ÀüÃ³¸® À¯´ÏÄÚµå Àü¿ë ÇÊÅÍ \"%s\" ·Îµå.\n", lpFileName);
-	if (FilterType == PREFILTER && !IsUnicode) WriteLog(NORMAL_LOG, L"PreFilterRead : ÀüÃ³¸® ÇÊÅÍ \"%s\" ·Îµå.\n", lpFileName);
-	else if (FilterType == POSTFILTER && IsUnicode) WriteLog(NORMAL_LOG, L"PostFilterRead : ÈÄÃ³¸® À¯´ÏÄÚµå Àü¿ë ÇÊÅÍ \"%s\" ·Îµå.\n", lpFileName);
-	else if (FilterType == POSTFILTER && !IsUnicode) WriteLog(NORMAL_LOG, L"PostFilterRead : ÈÄÃ³¸® ÇÊÅÍ \"%s\" ·Îµå.\n", lpFileName);
+	if (FilterType == PREFILTER && IsUnicode) WriteLog(NORMAL_LOG, L"PreFilterRead : ì „ì²˜ë¦¬ ìœ ë‹ˆì½”ë“œ ì „ìš© í•„í„° \"%s\" ë¡œë“œ.\n", lpFileName);
+	if (FilterType == PREFILTER && !IsUnicode) WriteLog(NORMAL_LOG, L"PreFilterRead : ì „ì²˜ë¦¬ í•„í„° \"%s\" ë¡œë“œ.\n", lpFileName);
+	else if (FilterType == POSTFILTER && IsUnicode) WriteLog(NORMAL_LOG, L"PostFilterRead : í›„ì²˜ë¦¬ ìœ ë‹ˆì½”ë“œ ì „ìš© í•„í„° \"%s\" ë¡œë“œ.\n", lpFileName);
+	else if (FilterType == POSTFILTER && !IsUnicode) WriteLog(NORMAL_LOG, L"PostFilterRead : í›„ì²˜ë¦¬ í•„í„° \"%s\" ë¡œë“œ.\n", lpFileName);
 	*/
 	for (int line = 0; fgetws(Buffer, 1000, fp) != NULL; line++, g_line++)
 	{
-		if (Buffer[0] == L'/' && Buffer[1] == L'/') continue;	// ÁÖ¼®
+		if (Buffer[0] == L'/' && Buffer[1] == L'/') continue;	// ì£¼ì„
 
 		FILTERSTRUCT fs;
 		fs.g_line = g_line;
@@ -593,8 +593,8 @@ bool filter::filter_load(vector<FILTERSTRUCT> &Filter, LPCWSTR lpPath, LPCWSTR l
 				int len = _MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
 				_MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
 
-				if (FilterType == 1) WriteLog(ERROR_LOG, L"PreFilterRead : Á¤±Ô½Ä ¿À·ù! : [%s:%d] %s | %s | %d | %d\n", D(lpFileName), line, D(fs.src), D(fs.dest), fs.layer, fs.regex);
-				else if (FilterType == 2) WriteLog(ERROR_LOG, L"PostFilterRead : Á¤±Ô½Ä ¿À·ù! : [%s:%d] %s | %s | %d | %d\n", D(lpFileName), line, D(fs.src), D(fs.dest), fs.layer, fs.regex);
+				if (FilterType == 1) WriteLog(ERROR_LOG, L"PreFilterRead : ì •ê·œì‹ ì˜¤ë¥˜! : [%s:%d] %s | %s | %d | %d\n", D(lpFileName), line, D(fs.src), D(fs.dest), fs.layer, fs.regex);
+				else if (FilterType == 2) WriteLog(ERROR_LOG, L"PostFilterRead : ì •ê·œì‹ ì˜¤ë¥˜! : [%s:%d] %s | %s | %d | %d\n", D(lpFileName), line, D(fs.src), D(fs.dest), fs.layer, fs.regex);
 				continue;
 			}
 		}
@@ -608,8 +608,8 @@ bool filter::filter_load(vector<FILTERSTRUCT> &Filter, LPCWSTR lpPath, LPCWSTR l
 	}
 	fclose(fp);
 
-	if (FilterType == PREFILTER) WriteLog(NORMAL_LOG, L"PreFilterRead : %d°³ÀÇ ÀüÃ³¸® ÇÊÅÍ \"%s\"¸¦ ÀĞ¾ú½À´Ï´Ù.\n", vaild_line, D(lpFileName));
-	else if (FilterType == POSTFILTER) WriteLog(NORMAL_LOG, L"PostFilterRead : %d°³ÀÇ ÈÄÃ³¸® ÇÊÅÍ \"%s\"¸¦ ÀĞ¾ú½À´Ï´Ù.\n", vaild_line, D(lpFileName));
+	if (FilterType == PREFILTER) WriteLog(NORMAL_LOG, L"PreFilterRead : %dê°œì˜ ì „ì²˜ë¦¬ í•„í„° \"%s\"ë¥¼ ì½ì—ˆìŠµë‹ˆë‹¤.\n", vaild_line, D(lpFileName));
+	else if (FilterType == POSTFILTER) WriteLog(NORMAL_LOG, L"PostFilterRead : %dê°œì˜ í›„ì²˜ë¦¬ í•„í„° \"%s\"ë¥¼ ì½ì—ˆìŠµë‹ˆë‹¤.\n", vaild_line, D(lpFileName));
 	return true;
 }
 
@@ -624,11 +624,11 @@ bool filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int &g_line)
 
 	if (_wfopen_s(&fp, Path.c_str(), L"rt,ccs=UTF-8") != 0)
 	{
-		WriteLog(NORMAL_LOG, L"UserDicRead : »ç¿ëÀÚ »çÀü '%s' ·Îµå ½ÇÆĞ!\n", D(lpFileName));
+		WriteLog(NORMAL_LOG, L"UserDicRead : ì‚¬ìš©ì ì‚¬ì „ '%s' ë¡œë“œ ì‹¤íŒ¨!\n", D(lpFileName));
 		return false;
 	}
 
-	//WriteLog(NORMAL_LOG, L"UserDicRead : »ç¿ëÀÚ »çÀü \"%s\" ·Îµå.\n", lpFileName);
+	//WriteLog(NORMAL_LOG, L"UserDicRead : ì‚¬ìš©ì ì‚¬ì „ \"%s\" ë¡œë“œ.\n", lpFileName);
 
 	count = 0;
 	for (int line = 1; fgetws(Buffer, 1000, fp) != NULL; line++)
@@ -681,25 +681,25 @@ bool filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int &g_line)
 		{
 			if ((len = _WideCharToMultiByte(932, 0, Jpn.c_str(), -1, NULL, NULL, NULL, NULL)) > 31)
 			{
-				WriteLog(NORMAL_LOG, L"UserDicRead : ¿À·ù : ¿ø¹® ´Ü¾îÀÇ ±æÀÌ´Â 15ÀÚ(30Byte)¸¦ ÃÊ°úÇÒ ¼ö ¾ø½À´Ï´Ù.\n");
-				WriteLog(NORMAL_LOG, L"UserDicRead : ¿À·ù : ´ÙÀ½ ´Ü¾î°¡ ¹«½ÃµË´Ï´Ù. (ÇöÀç: %dByte)\n", len);
-				WriteLog(NORMAL_LOG, L"UserDicRead : ¿À·ù : [%s:%d] : <<%s>> | %s | %x | %s\n", D(lpFileName), line, D(Jpn), D(Kor), us._type, D(Attr));
+				WriteLog(NORMAL_LOG, L"UserDicRead : ì˜¤ë¥˜ : ì›ë¬¸ ë‹¨ì–´ì˜ ê¸¸ì´ëŠ” 15ì(30Byte)ë¥¼ ì´ˆê³¼í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+				WriteLog(NORMAL_LOG, L"UserDicRead : ì˜¤ë¥˜ : ë‹¤ìŒ ë‹¨ì–´ê°€ ë¬´ì‹œë©ë‹ˆë‹¤. (í˜„ì¬: %dByte)\n", len);
+				WriteLog(NORMAL_LOG, L"UserDicRead : ì˜¤ë¥˜ : [%s:%d] : <<%s>> | %s | %x | %s\n", D(lpFileName), line, D(Jpn), D(Kor), us._type, D(Attr));
 				t = 0; break;
 			}
 			wcscpy_s(us._jpn, Jpn.c_str());
 			if ((len = _WideCharToMultiByte(949, 0, Kor.c_str(), -1, NULL, NULL, NULL, NULL)) > 31)
 			{
-				WriteLog(NORMAL_LOG, L"UserDicRead : ¿À·ù : ¿ª¹® ´Ü¾îÀÇ ±æÀÌ´Â 15ÀÚ(30Byte)¸¦ ÃÊ°úÇÒ ¼ö ¾ø½À´Ï´Ù.\n");
-				WriteLog(NORMAL_LOG, L"UserDicRead : ¿À·ù : ´ÙÀ½ ´Ü¾î°¡ ¹«½ÃµË´Ï´Ù. (ÇöÀç: %dByte)\n", len);
-				WriteLog(NORMAL_LOG, L"UserDicRead : ¿À·ù : [%s:%d] : %s | <<%s>> | %x | %s\n", D(lpFileName), line, D(Jpn), D(Kor), us._type, D(Attr));
+				WriteLog(NORMAL_LOG, L"UserDicRead : ì˜¤ë¥˜ : ì—­ë¬¸ ë‹¨ì–´ì˜ ê¸¸ì´ëŠ” 15ì(30Byte)ë¥¼ ì´ˆê³¼í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+				WriteLog(NORMAL_LOG, L"UserDicRead : ì˜¤ë¥˜ : ë‹¤ìŒ ë‹¨ì–´ê°€ ë¬´ì‹œë©ë‹ˆë‹¤. (í˜„ì¬: %dByte)\n", len);
+				WriteLog(NORMAL_LOG, L"UserDicRead : ì˜¤ë¥˜ : [%s:%d] : %s | <<%s>> | %x | %s\n", D(lpFileName), line, D(Jpn), D(Kor), us._type, D(Attr));
 				t = 0; break;
 			}
 			wcscpy_s(us._kor, Kor.c_str());
 			if ((len = _WideCharToMultiByte(949, 0, Attr.c_str(), -1, NULL, NULL, NULL, NULL)) > 37)
 			{
-				WriteLog(NORMAL_LOG, L"UserDicRead : ¿À·ù : ´Ü¾î ¼Ó¼ºÀº 36Byte¸¦ ÃÊ°úÇÒ ¼ö ¾ø½À´Ï´Ù.\n");
-				WriteLog(NORMAL_LOG, L"UserDicRead : ¿À·ù : ´ÙÀ½ ´Ü¾î°¡ ¹«½ÃµË´Ï´Ù. (ÇöÀç: %dByte)\n", len);
-				WriteLog(NORMAL_LOG, L"UserDicRead : ¿À·ù : [%s:%d] : %s | %s | %x | <<%s>>\n", D(lpFileName), line, D(Jpn), D(Kor), us._type, D(Attr));
+				WriteLog(NORMAL_LOG, L"UserDicRead : ì˜¤ë¥˜ : ë‹¨ì–´ ì†ì„±ì€ 36Byteë¥¼ ì´ˆê³¼í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+				WriteLog(NORMAL_LOG, L"UserDicRead : ì˜¤ë¥˜ : ë‹¤ìŒ ë‹¨ì–´ê°€ ë¬´ì‹œë©ë‹ˆë‹¤. (í˜„ì¬: %dByte)\n", len);
+				WriteLog(NORMAL_LOG, L"UserDicRead : ì˜¤ë¥˜ : [%s:%d] : %s | %s | %x | <<%s>>\n", D(lpFileName), line, D(Jpn), D(Kor), us._type, D(Attr));
 				t = 0; break;
 			}
 			wcscpy_s(us._attr, Attr.c_str());
@@ -711,13 +711,13 @@ bool filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int &g_line)
 			UserDic.push_back(us);
 		}
 	}
-	WriteLog(NORMAL_LOG, L"UserDicRead : %d°³ÀÇ »ç¿ëÀÚ »çÀü \"%s\"¸¦ ÀĞ¾ú½À´Ï´Ù.\n", count, D(lpFileName));
+	WriteLog(NORMAL_LOG, L"UserDicRead : %dê°œì˜ ì‚¬ìš©ì ì‚¬ì „ \"%s\"ë¥¼ ì½ì—ˆìŠµë‹ˆë‹¤.\n", count, D(lpFileName));
 	fclose(fp);
 	return true;
 }
 
-// anedic.txt È£È¯À» À§ÇÑ ÇÔ¼ö
-// ÇÊÅÍ°¡ º¯°æÀÌ µÇ¸é anedic.txt ÆÄÀÏÀ» Ã£¾Æ ÀĞ´Â´Ù
+// anedic.txt í˜¸í™˜ì„ ìœ„í•œ í•¨ìˆ˜
+// í•„í„°ê°€ ë³€ê²½ì´ ë˜ë©´ anedic.txt íŒŒì¼ì„ ì°¾ì•„ ì½ëŠ”ë‹¤
 bool filter::anedic_load(int &g_line)
 {
 	wstring Jpn, Kor, Attr;
@@ -771,7 +771,7 @@ bool filter::pre(wstring &wsText)
 {
 	if (!pConfig->GetPreSwitch())
 	{
-		WriteLog(NORMAL_LOG, L"PreFilter : ÀüÃ³¸®°¡ ²¨Á® ÀÖ½À´Ï´Ù.\n");
+		WriteLog(NORMAL_LOG, L"PreFilter : ì „ì²˜ë¦¬ê°€ êº¼ì ¸ ìˆìŠµë‹ˆë‹¤.\n");
 		return false;
 	}
 	return filter_proc(PreFilter, PREFILTER, wsText);
@@ -781,7 +781,7 @@ bool filter::post(wstring &wsText)
 {
 	if (!pConfig->GetPostSwitch())
 	{
-		WriteLog(NORMAL_LOG, L"PostFilter : ÈÄÃ³¸®°¡ ²¨Á® ÀÖ½À´Ï´Ù.\n");
+		WriteLog(NORMAL_LOG, L"PostFilter : í›„ì²˜ë¦¬ê°€ êº¼ì ¸ ìˆìŠµë‹ˆë‹¤.\n");
 		return false;
 	}
 	return filter_proc(PostFilter, POSTFILTER, wsText);
@@ -803,7 +803,7 @@ bool filter::filter_proc(vector<FILTERSTRUCT> &Filter, const int FilterType, wst
 
 	for (UINT i = 0; i < Filter.size(); i++)
 	{
-		// ÀúÀåµÈ Â÷¼ö¿Í ÇöÀç ÇÊÅÍÀÇ Â÷¼ö°¡ ´Ù¸¦ ¶§ Á¶°Ç½ÄÀ» µ¹·Á PASS ¿©ºÎ È®ÀÎ
+		// ì €ì¥ëœ ì°¨ìˆ˜ì™€ í˜„ì¬ í•„í„°ì˜ ì°¨ìˆ˜ê°€ ë‹¤ë¥¼ ë•Œ ì¡°ê±´ì‹ì„ ëŒë ¤ PASS ì—¬ë¶€ í™•ì¸
 		if (Filter[i].layer != layer_prev)
 		{
 			layer_prev = Filter[i].layer;
@@ -832,7 +832,7 @@ bool filter::filter_proc(vector<FILTERSTRUCT> &Filter, const int FilterType, wst
 						int len = _MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
 						_MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
 
-						WriteLog(ERROR_LOG, L"SkipLayerRead : Á¤±Ô½Ä ¿À·ù! : [%s:%d] %s | %d | %s\n", L"SkipLayer.txt", SkipLayer[i].line, D(SkipLayer[i].wtype), SkipLayer[i].layer, D(SkipLayer[i].cond));
+						WriteLog(ERROR_LOG, L"SkipLayerRead : ì •ê·œì‹ ì˜¤ë¥˜! : [%s:%d] %s | %d | %s\n", L"SkipLayer.txt", SkipLayer[i].line, D(SkipLayer[i].wtype), SkipLayer[i].layer, D(SkipLayer[i].cond));
 						continue;
 					}
 				}
@@ -881,8 +881,8 @@ bool filter::filter_proc(vector<FILTERSTRUCT> &Filter, const int FilterType, wst
 				int len = _MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
 				_MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
 
-				if (FilterType == PREFILTER) WriteLog(ERROR_LOG, L"PreFilter : Á¤±Ô½Ä ¿À·ù! : [%s:%d] %s | %s | %d | %d\n", D(Filter[i].db), Filter[i].line, D(Filter[i].src), D(Filter[i].dest), Filter[i].layer, Filter[i].regex);
-				else if (FilterType == POSTFILTER) WriteLog(ERROR_LOG, L"PostFilter : Á¤±Ô½Ä ¿À·ù! : [%s:%d] %s | %s | %d | %d\n", D(Filter[i].db), Filter[i].line, D(Filter[i].src), D(Filter[i].dest), Filter[i].layer, Filter[i].regex);
+				if (FilterType == PREFILTER) WriteLog(ERROR_LOG, L"PreFilter : ì •ê·œì‹ ì˜¤ë¥˜! : [%s:%d] %s | %s | %d | %d\n", D(Filter[i].db), Filter[i].line, D(Filter[i].src), D(Filter[i].dest), Filter[i].layer, Filter[i].regex);
+				else if (FilterType == POSTFILTER) WriteLog(ERROR_LOG, L"PostFilter : ì •ê·œì‹ ì˜¤ë¥˜! : [%s:%d] %s | %s | %d | %d\n", D(Filter[i].db), Filter[i].line, D(Filter[i].src), D(Filter[i].dest), Filter[i].layer, Filter[i].regex);
 				continue;
 			}
 

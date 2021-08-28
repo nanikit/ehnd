@@ -1,4 +1,4 @@
-// dllmain.cpp : DLL ÀÀ¿ë ÇÁ·Î±×·¥ÀÇ ÁøÀÔÁ¡À» Á¤ÀÇÇÕ´Ï´Ù.
+// dllmain.cpp : DLL ì‘ìš© í”„ë¡œê·¸ë¨ì˜ ì§„ì…ì ì„ ì •ì˜í•©ë‹ˆë‹¤.
 #include "stdafx.h"
 HINSTANCE g_hInst;
 filter *pFilter;

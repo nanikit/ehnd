@@ -3,7 +3,7 @@
 
 config::config()
 {
-	wcscpy_s(cfg_console_fontname, L"±¼¸²");
+	wcscpy_s(cfg_console_fontname, L"êµ´ë¦¼");
 }
 
 

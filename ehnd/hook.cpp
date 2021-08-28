@@ -544,7 +544,7 @@ __declspec(naked) void userdict_patch(void)
 	// [EBP + 0x04] + 0x6E * cnt + 0x01 = USERDICT_JPN
 	//
 
-	// UserDicÀÌ ÄÑÁ®ÀÖ´ÂÁö È®ÀÎ. ²¨Á®ÀÖÀ¸¸é Ã³¸®¸¦ ÇÏÁö ¾Ê´Â´Ù
+	// UserDicì´ ì¼œì ¸ìžˆëŠ”ì§€ í™•ì¸. êº¼ì ¸ìžˆìœ¼ë©´ ì²˜ë¦¬ë¥¼ í•˜ì§€ ì•ŠëŠ”ë‹¤
 	__asm
 	{
 		CALL userdict_check
@@ -552,7 +552,7 @@ __declspec(naked) void userdict_patch(void)
 		JE lFinish
 	}
 
-	// ÀÏÄ¡ÇÏ´Â ´Ü¾î°¡ ³ª¿À¸é ´Ü¾î µî·ÏÀ» ÇÏ°í ´Ù½Ã µ¹¾Æ¿È
+	// ì¼ì¹˜í•˜ëŠ” ë‹¨ì–´ê°€ ë‚˜ì˜¤ë©´ ë‹¨ì–´ ë“±ë¡ì„ í•˜ê³  ë‹¤ì‹œ ëŒì•„ì˜´
 	__asm
 	{
 		PUSH DWORD PTR SS : [EBP+0x08] // total count
@@ -565,9 +565,9 @@ __declspec(naked) void userdict_patch(void)
 		CMP EAX, DWORD PTR SS : [EBP+0x08]
 		JA lFinish
 
-		// word_string Ãâ·Â
-		// ESP+0x14¸¦ count¿ëÀ¸·Î »ç¿ë
-		// count´Â ÀÚµ¿À¸·Î ¿Ã¶ó°¡´Ï °Çµé ÇÊ¿ä°¡ ¾ø´Ù
+		// word_string ì¶œë ¥
+		// ESP+0x14ë¥¼ countìš©ìœ¼ë¡œ ì‚¬ìš©
+		// countëŠ” ìžë™ìœ¼ë¡œ ì˜¬ë¼ê°€ë‹ˆ ê±´ë“¤ í•„ìš”ê°€ ì—†ë‹¤
 		CMP DWORD PTR SS : [ESP+0x18], 0
 		JNZ lNext
 
@@ -666,7 +666,7 @@ int userdict_proc(char *word_str, char *base, int cur, int total)
 	int s = cur, e = total, m, min, max;
 	char *dic_str;
 
-	// Upper bound·Î ÃÖ´ë°ª »êÃâ
+	// Upper boundë¡œ ìµœëŒ€ê°’ ì‚°ì¶œ
 	while (e - s > 0)
 	{
 		m = (s + e) / 2;
@@ -678,7 +678,7 @@ int userdict_proc(char *word_str, char *base, int cur, int total)
 	}
 	max = s;
 
-	// Lower bound·Î ÃÖ¼Ò°ª »êÃâ
+	// Lower boundë¡œ ìµœì†Œê°’ ì‚°ì¶œ
 	s = cur, e = max;
 	while (e - s > 0)
 	{

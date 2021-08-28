@@ -141,32 +141,32 @@ MMRESULT watch::_NotifyProc(UINT m_nTimerID, UINT uiMsg, DWORD dwUser, DWORD dw1
 
 	if (c_prefilter == true)
 	{
-		WriteLog(NORMAL_LOG, L"PreFilter : ÀüÃ³¸® ÇÊÅÍ ÆÄÀÏ º¯°æ»çÇ× °¨Áö.\n");
+		WriteLog(NORMAL_LOG, L"PreFilter : ì „ì²˜ë¦¬ í•„í„° íŒŒì¼ ë³€ê²½ì‚¬í•­ ê°ì§€.\n");
 		pFilter->pre_load();
 	}
 
 	if (c_postfilter == true)
 	{
-		WriteLog(NORMAL_LOG, L"PostFilter : ÈÄÃ³¸® ÇÊÅÍ ÆÄÀÏ º¯°æ»çÇ× °¨Áö.\n");
+		WriteLog(NORMAL_LOG, L"PostFilter : í›„ì²˜ë¦¬ í•„í„° íŒŒì¼ ë³€ê²½ì‚¬í•­ ê°ì§€.\n");
 		pFilter->post_load();
 	}
 
 
 	if (c_skiplayer == true)
 	{
-		WriteLog(NORMAL_LOG, L"SkipLayer : ½ºÅµ ·¹ÀÌ¾î ÆÄÀÏ º¯°æ»çÇ× °¨Áö.\n");
+		WriteLog(NORMAL_LOG, L"SkipLayer : ìŠ¤í‚µ ë ˆì´ì–´ íŒŒì¼ ë³€ê²½ì‚¬í•­ ê°ì§€.\n");
 		pFilter->skiplayer_load();
 	}
 
 	if (c_userdic == true)
 	{
-		WriteLog(NORMAL_LOG, L"UserDic : »ç¿ëÀÚ »çÀü ÆÄÀÏ º¯°æ»çÇ× °¨Áö.\n");
+		WriteLog(NORMAL_LOG, L"UserDic : ì‚¬ìš©ìž ì‚¬ì „ íŒŒì¼ ë³€ê²½ì‚¬í•­ ê°ì§€.\n");
 		J2K_ReloadUserDict();
 	}
 
 	if (c_config == true)
 	{
-		WriteLog(NORMAL_LOG, L"Config : ¼³Á¤ÆÄÀÏ º¯°æ»çÇ× °¨Áö.\n");
+		WriteLog(NORMAL_LOG, L"Config : ì„¤ì •íŒŒì¼ ë³€ê²½ì‚¬í•­ ê°ì§€.\n");
 		pConfig->LoadConfig();
 	}
 
