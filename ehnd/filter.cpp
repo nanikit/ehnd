@@ -1,6 +1,25 @@
 #include "stdafx.h"
 #include "filter.h"
 
+int operator <(USERDICSTRUCT& left, USERDICSTRUCT& right) {
+	char buffer1[62], buffer2[62];
+	int result = _WideCharToMultiByte(932, 0, left._jpn, -1, buffer1, sizeof(buffer1), nullptr, nullptr);
+	if (!result)
+	{
+		return 0;
+	}
+
+	result = _WideCharToMultiByte(932, 0, right._jpn, -1, buffer2, sizeof(buffer2), nullptr, nullptr);
+	if (!result)
+	{
+		return 0;
+	}
+
+  return strcmp(buffer1, buffer2) > 0
+		|| ((strcmp(buffer1, buffer2) == 0) && left._type < right._type)
+		|| ((strcmp(buffer1, buffer2) == 0) && (left._type == right._type) && (left.g_line < right.g_line));
+}
+
 filter::filter()
 {
 	hLoadEvent = CreateEvent(NULL, TRUE, TRUE, NULL);

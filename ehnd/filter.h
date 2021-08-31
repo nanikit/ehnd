@@ -1,4 +1,5 @@
 #pragma once
+
 struct FILTERSTRUCT
 {
 	int g_line;
@@ -12,6 +13,7 @@ struct FILTERSTRUCT
 	int _ecount;
 	double _etime;
 };
+
 struct USERDICSTRUCT
 {
 	int g_line;
@@ -21,19 +23,9 @@ struct USERDICSTRUCT
 	wchar_t _kor[31];
 	wchar_t _attr[37];
 	wchar_t _db[260];
-
-	int operator<(USERDICSTRUCT uds) {
-		char s1[31], s2[31];
-		int len;
-		len = _WideCharToMultiByte(932, 0, _jpn, -1, NULL, NULL, NULL, NULL);
-		_WideCharToMultiByte(932, 0, _jpn, -1, s1, len, NULL, NULL);
-		s1[len] = 0;
-		len = _WideCharToMultiByte(932, 0, uds._jpn, -1, NULL, NULL, NULL, NULL);
-		_WideCharToMultiByte(932, 0, uds._jpn, -1, s2, len, NULL, NULL);
-		s2[len] = 0;
-
-		return ((strcmp(s1, s2) > 0) || ((strcmp(s1, s2) == 0) && _type < uds._type) || ((strcmp(s1, s2) == 0) && (_type == uds._type) && (g_line < uds.g_line))); }
 };
+int operator <(USERDICSTRUCT& left, USERDICSTRUCT& right);
+
 struct SKIPLAYERSTRUCT
 {
 	wstring wtype;
