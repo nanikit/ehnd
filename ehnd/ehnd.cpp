@@ -65,10 +65,12 @@ void __stdcall J2K_InitializeEx(int data0, LPSTR key)
 		CALL apfnEzt[4 * 1]
 	}
 }
-__declspec(naked) void J2K_FreeMem(void)
+
+void J2K_FreeMem(void* buffer)
 {
-	__asm JMP apfnEzt[4 * 2];
+	CoTaskMemFree(buffer);
 }
+
 __declspec(naked) void J2K_GetPriorDict(void)
 {
 	__asm JMP apfnEzt[4 * 3];
@@ -222,14 +224,14 @@ void *__stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn)
 		WriteLog(NORMAL_LOG, L"[COMMAND] %s\n\n", D(wsText));
 	}
 
-	szOut = (LPWSTR)msvcrt_malloc((wsText.length() + 1) * 2);
+	szOut = static_cast<LPWSTR>(CoTaskMemAlloc((wsText.length() + 1) * 2));
 	if (szOut == NULL)
 	{
 		WriteLog(ERROR_LOG, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
 		return 0;
 	}
-	wcscpy_s(szOut, (wsText.length() + 1) * 2, wsText.c_str());
-	return (void *)szOut;
+	wcscpy_s(szOut, wsText.length() + 1, wsText.c_str());
+	return szOut;
 }
 
 void *__stdcall J2K_TranslateMMNT(int data0, LPCSTR szIn)
@@ -255,7 +257,7 @@ void *__stdcall J2K_TranslateMMNT(int data0, LPCSTR szIn)
 
 	// cp949 내보내기 
 	i_len = _WideCharToMultiByte(949, 0, lpKOR, -1, NULL, NULL, NULL, NULL);
-	szOut = (LPSTR)msvcrt_malloc((i_len + 1) * 3);
+	szOut = static_cast<LPSTR>(CoTaskMemAlloc((i_len + 1) * 3));
 	if (szOut == NULL)
 	{
 		WriteLog(ERROR_LOG, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
@@ -264,7 +266,7 @@ void *__stdcall J2K_TranslateMMNT(int data0, LPCSTR szIn)
 	_WideCharToMultiByte(949, 0, lpKOR, -1, szOut, i_len, NULL, NULL);
 	msvcrt_free(lpKOR);
 
-	return (void *)szOut;
+	return szOut;
 }
 __declspec(naked) void J2K_GetJ2KMainDir(void)
 {
