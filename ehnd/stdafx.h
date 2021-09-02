@@ -8,8 +8,9 @@
 typedef struct IUnknown IUnknown;
 #include "targetver.h"
 
-// Additional windows headers
 #include <Windows.h>
+
+// Additional windows headers
 #include <Psapi.h>
 #include <Richedit.h>
 #include <tchar.h>
@@ -42,17 +43,17 @@ using namespace chrono;
 #define USERDIC_NOUN 2
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
+#include "config.h"
 #include "ehnd.h"
+#include "filter.h"
 #include "hook.h"
 #include "log.h"
-#include "filter.h"
 #include "watch.h"
-#include "config.h"
 
 extern HINSTANCE g_hInst;
-extern filter *pFilter;
-extern watch *pWatch;
-extern config *pConfig;
+extern filter* pFilter;
+extern watch* pWatch;
+extern config* pConfig;
 extern int g_initTick;
 extern char g_DicPath[MAX_PATH];
 extern BOOL g_bAnemone;

@@ -1,7 +1,7 @@
 #pragma once
 #include <Richedit.h>
 
-void WriteLog(int LogType, const wchar_t *format, ...);
+void WriteLog(int LogType, const wchar_t* format, ...);
 void WriteTextLog(const wchar_t* format, ...);
 
 void LogStartMsg();
