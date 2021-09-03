@@ -87,7 +87,9 @@ void WriteLog(int LogType, const wchar_t* format, ...) {
 
   _vsnwprintf_s(lpBuffer, _TRUNCATE, format, valist);
 
-  if (wcslen(lpBuffer) > 1000) wcscpy_s(lpBuffer + 1000, 1024, L"...\r\n");
+  if (wcslen(lpBuffer) > 1000) {
+    wcscpy_s(lpBuffer + 1000, 24, L"...\r\n");
+  }
 
   std::wstring t = lpBuffer;
   t = replace_all(t, L"%%", L"%");
