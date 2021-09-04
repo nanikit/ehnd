@@ -150,13 +150,13 @@ void* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
 
     WriteLog(NORMAL_LOG, L"[PRE] %s\n\n", D(wsText));
 
-    i_len = _WideCharToMultiByte(932, 0, wsText.c_str(), -1, NULL, NULL, NULL, NULL);
+    i_len = WideCharToMultiByteWithAral(932, 0, wsText.c_str(), -1, NULL, NULL, NULL, NULL);
     szJPN = (LPSTR)msvcrt_malloc((i_len + 1) * 3);
     if (szJPN == NULL) {
       WriteLog(ERROR_LOG, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
       return 0;
     }
-    _WideCharToMultiByte(932, 0, wsText.c_str(), -1, szJPN, i_len, NULL, NULL);
+    WideCharToMultiByteWithAral(932, 0, wsText.c_str(), -1, szJPN, i_len, NULL, NULL);
 
     if (!pConfig->GetUserDicSwitch())
       WriteLog(NORMAL_LOG, L"UserDic : 사용자 사전이 꺼져 있습니다.\n");
@@ -176,13 +176,13 @@ void* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
 
     msvcrt_free(szJPN);
 
-    i_len = _MultiByteToWideChar(949, MB_PRECOMPOSED, szKOR, -1, NULL, NULL);
+    i_len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, szKOR, -1, NULL, NULL);
     lpKOR = (LPWSTR)msvcrt_malloc((i_len + 1) * 3);
     if (lpKOR == NULL) {
       WriteLog(ERROR_LOG, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
       return 0;
     }
-    _MultiByteToWideChar(949, 0, szKOR, -1, lpKOR, i_len);
+    MultiByteToWideCharWithAral(949, 0, szKOR, -1, lpKOR, i_len);
 
     wsText = lpKOR;
     msvcrt_free(szKOR);
@@ -213,26 +213,26 @@ void* __stdcall J2K_TranslateMMNT(int data0, LPCSTR szIn) {
   LPWSTR lpJPN, lpKOR;
 
   lpJPN = 0;
-  i_len = _MultiByteToWideChar(932, MB_PRECOMPOSED, szIn, -1, NULL, NULL);
+  i_len = MultiByteToWideCharWithAral(932, MB_PRECOMPOSED, szIn, -1, NULL, NULL);
   lpJPN = (LPWSTR)msvcrt_malloc((i_len + 1) * 3);
   if (lpJPN == NULL) {
     WriteLog(ERROR_LOG, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
     return 0;
   }
-  _MultiByteToWideChar(932, 0, szIn, -1, lpJPN, i_len);
+  MultiByteToWideCharWithAral(932, 0, szIn, -1, lpJPN, i_len);
   wsText = lpJPN;
   msvcrt_free(lpJPN);
 
   lpKOR = (LPWSTR)J2K_TranslateMMNTW(data0, wsText.c_str());
 
   // cp949 내보내기
-  i_len = _WideCharToMultiByte(949, 0, lpKOR, -1, NULL, NULL, NULL, NULL);
+  i_len = WideCharToMultiByteWithAral(949, 0, lpKOR, -1, NULL, NULL, NULL, NULL);
   szOut = static_cast<LPSTR>(CoTaskMemAlloc((i_len + 1) * 3));
   if (szOut == NULL) {
     WriteLog(ERROR_LOG, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
     return 0;
   }
-  _WideCharToMultiByte(949, 0, lpKOR, -1, szOut, i_len, NULL, NULL);
+  WideCharToMultiByteWithAral(949, 0, lpKOR, -1, szOut, i_len, NULL, NULL);
   msvcrt_free(lpKOR);
 
   return szOut;

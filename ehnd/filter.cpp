@@ -4,12 +4,13 @@
 int operator<(USERDICSTRUCT& left, USERDICSTRUCT& right) {
   char buffer1[62], buffer2[62];
   int result =
-    _WideCharToMultiByte(932, 0, left._jpn, -1, buffer1, sizeof(buffer1), nullptr, nullptr);
+    WideCharToMultiByteWithAral(932, 0, left._jpn, -1, buffer1, sizeof(buffer1), nullptr, nullptr);
   if (!result) {
     return 0;
   }
 
-  result = _WideCharToMultiByte(932, 0, right._jpn, -1, buffer2, sizeof(buffer2), nullptr, nullptr);
+  result =
+    WideCharToMultiByteWithAral(932, 0, right._jpn, -1, buffer2, sizeof(buffer2), nullptr, nullptr);
   if (!result) {
     return 0;
   }
@@ -303,16 +304,16 @@ bool filter::jkdic_load(int& g_line) {
     if (!fread(Buffer, sizeof(char), 5, fp)) break;
 
     int len;
-    len = _MultiByteToWideChar(932, MB_PRECOMPOSED, Jpn, -1, NULL, NULL);
-    _MultiByteToWideChar(932, 0, Jpn, -1, lpBuffer, len);
+    len = MultiByteToWideCharWithAral(932, MB_PRECOMPOSED, Jpn, -1, NULL, NULL);
+    MultiByteToWideCharWithAral(932, 0, Jpn, -1, lpBuffer, len);
     wcsncpy_s(us._jpn, lpBuffer, len);
 
-    len = _MultiByteToWideChar(949, MB_PRECOMPOSED, Kor, -1, NULL, NULL);
-    _MultiByteToWideChar(949, 0, Kor, -1, lpBuffer, len);
+    len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, Kor, -1, NULL, NULL);
+    MultiByteToWideCharWithAral(949, 0, Kor, -1, lpBuffer, len);
     wcsncpy_s(us._kor, lpBuffer, len);
 
-    len = _MultiByteToWideChar(949, MB_PRECOMPOSED, Attr, -1, NULL, NULL);
-    _MultiByteToWideChar(949, 0, Attr, -1, lpBuffer, len);
+    len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, Attr, -1, NULL, NULL);
+    MultiByteToWideCharWithAral(949, 0, Attr, -1, lpBuffer, len);
     wcsncpy_s(us._attr, lpBuffer, len);
 
     wcscpy_s(us._db, L"UserDict.jk");
@@ -411,12 +412,12 @@ bool filter::ehnddic_create() {
     int len;
 
     // 유니코드 -> 932/949
-    len = _WideCharToMultiByte(932, 0, UserDic[i]._jpn, -1, NULL, NULL, NULL, NULL);
-    _WideCharToMultiByte(932, 0, UserDic[i]._jpn, -1, Jpn, len, NULL, NULL);
-    len = _WideCharToMultiByte(949, 0, UserDic[i]._kor, -1, NULL, NULL, NULL, NULL);
-    _WideCharToMultiByte(949, 0, UserDic[i]._kor, -1, Kor, len, NULL, NULL);
-    len = _WideCharToMultiByte(949, 0, UserDic[i]._attr, -1, NULL, NULL, NULL, NULL);
-    _WideCharToMultiByte(949, 0, UserDic[i]._attr, -1, Attr, len, NULL, NULL);
+    len = WideCharToMultiByteWithAral(932, 0, UserDic[i]._jpn, -1, NULL, NULL, NULL, NULL);
+    WideCharToMultiByteWithAral(932, 0, UserDic[i]._jpn, -1, Jpn, len, NULL, NULL);
+    len = WideCharToMultiByteWithAral(949, 0, UserDic[i]._kor, -1, NULL, NULL, NULL, NULL);
+    WideCharToMultiByteWithAral(949, 0, UserDic[i]._kor, -1, Kor, len, NULL, NULL);
+    len = WideCharToMultiByteWithAral(949, 0, UserDic[i]._attr, -1, NULL, NULL, NULL, NULL);
+    WideCharToMultiByteWithAral(949, 0, UserDic[i]._attr, -1, Attr, len, NULL, NULL);
 
     // 단어 타입
     if (UserDic[i]._type == USERDIC_COMM)
@@ -505,8 +506,8 @@ bool filter::skiplayer_load2(vector<SKIPLAYERSTRUCT>& SkipLayer, LPCWSTR lpPath,
       wregex ex(ss.cond);
     } catch (regex_error ex) {
       WCHAR lpWhat[255];
-      int len = _MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
-      _MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
+      int len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
+      MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
 
       WriteLog(ERROR_LOG, L"SkipLayerRead : 정규식 오류! : [%s:%d] %s | %s | %s\n",
                L"SkipLayer.txt", line, D(ss.wtype), D(ss.wlayer), D(ss.cond));
@@ -598,8 +599,8 @@ bool filter::filter_load(vector<FILTERSTRUCT>& Filter, LPCWSTR lpPath, LPCWSTR l
         wregex ex(fs.src);
       } catch (regex_error ex) {
         WCHAR lpWhat[255];
-        int len = _MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
-        _MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
+        int len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
+        MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
 
         if (FilterType == 1)
           WriteLog(ERROR_LOG, L"PreFilterRead : 정규식 오류! : [%s:%d] %s | %s | %d | %d\n",
@@ -689,7 +690,8 @@ bool filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int& g_line) {
     }
 
     if (t > 1) {
-      if ((len = _WideCharToMultiByte(932, 0, Jpn.c_str(), -1, NULL, NULL, NULL, NULL)) > 31) {
+      if ((len = WideCharToMultiByteWithAral(932, 0, Jpn.c_str(), -1, NULL, NULL, NULL, NULL)) >
+          31) {
         WriteLog(NORMAL_LOG,
                  L"UserDicRead : 오류 : 원문 단어의 길이는 15자(30Byte)를 초과할 수 없습니다.\n");
         WriteLog(NORMAL_LOG, L"UserDicRead : 오류 : 다음 단어가 무시됩니다. (현재: %dByte)\n", len);
@@ -699,7 +701,8 @@ bool filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int& g_line) {
         break;
       }
       wcscpy_s(us._jpn, Jpn.c_str());
-      if ((len = _WideCharToMultiByte(949, 0, Kor.c_str(), -1, NULL, NULL, NULL, NULL)) > 31) {
+      if ((len = WideCharToMultiByteWithAral(949, 0, Kor.c_str(), -1, NULL, NULL, NULL, NULL)) >
+          31) {
         WriteLog(NORMAL_LOG,
                  L"UserDicRead : 오류 : 역문 단어의 길이는 15자(30Byte)를 초과할 수 없습니다.\n");
         WriteLog(NORMAL_LOG, L"UserDicRead : 오류 : 다음 단어가 무시됩니다. (현재: %dByte)\n", len);
@@ -709,7 +712,8 @@ bool filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int& g_line) {
         break;
       }
       wcscpy_s(us._kor, Kor.c_str());
-      if ((len = _WideCharToMultiByte(949, 0, Attr.c_str(), -1, NULL, NULL, NULL, NULL)) > 37) {
+      if ((len = WideCharToMultiByteWithAral(949, 0, Attr.c_str(), -1, NULL, NULL, NULL, NULL)) >
+          37) {
         WriteLog(NORMAL_LOG, L"UserDicRead : 오류 : 단어 속성은 36Byte를 초과할 수 없습니다.\n");
         WriteLog(NORMAL_LOG, L"UserDicRead : 오류 : 다음 단어가 무시됩니다. (현재: %dByte)\n", len);
         WriteLog(NORMAL_LOG, L"UserDicRead : 오류 : [%s:%d] : %s | %s | %x | <<%s>>\n",
@@ -821,8 +825,8 @@ bool filter::filter_proc(vector<FILTERSTRUCT>& Filter, const int FilterType, wst
             }
           } catch (regex_error ex) {
             WCHAR lpWhat[255];
-            int len = _MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
-            _MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
+            int len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
+            MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
 
             WriteLog(ERROR_LOG, L"SkipLayerRead : 정규식 오류! : [%s:%d] %s | %d | %s\n",
                      L"SkipLayer.txt", SkipLayer[i].line, D(SkipLayer[i].wtype), SkipLayer[i].layer,
@@ -868,8 +872,8 @@ bool filter::filter_proc(vector<FILTERSTRUCT>& Filter, const int FilterType, wst
         Filter[i]._etime += duration_cast<doubleMilli>(end - start).count();
       } catch (regex_error ex) {
         WCHAR lpWhat[255];
-        int len = _MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
-        _MultiByteToWideChar(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
+        int len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
+        MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
 
         if (FilterType == PREFILTER)
           WriteLog(ERROR_LOG, L"PreFilter : 정규식 오류! : [%s:%d] %s | %s | %d | %d\n",
