@@ -1,5 +1,6 @@
-#include "filter.h"
 #include "stdafx.h"
+
+#include "globals.h"
 
 using namespace std;
 using namespace chrono;

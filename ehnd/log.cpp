@@ -1,5 +1,6 @@
-#include "log.h"
 #include "stdafx.h"
+
+#include "globals.h"
 
 HWND hLogWin, hLogRes;
 HANDLE hLogEvent;

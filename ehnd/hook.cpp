@@ -1,6 +1,6 @@
-#include "hook.h"
-#include "ehnd.h"
 #include "stdafx.h"
+
+#include "globals.h"
 
 LPBYTE lpfnRetn, lpfnfopen;
 LPBYTE lpfnwc2mb, lpfnmb2wc;

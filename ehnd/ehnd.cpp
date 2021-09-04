@@ -1,13 +1,12 @@
-// ehnd.cpp : DLL 응용 프로그램을 위해 내보낸 함수를 정의합니다.
-//
-
-#include "ehnd.h"
 #include "stdafx.h"
+
+#include "globals.h"
 
 using namespace std;
 
 FARPROC apfnEzt[100];
 FARPROC apfnMsv[100];
+bool initOnce = false;
 
 bool EhndInit(void) {
   // 중복 초기화 방지

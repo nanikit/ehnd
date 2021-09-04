@@ -1,5 +1,6 @@
-#include "watch.h"
 #include "stdafx.h"
+
+#include "globals.h"
 
 watch* watch::m_pThis = NULL;
 std::vector<std::wstring> fileList;

@@ -6,6 +6,10 @@
 // 이 DLL은 해당 매크로로 정의된 기호가 내보내지는 것으로 봅니다.
 
 #pragma once
+#include <tchar.h>
+#include <winnt.h>
+
+#include <string>
 
 constexpr auto EHND_VER = _T("V3.20");
 
@@ -38,11 +42,12 @@ EHND_EXPORT void* msvcrt_malloc(size_t _Size);
 EHND_EXPORT void* msvcrt_fopen(char* path, char* mode);
 };
 
-extern FARPROC apfnEzt[100];
-extern FARPROC apfnMsv[100];
 bool EhndInit();
 bool GetLoadPath(LPWSTR Path, int Size);
 bool GetExecutePath(LPWSTR Path, int Size);
 std::wstring replace_all(const std::wstring& str, const std::wstring& pattern,
                          const std::wstring& replace);
 std::wstring deformatted_string(const std::wstring& str);
+
+extern FARPROC apfnEzt[100];
+extern FARPROC apfnMsv[100];
