@@ -6,6 +6,9 @@
 // 이 DLL은 해당 매크로로 정의된 기호가 내보내지는 것으로 봅니다.
 
 #pragma once
+
+constexpr auto EHND_VER = _T("V3.20");
+
 #define EHND_EXPORT __declspec(dllexport)
 
 extern "C" {
@@ -40,5 +43,6 @@ extern FARPROC apfnMsv[100];
 bool EhndInit();
 bool GetLoadPath(LPWSTR Path, int Size);
 bool GetExecutePath(LPWSTR Path, int Size);
-wstring replace_all(const wstring& str, const wstring& pattern, const wstring& replace);
-wstring deformatted_string(const wstring& str);
+std::wstring replace_all(const std::wstring& str, const std::wstring& pattern,
+                         const std::wstring& replace);
+std::wstring deformatted_string(const std::wstring& str);

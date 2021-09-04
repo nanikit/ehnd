@@ -1,7 +1,6 @@
 ﻿// stdafx.h : 자주 사용하지만 자주 변경되지는 않는
 // 표준 시스템 포함 파일 및 프로젝트 관련 포함 파일이
 // 들어 있는 포함 파일입니다.
-//
 
 #pragma once
 
@@ -15,8 +14,6 @@ typedef struct IUnknown IUnknown;
 #include <Richedit.h>
 #include <tchar.h>
 
-constexpr auto EHND_VER = _T("V3.20");
-
 // C++ standard libraries
 #include <algorithm>
 #include <array>
@@ -26,21 +23,6 @@ constexpr auto EHND_VER = _T("V3.20");
 #include <cstdlib>
 #include <iostream>
 #include <vector>
-using namespace std;
-using namespace boost;
-using namespace chrono;
-#define PREFILTER 1
-#define POSTFILTER 2
-
-#define NORMAL_LOG 0
-#define ERROR_LOG 10
-#define DETAIL_LOG 20
-#define TIME_LOG 30
-#define SKIPLAYER_LOG 40
-#define USERDIC_LOG 50
-
-#define USERDIC_COMM 1
-#define USERDIC_NOUN 2
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
 #include "config.h"

@@ -4,6 +4,8 @@
 #include "ehnd.h"
 #include "stdafx.h"
 
+using namespace std;
+
 FARPROC apfnEzt[100];
 FARPROC apfnMsv[100];
 

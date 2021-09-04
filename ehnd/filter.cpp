@@ -1,6 +1,10 @@
 #include "filter.h"
 #include "stdafx.h"
 
+using namespace std;
+using namespace chrono;
+using namespace boost;
+
 int operator<(USERDICSTRUCT& left, USERDICSTRUCT& right) {
   char buffer1[62], buffer2[62];
   int result =

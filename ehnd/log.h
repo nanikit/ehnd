@@ -1,5 +1,12 @@
 #pragma once
-#include <Richedit.h>
+#include <winnt.h>
+
+#define NORMAL_LOG 0
+#define ERROR_LOG 10
+#define DETAIL_LOG 20
+#define TIME_LOG 30
+#define SKIPLAYER_LOG 40
+#define USERDIC_LOG 50
 
 void WriteLog(int LogType, const wchar_t* format, ...);
 void WriteTextLog(const wchar_t* format, ...);
