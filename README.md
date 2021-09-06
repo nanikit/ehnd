@@ -12,7 +12,8 @@ Boost 라이브러리를 링크하기 위해 [vcpkg](https://vcpkg.io/) 사용�
 
 ```
 git clone https://github.com/Microsoft/vcpkg.git
-.\vcpkg\bootstrap-vcpkg.bat
-vcpkg install boost-regex
-vcpkg integrate install
+cd vcpkg
+.\bootstrap-vcpkg.bat
+.\vcpkg install boost-regex:x86-windows-static
+.\vcpkg integrate install
 ```
