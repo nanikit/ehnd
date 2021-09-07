@@ -14,11 +14,13 @@ struct FILTERSTRUCT {
   int layer;
   int regex;
   std::wstring db;
+
+  int _ecount;
+  double _etime;
+
   int operator<(FILTERSTRUCT fs) {
     return (layer) < (fs.layer) || ((layer) == (fs.layer) && (g_line < fs.g_line));
   }
-  int _ecount;
-  double _etime;
 };
 
 struct USERDICSTRUCT {
