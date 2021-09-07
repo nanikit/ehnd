@@ -63,7 +63,7 @@ bool config::LoadConfig() {
   if (buf[0] != NULL) SetConsoleFontSize(_wtoi(buf));
 
   if (!firstInit)
-    WriteLog(NORMAL_LOG, L"LoadConfig : Success.\n");
+    WriteLog(log_category::normal, L"LoadConfig : Success.\n");
   else
     firstInit = false;
   return true;
@@ -110,7 +110,7 @@ bool config::SaveConfig() {
   wsprintf(buf, L"%d", GetConsoleFontSize());
   WriteINI(L"CONSOLE_FONTSIZE", L"CONFIG", buf, (wchar_t*)INIPath);
 
-  WriteLog(NORMAL_LOG, L"SaveConfig : Success.\n");
+  WriteLog(log_category::normal, L"SaveConfig : Success.\n");
   return true;
 }
 

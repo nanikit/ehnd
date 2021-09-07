@@ -1,14 +1,16 @@
 #pragma once
 #include <winnt.h>
 
-#define NORMAL_LOG 0
-#define ERROR_LOG 10
-#define DETAIL_LOG 20
-#define TIME_LOG 30
-#define SKIPLAYER_LOG 40
-#define USERDIC_LOG 50
+enum class log_category {
+  normal = 0,
+  error = 10,
+  detail = 20,
+  time = 30,
+  skip_layer = 40,
+  user_dict = 50,
+};
 
-void WriteLog(int LogType, const wchar_t* format, ...);
+void WriteLog(log_category category, const wchar_t* format, ...);
 void WriteTextLog(const wchar_t* format, ...);
 
 void LogStartMsg();

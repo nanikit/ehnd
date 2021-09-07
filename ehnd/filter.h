@@ -1,10 +1,14 @@
 #pragma once
 
-#define USERDIC_COMM 1
-#define USERDIC_NOUN 2
+enum class user_word {
+  common = 1,
+  noun = 2,
+};
 
-#define PREFILTER 1
-#define POSTFILTER 2
+enum class rule_type {
+  preprocess = 1,
+  postprocess = 2,
+};
 
 struct FILTERSTRUCT {
   int g_line;
@@ -26,7 +30,7 @@ struct FILTERSTRUCT {
 struct USERDICSTRUCT {
   int g_line;
   int line;
-  wchar_t _type;
+  user_word _type;
   wchar_t _jpn[31];
   wchar_t _kor[31];
   wchar_t _attr[37];
@@ -36,7 +40,7 @@ int operator<(USERDICSTRUCT& left, USERDICSTRUCT& right);
 
 struct SKIPLAYERSTRUCT {
   std::wstring wtype;
-  int type;
+  rule_type type;
   int layer;
   int g_line;
   int line;
@@ -79,9 +83,9 @@ class filter {
     return UserDic[idx]._kor;
   }
   const wchar_t* GetDicTYPE(int idx) {
-    return (UserDic[idx]._type == USERDIC_NOUN
+    return (UserDic[idx]._type == user_word::noun
               ? L"명사"
-              : (UserDic[idx]._type == USERDIC_COMM ? L"상용어구" : L"Unknown"));
+              : (UserDic[idx]._type == user_word::common ? L"상용어구" : L"Unknown"));
   }
   const wchar_t* GetDicATTR(int idx) {
     return UserDic[idx]._attr;
@@ -91,9 +95,9 @@ class filter {
   bool skiplayer_load2(std::vector<SKIPLAYERSTRUCT>& SkipLayer, LPCWSTR lpPath, LPCWSTR lpFileName,
                        int& g_line);
   bool filter_load(std::vector<FILTERSTRUCT>& Filter, LPCWSTR lpPath, LPCWSTR lpFileName,
-                   int FilterType, int& g_line);
+                   rule_type rule_type, int& g_line);
   bool userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int& g_line);
-  bool filter_proc(std::vector<FILTERSTRUCT>& Filter, const int FilterType, std::wstring& wsText);
+  bool filter_proc(std::vector<FILTERSTRUCT>& Filter, rule_type rule_type, std::wstring& wsText);
 
   std::vector<FILTERSTRUCT> PreFilter;
   std::vector<FILTERSTRUCT> PostFilter;

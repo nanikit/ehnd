@@ -41,7 +41,7 @@ bool EhndInit(void) {
   if (!hook_userdict2()) return false;
   if (!hook_getwordinfo()) return false;
 
-  WriteLog(NORMAL_LOG, L"HookUserDict : 사용자사전 알고리즘 최적화.\n");
+  WriteLog(log_category::normal, L"HookUserDict : 사용자사전 알고리즘 최적화.\n");
 
   // 엔드 임시파일 삭제
   pFilter->ehnddic_cleanup();
@@ -143,24 +143,24 @@ void* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
   // 콘솔 라인 체크
   CheckConsoleLine();
 
-  if (wsText.length()) WriteLog(NORMAL_LOG, L"[REQUEST] %s\n\n", D(wsText));
+  if (wsText.length()) WriteLog(log_category::normal, L"[REQUEST] %s\n\n", D(wsText));
 
   // 넘어온 문자열의 길이가 0이거나 명령어일때 번역 프로세스 스킵
   if (wcslen(szIn) && !pFilter->cmd(wsText)) {
     pFilter->pre(wsText);
 
-    WriteLog(NORMAL_LOG, L"[PRE] %s\n\n", D(wsText));
+    WriteLog(log_category::normal, L"[PRE] %s\n\n", D(wsText));
 
     i_len = WideCharToMultiByteWithAral(932, 0, wsText.c_str(), -1, NULL, NULL, NULL, NULL);
     szJPN = (LPSTR)msvcrt_malloc((i_len + 1) * 3);
     if (szJPN == NULL) {
-      WriteLog(ERROR_LOG, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
+      WriteLog(log_category::error, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
       return 0;
     }
     WideCharToMultiByteWithAral(932, 0, wsText.c_str(), -1, szJPN, i_len, NULL, NULL);
 
     if (!pConfig->GetUserDicSwitch())
-      WriteLog(NORMAL_LOG, L"UserDic : 사용자 사전이 꺼져 있습니다.\n");
+      WriteLog(log_category::normal, L"UserDic : 사용자 사전이 꺼져 있습니다.\n");
 
     dwStart = GetTickCount();
 
@@ -173,14 +173,15 @@ void* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
 
     dwEnd = GetTickCount();
 
-    WriteLog(TIME_LOG, L"J2K_TranslateMMNT : --- Elasped Time : %dms ---\n", dwEnd - dwStart);
+    WriteLog(log_category::time, L"J2K_TranslateMMNT : --- Elasped Time : %dms ---\n",
+             dwEnd - dwStart);
 
     msvcrt_free(szJPN);
 
     i_len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, szKOR, -1, NULL, NULL);
     lpKOR = (LPWSTR)msvcrt_malloc((i_len + 1) * 3);
     if (lpKOR == NULL) {
-      WriteLog(ERROR_LOG, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
+      WriteLog(log_category::error, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
       return 0;
     }
     MultiByteToWideCharWithAral(949, 0, szKOR, -1, lpKOR, i_len);
@@ -189,18 +190,18 @@ void* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
     msvcrt_free(szKOR);
     msvcrt_free(lpKOR);
 
-    WriteLog(NORMAL_LOG, L"[TRANS] %s\n\n", D(wsText));
+    WriteLog(log_category::normal, L"[TRANS] %s\n\n", D(wsText));
 
     pFilter->post(wsText);
 
-    WriteLog(NORMAL_LOG, L"[POST] %s\n\n", D(wsText));
+    WriteLog(log_category::normal, L"[POST] %s\n\n", D(wsText));
   } else if (wcslen(szIn)) {
-    WriteLog(NORMAL_LOG, L"[COMMAND] %s\n\n", D(wsText));
+    WriteLog(log_category::normal, L"[COMMAND] %s\n\n", D(wsText));
   }
 
   szOut = static_cast<LPWSTR>(CoTaskMemAlloc((wsText.length() + 1) * 2));
   if (szOut == NULL) {
-    WriteLog(ERROR_LOG, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
+    WriteLog(log_category::error, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
     return 0;
   }
   wcscpy_s(szOut, wsText.length() + 1, wsText.c_str());
@@ -217,7 +218,7 @@ void* __stdcall J2K_TranslateMMNT(int data0, LPCSTR szIn) {
   i_len = MultiByteToWideCharWithAral(932, MB_PRECOMPOSED, szIn, -1, NULL, NULL);
   lpJPN = (LPWSTR)msvcrt_malloc((i_len + 1) * 3);
   if (lpJPN == NULL) {
-    WriteLog(ERROR_LOG, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
+    WriteLog(log_category::error, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
     return 0;
   }
   MultiByteToWideCharWithAral(932, 0, szIn, -1, lpJPN, i_len);
@@ -230,7 +231,7 @@ void* __stdcall J2K_TranslateMMNT(int data0, LPCSTR szIn) {
   i_len = WideCharToMultiByteWithAral(949, 0, lpKOR, -1, NULL, NULL, NULL, NULL);
   szOut = static_cast<LPSTR>(CoTaskMemAlloc((i_len + 1) * 3));
   if (szOut == NULL) {
-    WriteLog(ERROR_LOG, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
+    WriteLog(log_category::error, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
     return 0;
   }
   WideCharToMultiByteWithAral(949, 0, lpKOR, -1, szOut, i_len, NULL, NULL);

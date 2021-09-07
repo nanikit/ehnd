@@ -13,15 +13,15 @@ void LogStartMsg() {
   GetLoadPath(lpEztPath, MAX_PATH);
   GetExecutePath(lpExePath, MAX_PATH);
 
-  WriteLog(NORMAL_LOG, L"──── ━━\n");
-  WriteLog(NORMAL_LOG, L"Ehnd :: 엔드 - VER. %s :: COMPILE AT %s, %s\n", EHND_VER, _T(__DATE__),
-           _T(__TIME__));
-  WriteLog(NORMAL_LOG, L"──── ━━ Ehnd -- sokcuri.neko.kr --\n");
-  WriteLog(NORMAL_LOG, L"\n");
-  WriteLog(NORMAL_LOG, L"- 제작자 : %s\n", L"소쿠릿");
-  WriteLog(NORMAL_LOG, L"━━━━━━━━━───────────-＊\n");
-  WriteLog(NORMAL_LOG, L"EzTransPath : %s\n", lpEztPath);
-  WriteLog(NORMAL_LOG, L"ExecutePath : %s\n", lpExePath);
+  WriteLog(log_category::normal, L"──── ━━\n");
+  WriteLog(log_category::normal, L"Ehnd :: 엔드 - VER. %s :: COMPILE AT %s, %s\n", EHND_VER,
+           _T(__DATE__), _T(__TIME__));
+  WriteLog(log_category::normal, L"──── ━━ Ehnd -- sokcuri.neko.kr --\n");
+  WriteLog(log_category::normal, L"\n");
+  WriteLog(log_category::normal, L"- 제작자 : %s\n", L"소쿠릿");
+  WriteLog(log_category::normal, L"━━━━━━━━━───────────-＊\n");
+  WriteLog(log_category::normal, L"EzTransPath : %s\n", lpEztPath);
+  WriteLog(log_category::normal, L"ExecutePath : %s\n", lpExePath);
   return;
 }
 
@@ -61,11 +61,11 @@ void CheckConsoleLine() {
   }
 }
 
-void WriteLog(int LogType, const wchar_t* format, ...) {
-  if (!pConfig->GetLogTime() && LogType == TIME_LOG) return;
-  if (!pConfig->GetLogDetail() && LogType == DETAIL_LOG) return;
-  if (!pConfig->GetLogSkipLayer() && LogType == SKIPLAYER_LOG) return;
-  if (!pConfig->GetLogUserDic() && LogType == USERDIC_LOG) return;
+void WriteLog(log_category category, const wchar_t* format, ...) {
+  if (!pConfig->GetLogTime() && category == log_category::time) return;
+  if (!pConfig->GetLogDetail() && category == log_category::detail) return;
+  if (!pConfig->GetLogSkipLayer() && category == log_category::skip_layer) return;
+  if (!pConfig->GetLogUserDic() && category == log_category::user_dict) return;
 
   va_list valist;
   FILE* fp = NULL;
@@ -148,12 +148,12 @@ bool CreateLogWin(HINSTANCE hInst) {
 
   hLogEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
   if (!hLogEvent) {
-    WriteLog(ERROR_LOG, L"CreateLogWin : Event Init Error");
+    WriteLog(log_category::error, L"CreateLogWin : Event Init Error");
     return 0;
   }
   HANDLE hThread = CreateThread(&thAttr, 0, LogThreadMain, NULL, 0, NULL);
   if (hThread == NULL) {
-    WriteLog(ERROR_LOG, L"CreateLogWin : Log Thread Create Error");
+    WriteLog(log_category::error, L"CreateLogWin : Log Thread Create Error");
   }
 
   // 로그 윈도우가 초기화될때까지 기다림
@@ -170,7 +170,7 @@ DWORD WINAPI LogThreadMain(LPVOID lpParam) {
   hLogWin = CreateWindowEx(0, L"EhndLogWin", wszTitle, WS_OVERLAPPEDWINDOW, 64, 64, 640, 480, 0, 0,
                            hInst, 0);
   if (!hLogWin) {
-    WriteLog(ERROR_LOG, L"LogThreadMain : Log Window Create Failed");
+    WriteLog(log_category::error, L"LogThreadMain : Log Window Create Failed");
     return 0;
   }
 
@@ -179,7 +179,7 @@ DWORD WINAPI LogThreadMain(LPVOID lpParam) {
     WS_VISIBLE | WS_CHILD | WS_VSCROLL | ES_MULTILINE | ES_LEFT | ES_NOHIDESEL | ES_AUTOVSCROLL, 0,
     0, 640, 480, hLogWin, NULL, hInst, NULL);
   if (!hLogRes) {
-    WriteLog(ERROR_LOG, L"LogThreadMain : Log Edit Create Failed");
+    WriteLog(log_category::error, L"LogThreadMain : Log Edit Create Failed");
   }
 
   CHARFORMAT2 cf;
