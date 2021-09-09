@@ -93,16 +93,11 @@ DWORD watch::_NotifyThread(LPVOID lpParam) {
 }
 
 MMRESULT watch::_NotifyProc(UINT m_nTimerID, UINT uiMsg, DWORD dwUser, DWORD dw1, DWORD d2) {
-  bool c_prefilter;
-  bool c_postfilter;
-  bool c_userdic;
-  bool c_config;
-  bool c_skiplayer;
-
-  c_prefilter = false;
-  c_postfilter = false;
-  c_userdic = false;
-  c_skiplayer = false;
+  bool c_prefilter = false;
+  bool c_postfilter = false;
+  bool c_userdic = false;
+  bool c_config = false;
+  bool c_skiplayer = false;
 
   if (fileList.begin() == fileList.end()) return 0;
 
