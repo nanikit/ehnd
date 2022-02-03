@@ -1,5 +1,11 @@
 #pragma once
 
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
+#include <string>
+#include <variant>
+
 enum class user_word {
   common = 1,
   noun = 2,
