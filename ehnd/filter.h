@@ -28,7 +28,7 @@ struct FILTERSTRUCT {
   int _ecount;
   double _etime;
 
-  int operator<(FILTERSTRUCT fs) {
+  int operator<(const FILTERSTRUCT& fs) const {
     return (layer) < (fs.layer) || ((layer) == (fs.layer) && (g_line < fs.g_line));
   }
 };
