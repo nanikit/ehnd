@@ -13,15 +13,15 @@ void LogStartMsg() {
   GetLoadPath(lpEztPath, MAX_PATH);
   GetExecutePath(lpExePath, MAX_PATH);
 
-  WriteLog(log_category::normal, L"──── ━━\n");
-  WriteLog(log_category::normal, L"Ehnd :: 엔드 - VER. %s :: COMPILE AT %s, %s\n", EHND_VER,
-           _T(__DATE__), _T(__TIME__));
-  WriteLog(log_category::normal, L"──── ━━ Ehnd -- sokcuri.neko.kr --\n");
-  WriteLog(log_category::normal, L"\n");
-  WriteLog(log_category::normal, L"- 제작자 : %s\n", L"소쿠릿");
-  WriteLog(log_category::normal, L"━━━━━━━━━───────────-＊\n");
-  WriteLog(log_category::normal, L"EzTransPath : %s\n", lpEztPath);
-  WriteLog(log_category::normal, L"ExecutePath : %s\n", lpExePath);
+  Log(log_category::normal, L"──── ━━\n");
+  Log(log_category::normal, L"Ehnd :: 엔드 - VER. {} :: COMPILE AT {}, {}\n", EHND_VER,
+      _T(__DATE__), _T(__TIME__));
+  Log(log_category::normal, L"──── ━━ Ehnd -- sokcuri.neko.kr --\n");
+  Log(log_category::normal, L"\n");
+  Log(log_category::normal, L"- 제작자 : {}\n", L"소쿠릿");
+  Log(log_category::normal, L"━━━━━━━━━───────────-＊\n");
+  Log(log_category::normal, L"EzTransPath : {}\n", lpEztPath);
+  Log(log_category::normal, L"ExecutePath : {}\n", lpExePath);
   return;
 }
 
@@ -61,69 +61,6 @@ void CheckConsoleLine() {
   }
 }
 
-void WriteLog(log_category category, const wchar_t* format, ...) {
-  if (!pConfig->GetLogTime() && category == log_category::time) return;
-  if (!pConfig->GetLogDetail() && category == log_category::detail) return;
-  if (!pConfig->GetLogSkipLayer() && category == log_category::skip_layer) return;
-  if (!pConfig->GetLogUserDic() && category == log_category::user_dict) return;
-
-  va_list valist;
-  FILE* fp = NULL;
-  wchar_t lpBuffer[1024], lpTime[64];
-  BOOL IsFileLog = pConfig->GetFileLogSwitch();
-  if (IsFileLog) {
-    wchar_t lpFileName[MAX_PATH];
-    if (pConfig->GetFileLogEztLoc())
-      GetLoadPath(lpFileName, MAX_PATH);
-    else
-      GetExecutePath(lpFileName, MAX_PATH);
-    wcscat_s(lpFileName, L"\\ehnd_log.log");
-
-    if (_wfopen_s(&fp, lpFileName, L"a+t,ccs=UTF-8")) return;
-    _wstrtime_s(lpTime, 32);
-
-    fwprintf_s(fp, L"%s.%03d | ", lpTime, GetTickCount() % 1000);
-  }
-  va_start(valist, format);
-
-  _vsnwprintf_s(lpBuffer, _TRUNCATE, format, valist);
-
-  if (wcslen(lpBuffer) > 1000) {
-    wcscpy_s(lpBuffer + 1000, 24, L"...\r\n");
-  }
-
-  std::wstring t = lpBuffer;
-  t = replace_all(t, L"%%", L"%");
-  if (IsShownLogWin()) SetLogText(t.c_str());
-  if (IsFileLog) fwprintf_s(fp, lpBuffer);
-
-  va_end(valist);
-
-  if (IsFileLog) fclose(fp);
-
-  logLine++;
-}
-
-void WriteTextLog(const wchar_t* format, ...) {
-  va_list valist;
-  FILE* fp = NULL;
-  wchar_t lpBuffer[1024];
-
-  const char* szFileName = ".\\ehnd_text.log";
-  if (fopen_s(&fp, szFileName, "a+t,ccs=UTF-8")) return;
-  va_start(valist, format);
-
-  _vsnwprintf_s(lpBuffer, _TRUNCATE, format, valist);
-
-  if (wcslen(lpBuffer) > 1000) wcscpy_s(lpBuffer + 1000, 1024, L"...\r\n");
-
-  fwprintf_s(fp, lpBuffer);
-
-  va_end(valist);
-
-  fclose(fp);
-}
-
 bool CreateLogWin(HINSTANCE hInst) {
   LoadLibrary(TEXT("Msftedit.dll"));
   WNDCLASSEX wc = {
@@ -148,12 +85,12 @@ bool CreateLogWin(HINSTANCE hInst) {
 
   hLogEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
   if (!hLogEvent) {
-    WriteLog(log_category::error, L"CreateLogWin : Event Init Error");
+    Log(log_category::error, L"CreateLogWin : Event Init Error");
     return 0;
   }
   HANDLE hThread = CreateThread(&thAttr, 0, LogThreadMain, NULL, 0, NULL);
   if (hThread == NULL) {
-    WriteLog(log_category::error, L"CreateLogWin : Log Thread Create Error");
+    Log(log_category::error, L"CreateLogWin : Log Thread Create Error");
   }
 
   // 로그 윈도우가 초기화될때까지 기다림
@@ -170,7 +107,7 @@ DWORD WINAPI LogThreadMain(LPVOID lpParam) {
   hLogWin = CreateWindowEx(0, L"EhndLogWin", wszTitle, WS_OVERLAPPEDWINDOW, 64, 64, 640, 480, 0, 0,
                            hInst, 0);
   if (!hLogWin) {
-    WriteLog(log_category::error, L"LogThreadMain : Log Window Create Failed");
+    Log(log_category::error, L"LogThreadMain : Log Window Create Failed");
     return 0;
   }
 
@@ -179,7 +116,7 @@ DWORD WINAPI LogThreadMain(LPVOID lpParam) {
     WS_VISIBLE | WS_CHILD | WS_VSCROLL | ES_MULTILINE | ES_LEFT | ES_NOHIDESEL | ES_AUTOVSCROLL, 0,
     0, 640, 480, hLogWin, NULL, hInst, NULL);
   if (!hLogRes) {
-    WriteLog(log_category::error, L"LogThreadMain : Log Edit Create Failed");
+    Log(log_category::error, L"LogThreadMain : Log Edit Create Failed");
   }
 
   CHARFORMAT2 cf;

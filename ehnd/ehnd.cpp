@@ -41,7 +41,7 @@ bool EhndInit(void) {
   if (!hook_userdict2()) return false;
   if (!hook_getwordinfo()) return false;
 
-  WriteLog(log_category::normal, L"HookUserDict : 사용자사전 알고리즘 최적화.\n");
+  Log(log_category::normal, L"HookUserDict : 사용자사전 알고리즘 최적화.\n");
 
   // 엔드 임시파일 삭제
   pFilter->ehnddic_cleanup();
@@ -175,8 +175,8 @@ wchar_t* TranslateMMNTW(LPCWSTR szIn) {
 
     auto tickEnd = GetTickCount64();
 
-    WriteLog(log_category::time, L"J2K_TranslateMMNT : --- Elasped Time : {}ms ---\n",
-             tickEnd - tickStart);
+    Log(log_category::time, L"J2K_TranslateMMNT : --- Elasped Time : {}ms ---\n",
+        tickEnd - tickStart);
 
     i_len = MultiByteToWideCharWithAral(949, 0, szKor, -1, nullptr, 0);
     text.resize(i_len);
@@ -206,9 +206,16 @@ void* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
   try {
     return TranslateMMNTW(szIn);
   } catch (exception ex) {
-    WriteLog(log_category::error, L"J2K_TranslateMMNT : %s\n", ex.what());
+    mbstate_t state{};
+    auto message = string_view{ex.what()};
+    wstring dest;
+    dest.resize(message.size());
+    auto pt = message.data();
+    size_t count = 0;
+    mbsrtowcs_s(&count, dest.data(), dest.size(), &pt, dest.size(), &state);
+    Log(log_category::error, L"J2K_TranslateMMNT : {}\n", dest);
   } catch (...) {
-    WriteLog(log_category::error, L"J2K_TranslateMMNT : Unknown error\n");
+    Log(log_category::error, L"J2K_TranslateMMNT : Unknown error\n");
   }
   return nullptr;
 }
@@ -223,7 +230,7 @@ void* __stdcall J2K_TranslateMMNT(int data0, LPCSTR szIn) {
   i_len = MultiByteToWideCharWithAral(932, MB_PRECOMPOSED, szIn, -1, NULL, NULL);
   lpJPN = (LPWSTR)msvcrt_malloc((i_len + 1) * 3);
   if (lpJPN == NULL) {
-    WriteLog(log_category::error, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
+    Log(log_category::error, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
     return 0;
   }
   MultiByteToWideCharWithAral(932, 0, szIn, -1, lpJPN, i_len);
@@ -236,7 +243,7 @@ void* __stdcall J2K_TranslateMMNT(int data0, LPCSTR szIn) {
   i_len = WideCharToMultiByteWithAral(949, 0, lpKOR, -1, NULL, NULL, NULL, NULL);
   szOut = static_cast<LPSTR>(CoTaskMemAlloc((i_len + 1) * 3));
   if (szOut == NULL) {
-    WriteLog(log_category::error, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
+    Log(log_category::error, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
     return 0;
   }
   WideCharToMultiByteWithAral(949, 0, lpKOR, -1, szOut, i_len, NULL, NULL);

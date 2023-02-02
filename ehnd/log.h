@@ -18,10 +18,6 @@ enum class log_category {
   user_dict = 50,
 };
 
-void WriteLog(log_category category, const wchar_t* format, ...);
-
-void WriteTextLog(const wchar_t* format, ...);
-
 void LogStartMsg();
 void CheckLogSize();
 void CheckConsoleLine();

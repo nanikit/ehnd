@@ -15,7 +15,7 @@ watch::watch() {
 
   hWatchThread = CreateThread(&ThreadAttributes, 0, NotifyThread, NULL, 0, NULL);
   if (hWatchThread == NULL) {
-    WriteLog(log_category::error, L"WatchThread : WatchThread Create Error");
+    Log(log_category::error, L"WatchThread : WatchThread Create Error");
   }
 }
 
@@ -120,27 +120,27 @@ MMRESULT watch::_NotifyProc(UINT m_nTimerID, UINT uiMsg, DWORD dwUser, DWORD dw1
   }
 
   if (c_prefilter == true) {
-    WriteLog(log_category::normal, L"PreFilter : 전처리 필터 파일 변경사항 감지.\n");
+    Log(log_category::normal, L"PreFilter : 전처리 필터 파일 변경사항 감지.\n");
     pFilter->pre_load();
   }
 
   if (c_postfilter == true) {
-    WriteLog(log_category::normal, L"PostFilter : 후처리 필터 파일 변경사항 감지.\n");
+    Log(log_category::normal, L"PostFilter : 후처리 필터 파일 변경사항 감지.\n");
     pFilter->post_load();
   }
 
   if (c_skiplayer == true) {
-    WriteLog(log_category::normal, L"SkipLayer : 스킵 레이어 파일 변경사항 감지.\n");
+    Log(log_category::normal, L"SkipLayer : 스킵 레이어 파일 변경사항 감지.\n");
     pFilter->skiplayer_load();
   }
 
   if (c_userdic == true) {
-    WriteLog(log_category::normal, L"UserDic : 사용자 사전 파일 변경사항 감지.\n");
+    Log(log_category::normal, L"UserDic : 사용자 사전 파일 변경사항 감지.\n");
     J2K_ReloadUserDict();
   }
 
   if (c_config == true) {
-    WriteLog(log_category::normal, L"Config : 설정파일 변경사항 감지.\n");
+    Log(log_category::normal, L"Config : 설정파일 변경사항 감지.\n");
     pConfig->LoadConfig();
   }
 
