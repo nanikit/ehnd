@@ -389,3 +389,6 @@ FodyWeavers.xsd
 
 # User specific project property
 user.props
+
+# vcpkg
+vcpkg_installed/
