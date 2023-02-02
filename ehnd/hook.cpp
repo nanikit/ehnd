@@ -64,7 +64,7 @@ bool hook() {
   return true;
 }
 
-int search_ptn(LPWORD ptn, size_t ptn_size, LPBYTE* addr) {
+int SearchPattern(LPWORD ptn, size_t ptn_size, LPBYTE* addr) {
   HMODULE hDll = GetModuleHandle(L"j2kengine.dlx");
   if (hDll == NULL) MessageBox(0, L"J2KEngine.dlx Load Failed", L"", 0);
 
@@ -118,15 +118,19 @@ int search_ptn(LPWORD ptn, size_t ptn_size, LPBYTE* addr) {
     }
     p += skipLen[p[ptnEnd]];
   }
-  if (searchSuccessCount != 1) addr = 0;
+  if (searchSuccessCount != 1) {
+    *addr = nullptr;
+  }
   return searchSuccessCount;
 }
 
 bool hook_userdict(void) {
+  using namespace std;
+
   WORD ptn[] = {0x8B, 0x4D, 0x04, 0x03, 0xC1, 0x80, 0x38};
 
   LPBYTE addr = 0;
-  int r = search_ptn(ptn, _countof(ptn), &addr);
+  int r = SearchPattern(ptn, _countof(ptn), &addr);
 
   if (r == 0) {
     Log(log_category::normal, L"HookUserDict : J2KEngine Pattern Search Failed\n");
@@ -135,25 +139,25 @@ bool hook_userdict(void) {
     Log(log_category::normal, L"HookUserDict : J2KEngine Pattern Search Failed\n");
     return false;
   } else {
-    BYTE Patch[] = {0x90, 0x90, 0x90, 0x90, 0x90, 0xE9, -1, -1, -1, -1, 0x90, 0x90, 0x74, 0x08};
+    array<::byte, 14> patch{0x90, 0x90, 0x90, 0x90, 0x90, 0xE9, 0xFF,
+                            0xFF, 0xFF, 0xFF, 0x90, 0x90, 0x74, 0x08};
 
-    int PatchSize = _countof(Patch);
     LPBYTE Offset = (LPBYTE)((LPBYTE)&userdict_patch - (addr + 10));
     lpfnRetn = addr + 10;
-    Patch[6] = (WORD)LOBYTE(LOWORD(Offset));
-    Patch[7] = (WORD)HIBYTE(LOWORD(Offset));
-    Patch[8] = (WORD)LOBYTE(HIWORD(Offset));
-    Patch[9] = (WORD)HIBYTE(HIWORD(Offset));
+    patch[6] = (WORD)LOBYTE(LOWORD(Offset));
+    patch[7] = (WORD)HIBYTE(LOWORD(Offset));
+    patch[8] = (WORD)LOBYTE(HIWORD(Offset));
+    patch[9] = (WORD)HIBYTE(HIWORD(Offset));
 
     DWORD OldProtect, OldProtect2;
     HANDLE hHandle;
     hHandle = OpenProcess(PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE, FALSE,
                           GetCurrentProcessId());
-    VirtualProtectEx(hHandle, (void*)addr, PatchSize, PAGE_EXECUTE_READWRITE, &OldProtect);
-    memcpy(addr, Patch, PatchSize);
+    VirtualProtectEx(hHandle, (void*)addr, patch.size(), PAGE_EXECUTE_READWRITE, &OldProtect);
+    copy(begin(patch), end(patch), addr);
     hHandle = OpenProcess(PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE, FALSE,
                           GetCurrentProcessId());
-    VirtualProtectEx(hHandle, (void*)addr, PatchSize, OldProtect, &OldProtect2);
+    VirtualProtectEx(hHandle, (void*)addr, patch.size(), OldProtect, &OldProtect2);
     Log(log_category::normal, L"HookUserDict : Success.\n");
   }
 
@@ -161,17 +165,19 @@ bool hook_userdict(void) {
 }
 
 bool hook_userdict2(void) {
+  using namespace std;
+
   // 101C4B00 . 8B43 14        MOV EAX,DWORD PTR DS:[EBX+14]
   // 101C4B03 . 8B3D A4192A10  MOV EDI,DWORD PTR DS:[<&MSVCRT.fopen>]   ;  msvcrt.fopen << intercept
   // here 101C4B09 . 68 60982110    PUSH J2KEngin.10219860                   ; /mode = "rb" 101C4B0E
   // . 50             PUSH EAX                                 ; |path 101C4B0F . FFD7 CALL EDI ;
   // \fopen 101C4B11 . 8BF0           MOV ESI,EAX
 
-  WORD ptn[] = {0x8B, 0x43, 0x14, 0x8B, 0x3D, -1,   -1,   -1,   -1,  0x68,
-                -1,   -1,   -1,   -1,   0x50, 0xFF, 0xD7, 0x8B, 0xF0};
+  array<WORD, 19> ptn = {0x8B,   0x43,   0x14,   0x8B,   0x3D, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0x68,
+                         0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0x50, 0xFF,   0xD7,   0x8B,   0xF0};
 
   LPBYTE addr = 0;
-  int r = search_ptn(ptn, _countof(ptn), &addr);
+  int r = SearchPattern(ptn.data(), ptn.size(), &addr);
 
   if (r == 0) {
     Log(log_category::normal, L"HookUserDict2 : J2KEngine Pattern Search Failed\n");
@@ -206,6 +212,8 @@ bool hook_userdict2(void) {
 }
 
 bool hook_getwordinfo(void) {
+  using namespace std;
+
   /*
   05BBF270    6A FF           PUSH -1
   05BBF272    68 1B59BF05     PUSH j2keng_1.05BF591B
@@ -231,13 +239,12 @@ bool hook_getwordinfo(void) {
   05BBF2A9    892B            MOV DWORD PTR DS:[EBX],EBP
   05BBF2AB    896C24 24       MOV DWORD PTR SS:[ESP+24],EBP
   */
-
-  WORD ptn[] = {0x6A, 0xFF, 0x68, -1,   -1,   -1,   -1,   0x64, 0xA1, 0x00, 0x00,
-                0x00, 0x00, 0x50, 0x64, 0x89, 0x25, 0x00, 0x00, 0x00, 0x00, 0x83,
-                0xEC, 0x18, 0x53, 0x8B, 0x5C, 0x24, 0x30, 0x55, 0x56};
+  array<WORD, 31> ptn{0x6A, 0xFF, 0x68, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0x64, 0xA1, 0x00, 0x00,
+                      0x00, 0x00, 0x50, 0x64,   0x89,   0x25,   0x00,   0x00, 0x00, 0x00, 0x83,
+                      0xEC, 0x18, 0x53, 0x8B,   0x5C,   0x24,   0x30,   0x55, 0x56};
 
   LPBYTE addr = 0;
-  int r = search_ptn(ptn, _countof(ptn), &addr);
+  int r = SearchPattern(ptn.data(), ptn.size(), &addr);
 
   if (r == 0) {
     Log(log_category::normal, L"HookGetWordInfo : J2KEngine Pattern Search Failed\n");
