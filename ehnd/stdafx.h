@@ -1,4 +1,4 @@
-﻿// stdafx.h : 자주 사용하지만 자주 변경되지는 않는
+// stdafx.h : 자주 사용하지만 자주 변경되지는 않는
 // 표준 시스템 포함 파일 및 프로젝트 관련 포함 파일이
 // 들어 있는 포함 파일입니다.
 
@@ -22,6 +22,7 @@ typedef struct IUnknown IUnknown;
 #include <cstdarg>
 #include <cstdlib>
 #include <iostream>
+#include <span>
 #include <vector>
 
 #define D(x) deformatted_string(x).c_str()
