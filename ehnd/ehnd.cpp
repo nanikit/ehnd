@@ -139,17 +139,17 @@ wchar_t* TranslateMMNTW(LPCWSTR szIn) {
   CheckConsoleLine();
 
   if (text.length()) {
-    WriteLog(log_category::normal, L"[REQUEST] %s\n\n", D(text));
+    Log(log_category::normal, L"[REQUEST] {}\n\n", text);
   }
 
   // 넘어온 문자열의 길이가 0이거나 명령어일때 번역 프로세스 스킵
   if (text.empty()) {
   } else if (pFilter->cmd(text)) {
-    WriteLog(log_category::normal, L"[COMMAND] %s\n\n", D(text));
+    Log(log_category::normal, L"[COMMAND] {}\n\n", text);
   } else {
     pFilter->pre(text);
 
-    WriteLog(log_category::normal, L"[PRE] %s\n\n", D(text));
+    Log(log_category::normal, L"[PRE] {}\n\n", text);
 
     i_len = WideCharToMultiByteWithAral(932, 0, text.c_str(), -1, nullptr, 0, nullptr, nullptr);
     string jpn;
@@ -158,7 +158,7 @@ wchar_t* TranslateMMNTW(LPCWSTR szIn) {
     WideCharToMultiByteWithAral(932, 0, text.c_str(), -1, jpn.data(), jpn.size(), NULL, NULL);
 
     if (!pConfig->GetUserDicSwitch()) {
-      WriteLog(log_category::normal, L"UserDic : 사용자 사전이 꺼져 있습니다.\n");
+      Log(log_category::normal, L"UserDic : 사용자 사전이 꺼져 있습니다.\n");
     }
 
     auto tickStart = GetTickCount64();
@@ -175,7 +175,7 @@ wchar_t* TranslateMMNTW(LPCWSTR szIn) {
 
     auto tickEnd = GetTickCount64();
 
-    WriteLog(log_category::time, L"J2K_TranslateMMNT : --- Elasped Time : %ullms ---\n",
+    WriteLog(log_category::time, L"J2K_TranslateMMNT : --- Elasped Time : {}ms ---\n",
              tickEnd - tickStart);
 
     i_len = MultiByteToWideCharWithAral(949, 0, szKor, -1, nullptr, 0);
@@ -183,16 +183,16 @@ wchar_t* TranslateMMNTW(LPCWSTR szIn) {
     MultiByteToWideCharWithAral(949, 0, szKor, -1, text.data(), text.size());
     text.resize(max(0, text.size() - 1));
 
-    WriteLog(log_category::normal, L"[TRANS] %s\n\n", D(text));
+    Log(log_category::normal, L"[TRANS] {}\n\n", text);
 
     pFilter->post(text);
 
-    WriteLog(log_category::normal, L"[POST] %s\n\n", D(text));
+    Log(log_category::normal, L"[POST] {}\n\n", text);
   }
 
   auto pShareable = static_cast<LPWSTR>(CoTaskMemAlloc((text.size() + 1) * sizeof(text[0])));
   if (!pShareable) {
-    WriteLog(log_category::error, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
+    Log(log_category::error, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
     return nullptr;
   }
   span<wchar_t> szOut{pShareable, text.size() + 1};

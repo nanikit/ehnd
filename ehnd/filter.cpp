@@ -154,8 +154,7 @@ bool filter::skiplayer_load() {
   FILTERSTRUCT fs;
   wstring Path;
 
-  DWORD dwStart, dwEnd;
-  dwStart = GetTickCount();
+  auto dwStart = GetTickCount64();
 
   GetLoadPath(lpEztPath, MAX_PATH);
   Path = lpEztPath;
@@ -186,12 +185,12 @@ bool filter::skiplayer_load() {
 
   // 스킵레이어 대체
   SkipLayer = _SkipLayer;
-  WriteLog(log_category::normal, L"SkipLayerRead : 총 %d개의 스킵레이어를 읽었습니다.\n",
-           SkipLayer.size());
+  Log(log_category::normal, L"SkipLayerRead : 총 {}개의 스킵레이어를 읽었습니다.\n",
+      SkipLayer.size());
 
   // 소요시간 계산
-  dwEnd = GetTickCount();
-  WriteLog(log_category::time, L"SkipLayerRead : --- Elasped Time : %dms ---\n", dwEnd - dwStart);
+  auto dwEnd = GetTickCount64();
+  Log(log_category::time, L"SkipLayerRead : --- Elasped Time : {}ms ---\n", dwEnd - dwStart);
   return true;
 }
 bool filter::userdic_load() {
@@ -199,8 +198,7 @@ bool filter::userdic_load() {
   WIN32_FIND_DATA FindFileData;
   wstring Path;
 
-  DWORD dwStart, dwEnd;
-  dwStart = GetTickCount();
+  auto dwStart = GetTickCount64();
 
   GetLoadPath(lpEztPath, MAX_PATH);
   Path = lpEztPath;
@@ -234,12 +232,12 @@ bool filter::userdic_load() {
   sort(UserDic.begin(), UserDic.end());
   // WriteLog(log_category::normal, L"UserDicRead : 사용자 사전 정렬을 완료했습니다.\n");
 
-  WriteLog(log_category::normal, L"UserDicRead : 총 %d개의 사용자 사전 파일을 읽었습니다.\n",
-           UserDic.size());
+  Log(log_category::normal, L"UserDicRead : 총 {}개의 사용자 사전 파일을 읽었습니다.\n",
+      UserDic.size());
 
   // 소요시간 계산
-  dwEnd = GetTickCount();
-  WriteLog(log_category::time, L"UserDicRead : --- Elasped Time : %dms ---\n", dwEnd - dwStart);
+  auto dwEnd = GetTickCount64();
+  Log(log_category::time, L"UserDicRead : --- Elasped Time : {}ms ---\n", dwEnd - dwStart);
 
   // 엔드 임시파일 생성
   ehnddic_create();
@@ -255,8 +253,7 @@ bool filter::jkdic_load(int& g_line) {
   int line = 1;
   wchar_t lpBuffer[128];
 
-  DWORD dwStart, dwEnd;
-  dwStart = GetTickCount();
+  auto dwStart = GetTickCount64();
 
   GetLoadPath(lpEztPath, MAX_PATH);
   Path = lpEztPath;
@@ -340,12 +337,12 @@ bool filter::jkdic_load(int& g_line) {
   }
   fclose(fp);
 
-  WriteLog(log_category::normal,
-           L"JkDicRead : %d개의 DAT 사용자 사전 \"UserDict.jk\"를 읽었습니다.\n", line - 1);
+  Log(log_category::normal, L"JkDicRead : {}개의 DAT 사용자 사전 \"UserDict.jk\"를 읽었습니다.\n",
+      line - 1);
 
   // 소요시간 계산
-  dwEnd = GetTickCount();
-  WriteLog(log_category::time, L"JkDicRead : --- Elasped Time : %dms ---\n", dwEnd - dwStart);
+  auto dwEnd = GetTickCount64();
+  Log(log_category::time, L"JkDicRead : --- Elasped Time : {}ms ---\n", dwEnd - dwStart);
   return true;
 }
 
@@ -354,8 +351,7 @@ bool filter::ehnddic_cleanup() {
   WIN32_FIND_DATA FindFileData;
   wstring Path;
 
-  DWORD dwStart, dwEnd;
-  dwStart = GetTickCount();
+  auto dwStart = GetTickCount64();
 
   GetTempPath(MAX_PATH, lpTmpPath);
   Path = lpTmpPath;
@@ -364,11 +360,11 @@ bool filter::ehnddic_cleanup() {
   HANDLE hFind = FindFirstFile(Path.c_str(), &FindFileData);
 
   do {
-    WriteLog(log_category::normal, L"EhndDicCleanUp : %s\n", D(FindFileData.cFileName));
     if (hFind == INVALID_HANDLE_VALUE)
       break;
     else if (FindFileData.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
       continue;
+    Log(log_category::normal, L"EhndDicCleanUp : {}\n", FindFileData.cFileName);
 
     int i = wcslen(FindFileData.cFileName) - 1;
     while (i--) {
@@ -383,8 +379,8 @@ bool filter::ehnddic_cleanup() {
   } while (FindNextFile(hFind, &FindFileData));
 
   // 소요시간 계산
-  dwEnd = GetTickCount();
-  WriteLog(log_category::time, L"EhndDicCleanUp : --- Elasped Time : %dms ---\n", dwEnd - dwStart);
+  auto dwEnd = GetTickCount64();
+  Log(log_category::time, L"EhndDicCleanUp : --- Elasped Time : {}ms ---\n", dwEnd - dwStart);
 
   return true;
 }
@@ -405,9 +401,9 @@ bool filter::ehnddic_create() {
   Path += L".ehnd";
 
   if (_wfopen_s(&fp, Path.c_str(), L"wb") != 0)
-    WriteLog(
+    Log(
       log_category::normal,
-      L"EhndDicCreate : 사용자사전 바이너리 \"UserDict_%s.ehnd\" 파일을 생성하는데 실패했습니다.\n",
+      L"EhndDicCreate : 사용자사전 바이너리 \"UserDict_{}.ehnd\" 파일을 생성하는데 실패했습니다.\n",
       lpText);
 
   for (UINT i = 0; i < UserDic.size(); i++) {
@@ -445,13 +441,13 @@ bool filter::ehnddic_create() {
     fwrite(L"", sizeof(char), 1, fp);
     fwrite(&i, sizeof(char), 4, fp);
   }
-  WriteLog(log_category::normal,
-           L"EhndDicCreate : 사용자사전 바이너리 \"UserDict_%s.ehnd\" 생성.\n", lpText);
+  Log(log_category::normal, L"EhndDicCreate : 사용자사전 바이너리 \"UserDict_{}.ehnd\" 생성.\n",
+      lpText);
   fclose(fp);
 
   // 소요시간 계산
   dwEnd = GetTickCount();
-  WriteLog(log_category::time, L"EhndDicCreate : --- Elasped Time : %dms ---\n", dwEnd - dwStart);
+  Log(log_category::time, L"EhndDicCreate : --- Elasped Time : {}ms ---\n", dwEnd - dwStart);
   return true;
 }
 
@@ -865,13 +861,11 @@ bool filter::filter_proc(vector<FILTERSTRUCT>& Filter, rule_type rule_type, wstr
       wsText = replace_all(wsText, Filter[i].src, Filter[i].dest);
       if (Str.compare(wsText)) {
         if (rule_type == rule_type::preprocess)
-          WriteLog(log_category::detail, L"PreFilter : [%s:%d] | %s | %s | %d | %d\n",
-                   D(Filter[i].db), Filter[i].line, D(Filter[i].src), D(Filter[i].dest),
-                   Filter[i].layer, Filter[i].regex);
+          Log(log_category::detail, L"PreFilter : [{}:{}] | {} | {} | {} | {}\n", Filter[i].db,
+              Filter[i].line, Filter[i].src, Filter[i].dest, Filter[i].layer, Filter[i].regex);
         else if (rule_type == rule_type::postprocess)
-          WriteLog(log_category::detail, L"PostFIlter : [%s:%d] | %s | %s | %d | %d\n",
-                   D(Filter[i].db), Filter[i].line, D(Filter[i].src), D(Filter[i].dest),
-                   Filter[i].layer, Filter[i].regex);
+          Log(log_category::detail, L"PostFilter : [{}:{}] | {} | {} | {} | {}\n", Filter[i].db,
+              Filter[i].line, Filter[i].src, Filter[i].dest, Filter[i].layer, Filter[i].regex);
       }
 
       end = system_clock::now();

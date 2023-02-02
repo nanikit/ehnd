@@ -17,12 +17,18 @@ typedef struct IUnknown IUnknown;
 // C++ standard libraries
 #include <algorithm>
 #include <array>
-#include <boost/regex.hpp>
 #include <chrono>
 #include <cstdarg>
 #include <cstdlib>
+#include <format>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <span>
 #include <vector>
+
+// Boost
+#include <boost/locale.hpp>
+#include <boost/regex.hpp>
 
 #define D(x) deformatted_string(x).c_str()

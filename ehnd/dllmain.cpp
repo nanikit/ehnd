@@ -16,6 +16,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInstance, DWORD ul_reason_for_call, LPVOID lpRe
   switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
       g_hInst = hInstance;
+      std::ios::sync_with_stdio(false);
 
       // init ehnd
       pFilter = new filter();

@@ -1,5 +1,6 @@
 #pragma once
-#include "log.h"
+
+void ShowLogWin(bool bShow);
 
 class config {
  private:

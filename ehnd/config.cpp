@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "ehnd.h"
+#include "log.h"
 
 config::config() {
   wcscpy_s(cfg_console_fontname, L"굴림");
