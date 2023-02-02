@@ -65,7 +65,7 @@ void __stdcall J2K_InitializeEx(int data0, LPSTR key) {
   }
 }
 
-void J2K_FreeMem(void* buffer) {
+void __stdcall J2K_FreeMem(void* buffer) {
   CoTaskMemFree(buffer);
 }
 
