@@ -127,7 +127,6 @@ __declspec(naked) void* msvcrt_fopen(char* path, char* mode) {
 }
 
 void* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
-  DWORD dwStart, dwEnd;
   LPWSTR szOut;
   wstring wsText, wsOriginal;
   int i_len;
@@ -162,8 +161,9 @@ void* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
     if (!pConfig->GetUserDicSwitch())
       WriteLog(log_category::normal, L"UserDic : 사용자 사전이 꺼져 있습니다.\n");
 
-    dwStart = GetTickCount();
+    auto tickStart = GetTickCount64();
 
+    // TranslateMMNT increases ESP by 1 and it matches with no calling convention.
     __asm {
 			PUSH DWORD PTR DS : [szJPN]
 			PUSH data0
@@ -171,10 +171,10 @@ void* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
 			MOV DWORD PTR DS : [szKOR], EAX
     }
 
-    dwEnd = GetTickCount();
+    auto tickEnd = GetTickCount64();
 
-    WriteLog(log_category::time, L"J2K_TranslateMMNT : --- Elasped Time : %dms ---\n",
-             dwEnd - dwStart);
+    WriteLog(log_category::time, L"J2K_TranslateMMNT : --- Elasped Time : %ullms ---\n",
+             tickEnd - tickStart);
 
     msvcrt_free(szJPN);
 
