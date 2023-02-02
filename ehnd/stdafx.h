@@ -4,7 +4,6 @@
 
 #pragma once
 
-typedef struct IUnknown IUnknown;
 #include "targetver.h"
 
 #include <Windows.h>
@@ -18,17 +17,12 @@ typedef struct IUnknown IUnknown;
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cstdarg>
-#include <cstdlib>
 #include <format>
 #include <fstream>
-#include <iomanip>
-#include <iostream>
 #include <span>
+#include <string>
 #include <vector>
 
 // Boost
 #include <boost/locale.hpp>
 #include <boost/regex.hpp>
-
-#define D(x) deformatted_string(x).c_str()

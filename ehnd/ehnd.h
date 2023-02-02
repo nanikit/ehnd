@@ -47,7 +47,6 @@ bool GetLoadPath(LPWSTR Path, int Size);
 bool GetExecutePath(LPWSTR Path, int Size);
 std::wstring replace_all(const std::wstring& str, const std::wstring& pattern,
                          const std::wstring& replace);
-std::wstring deformatted_string(const std::wstring& str);
 
 extern FARPROC apfnEzt[100];
 extern FARPROC apfnMsv[100];

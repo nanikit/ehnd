@@ -2,8 +2,6 @@
 
 #include "globals.h"
 
-using namespace std;
-
 FARPROC apfnEzt[100];
 FARPROC apfnMsv[100];
 bool initOnce = false;
@@ -126,7 +124,21 @@ __declspec(naked) void* msvcrt_fopen(char* path, char* mode) {
   __asm JMP apfnMsv[4 * 2];
 }
 
+LPCSTR TranslateMMNT(LPCSTR jpn) {
+  LPCSTR szKor = "";
+  // J2KEngine.dll's TranslateMMNT increases ESP by 1 and it matches with no calling convention.
+  __asm {
+    PUSH DWORD PTR DS : [jpn]
+    PUSH 0
+    CALL apfnEzt[4 * 18]
+    MOV DWORD PTR DS : [szKor], EAX
+  }
+  return szKor;
+}
+
 void FilterAndTranslate(std::wstring& text) {
+  using namespace std;
+
   pFilter->pre(text);
 
   Log(log_category::normal, L"[PRE] {}\n\n", text);
@@ -135,26 +147,25 @@ void FilterAndTranslate(std::wstring& text) {
   string jpn;
   jpn.resize(i_len);
 
-  WideCharToMultiByteWithAral(932, 0, text.c_str(), -1, jpn.data(), jpn.size(), NULL, NULL);
+  const char replacementChar = 0x01;
+  BOOL hasUnconvertible = false;
+  WideCharToMultiByteWithAral(932, 0, text.c_str(), -1, jpn.data(), jpn.size(), &replacementChar,
+                              &hasUnconvertible);
+  if (hasUnconvertible) {
+    for (auto& ch : jpn) {
+      if (ch == replacementChar) {
+        ch = ' ';
+      }
+    }
+  }
 
   if (!pConfig->GetUserDicSwitch()) {
     Log(log_category::normal, L"UserDic : 사용자 사전이 꺼져 있습니다.\n");
   }
 
   auto tickStart = GetTickCount64();
-
-  // TranslateMMNT increases ESP by 1 and it matches with no calling convention.
-  LPCSTR szJpn = jpn.c_str();
-  LPCSTR szKor = "";
-  __asm {
-			PUSH DWORD PTR DS : [szJpn]
-			PUSH 0
-			CALL apfnEzt[4 * 18]
-			MOV DWORD PTR DS : [szKor], EAX
-  }
-
+  LPCSTR szKor = TranslateMMNT(jpn.c_str());
   auto tickEnd = GetTickCount64();
-
   Log(log_category::time, L"J2K_TranslateMMNT : --- Elasped Time : {}ms ---\n",
       tickEnd - tickStart);
 
@@ -171,6 +182,8 @@ void FilterAndTranslate(std::wstring& text) {
 }
 
 wchar_t* AllocateNullTerminatedSharedMemory(std::wstring& text) {
+  using namespace std;
+
   auto pShareable = static_cast<LPWSTR>(CoTaskMemAlloc((text.size() + 1) * sizeof(text[0])));
   if (!pShareable) {
     Log(log_category::error, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
@@ -184,6 +197,8 @@ wchar_t* AllocateNullTerminatedSharedMemory(std::wstring& text) {
 }
 
 wchar_t* TranslateMMNTW(LPCWSTR szIn) {
+  using namespace std;
+
   // 로그 크기 체크
   CheckLogSize();
 
@@ -207,6 +222,8 @@ wchar_t* TranslateMMNTW(LPCWSTR szIn) {
 }
 
 void* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
+  using namespace std;
+
   try {
     return TranslateMMNTW(szIn);
   } catch (exception ex) {
@@ -225,6 +242,8 @@ void* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
 }
 
 void* __stdcall J2K_TranslateMMNT(int data0, LPCSTR szIn) {
+  using namespace std;
+
   LPSTR szOut;
   wstring wsText, wsOriginal;
   int i_len;
@@ -285,28 +304,16 @@ bool GetExecutePath(LPWSTR Path, int Size) {
   return true;
 }
 
-wstring replace_all(const wstring& str, const wstring& pattern, const wstring& replace) {
+std::wstring replace_all(const std::wstring& str, const std::wstring& pattern,
+                         const std::wstring& replace) {
+  using namespace std;
+
   wstring result = str;
   wstring::size_type pos = 0, offset = 0;
 
   while ((pos = result.find(pattern, offset)) != wstring::npos) {
     result.replace(result.begin() + pos, result.begin() + pos + pattern.size(), replace);
     offset = pos + replace.size();
-  }
-  return result;
-}
-
-wstring deformatted_string(const wstring& str) {
-  wchar_t pattern[][2] = {L"%", L"\\"};
-  wchar_t replace[][3] = {L"%%", L"\\\\"};
-  wstring result = str;
-  wstring::size_type pos = 0, offset = 0;
-
-  for (int i = 0; i < 1; i++) {
-    while ((pos = result.find(pattern[i], offset)) != wstring::npos) {
-      result.replace(result.begin() + pos, result.begin() + pos + 1, replace[i]);
-      offset = pos + 2;
-    }
   }
   return result;
 }
