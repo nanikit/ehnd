@@ -126,80 +126,84 @@ __declspec(naked) void* msvcrt_fopen(char* path, char* mode) {
   __asm JMP apfnMsv[4 * 2];
 }
 
+void FilterAndTranslate(std::wstring& text) {
+  pFilter->pre(text);
+
+  Log(log_category::normal, L"[PRE] {}\n\n", text);
+
+  int i_len = WideCharToMultiByteWithAral(932, 0, text.c_str(), -1, nullptr, 0, nullptr, nullptr);
+  string jpn;
+  jpn.resize(i_len);
+
+  WideCharToMultiByteWithAral(932, 0, text.c_str(), -1, jpn.data(), jpn.size(), NULL, NULL);
+
+  if (!pConfig->GetUserDicSwitch()) {
+    Log(log_category::normal, L"UserDic : 사용자 사전이 꺼져 있습니다.\n");
+  }
+
+  auto tickStart = GetTickCount64();
+
+  // TranslateMMNT increases ESP by 1 and it matches with no calling convention.
+  LPCSTR szJpn = jpn.c_str();
+  LPCSTR szKor = "";
+  __asm {
+			PUSH DWORD PTR DS : [szJpn]
+			PUSH 0
+			CALL apfnEzt[4 * 18]
+			MOV DWORD PTR DS : [szKor], EAX
+  }
+
+  auto tickEnd = GetTickCount64();
+
+  Log(log_category::time, L"J2K_TranslateMMNT : --- Elasped Time : {}ms ---\n",
+      tickEnd - tickStart);
+
+  i_len = MultiByteToWideCharWithAral(949, 0, szKor, -1, nullptr, 0);
+  text.resize(i_len);
+  MultiByteToWideCharWithAral(949, 0, szKor, -1, text.data(), text.size());
+  text.resize(max(0, text.size() - 1));
+
+  Log(log_category::normal, L"[TRANS] {}\n\n", text);
+
+  pFilter->post(text);
+
+  Log(log_category::normal, L"[POST] {}\n\n", text);
+}
+
+wchar_t* AllocateNullTerminatedSharedMemory(std::wstring& text) {
+  auto pShareable = static_cast<LPWSTR>(CoTaskMemAlloc((text.size() + 1) * sizeof(text[0])));
+  if (!pShareable) {
+    Log(log_category::error, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
+    return nullptr;
+  }
+
+  span<wchar_t> szOut{pShareable, text.size() + 1};
+  text.copy(szOut.data(), text.size());
+  szOut[text.size()] = L'\0';
+  return szOut.data();
+}
+
 wchar_t* TranslateMMNTW(LPCWSTR szIn) {
-  int i_len;
-
-  wstring_view original{szIn};
-  wstring text{original};
-
   // 로그 크기 체크
   CheckLogSize();
 
   // 콘솔 라인 체크
   CheckConsoleLine();
 
-  if (text.length()) {
-    Log(log_category::normal, L"[REQUEST] {}\n\n", text);
-  }
+  wstring_view original{szIn};
+  wstring text{original};
 
   // 넘어온 문자열의 길이가 0이거나 명령어일때 번역 프로세스 스킵
-  if (text.empty()) {
-  } else if (pFilter->cmd(text)) {
-    Log(log_category::normal, L"[COMMAND] {}\n\n", text);
-  } else {
-    pFilter->pre(text);
-
-    Log(log_category::normal, L"[PRE] {}\n\n", text);
-
-    i_len = WideCharToMultiByteWithAral(932, 0, text.c_str(), -1, nullptr, 0, nullptr, nullptr);
-    string jpn;
-    jpn.resize(i_len);
-
-    WideCharToMultiByteWithAral(932, 0, text.c_str(), -1, jpn.data(), jpn.size(), NULL, NULL);
-
-    if (!pConfig->GetUserDicSwitch()) {
-      Log(log_category::normal, L"UserDic : 사용자 사전이 꺼져 있습니다.\n");
+  if (text.size()) {
+    Log(log_category::normal, L"[REQUEST] {}\n\n", text);
+    if (pFilter->cmd(text)) {
+      Log(log_category::normal, L"[COMMAND] {}\n\n", text);
+    } else {
+      FilterAndTranslate(text);
     }
-
-    auto tickStart = GetTickCount64();
-
-    // TranslateMMNT increases ESP by 1 and it matches with no calling convention.
-    LPCSTR szJpn = jpn.c_str();
-    LPCSTR szKor = "";
-    __asm {
-			PUSH DWORD PTR DS : [szJpn]
-			PUSH 0
-			CALL apfnEzt[4 * 18]
-			MOV DWORD PTR DS : [szKor], EAX
-    }
-
-    auto tickEnd = GetTickCount64();
-
-    Log(log_category::time, L"J2K_TranslateMMNT : --- Elasped Time : {}ms ---\n",
-        tickEnd - tickStart);
-
-    i_len = MultiByteToWideCharWithAral(949, 0, szKor, -1, nullptr, 0);
-    text.resize(i_len);
-    MultiByteToWideCharWithAral(949, 0, szKor, -1, text.data(), text.size());
-    text.resize(max(0, text.size() - 1));
-
-    Log(log_category::normal, L"[TRANS] {}\n\n", text);
-
-    pFilter->post(text);
-
-    Log(log_category::normal, L"[POST] {}\n\n", text);
   }
 
-  auto pShareable = static_cast<LPWSTR>(CoTaskMemAlloc((text.size() + 1) * sizeof(text[0])));
-  if (!pShareable) {
-    Log(log_category::error, L"J2K_TranslateMMNT : Memory Allocation Error.\n");
-    return nullptr;
-  }
-  span<wchar_t> szOut{pShareable, text.size() + 1};
-
-  text.copy(szOut.data(), text.size());
-  szOut[text.size()] = L'\0';
-  return szOut.data();
+  return AllocateNullTerminatedSharedMemory(text);
 }
 
 void* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
