@@ -9,8 +9,6 @@
 #include <Windows.h>
 #include <tchar.h>
 
-#include <string>
-
 constexpr auto EHND_VER = _T("V3.20");
 
 #define EHND_EXPORT __declspec(dllexport)
@@ -44,8 +42,6 @@ EHND_EXPORT void* msvcrt_fopen(char* path, char* mode);
 
 bool GetLoadPath(LPWSTR Path, int Size);
 bool GetExecutePath(LPWSTR Path, int Size);
-std::wstring replace_all(const std::wstring& str, const std::wstring& pattern,
-                         const std::wstring& replace);
 
 extern FARPROC apfnEzt[100];
 extern FARPROC apfnMsv[100];

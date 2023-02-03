@@ -332,17 +332,3 @@ bool GetExecutePath(LPWSTR Path, int Size) {
   }
   return true;
 }
-
-std::wstring replace_all(const std::wstring& str, const std::wstring& pattern,
-                         const std::wstring& replace) {
-  using namespace std;
-
-  wstring result = str;
-  wstring::size_type pos = 0, offset = 0;
-
-  while ((pos = result.find(pattern, offset)) != wstring::npos) {
-    result.replace(result.begin() + pos, result.begin() + pos + pattern.size(), replace);
-    offset = pos + replace.size();
-  }
-  return result;
-}
