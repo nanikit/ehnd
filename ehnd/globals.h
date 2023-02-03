@@ -9,9 +9,9 @@
 #include "watch.h"
 
 extern HINSTANCE g_hInst;
-extern filter* pFilter;
-extern watch* pWatch;
-extern config* pConfig;
+extern Filter* pFilter;
+extern Watch* pWatch;
+extern Config* pConfig;
 extern int g_initTick;
 extern char g_DicPath[MAX_PATH];
 extern BOOL g_bAnemone;

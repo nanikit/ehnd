@@ -2,10 +2,10 @@
 
 #include "globals.h"
 
-watch* watch::m_pThis = NULL;
+Watch* Watch::m_pThis = NULL;
 std::vector<std::wstring> fileList;
 
-watch::watch() {
+Watch::Watch() {
   m_pThis = this;
 
   SECURITY_ATTRIBUTES ThreadAttributes;
@@ -19,19 +19,19 @@ watch::watch() {
   }
 }
 
-watch::~watch() {
+Watch::~Watch() {
   TerminateThread(hWatchThread, 0);
 }
 
-void watch::TurnOn() {
+void Watch::TurnOn() {
   bWatch = true;
 }
 
-void watch::TurnOff() {
+void Watch::TurnOff() {
   bWatch = false;
 }
 
-DWORD watch::_NotifyThread(LPVOID lpParam) {
+DWORD Watch::_NotifyThread(LPVOID lpParam) {
   HWND hwnd = (HWND)lpParam;
   UINT m_nTimerID;
   WCHAR lpEztPath[MAX_PATH];
@@ -92,7 +92,7 @@ DWORD watch::_NotifyThread(LPVOID lpParam) {
   return 0;
 }
 
-MMRESULT watch::_NotifyProc(UINT m_nTimerID, UINT uiMsg, DWORD dwUser, DWORD dw1, DWORD d2) {
+MMRESULT Watch::_NotifyProc(UINT m_nTimerID, UINT uiMsg, DWORD dwUser, DWORD dw1, DWORD d2) {
   bool c_prefilter = false;
   bool c_postfilter = false;
   bool c_userdic = false;

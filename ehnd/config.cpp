@@ -4,14 +4,14 @@
 #include "ehnd.h"
 #include "log.h"
 
-config::config() {
+Config::Config() {
   wcscpy_s(cfg_console_fontname, L"굴림");
 }
 
-config::~config() {
+Config::~Config() {
 }
 
-bool config::LoadConfig() {
+bool Config::LoadConfig() {
   wchar_t INIPath[MAX_PATH], buf[255];
   GetLoadPath(INIPath, MAX_PATH);
   wcscat_s(INIPath, L"\\Ehnd\\ehnd_conf.ini");
@@ -70,7 +70,7 @@ bool config::LoadConfig() {
   return true;
 }
 
-bool config::SaveConfig() {
+bool Config::SaveConfig() {
   wchar_t INIPath[MAX_PATH], buf[255];
   GetLoadPath(INIPath, MAX_PATH);
   wcscat_s(INIPath, L"\\Ehnd\\ehnd_conf.ini");
@@ -115,13 +115,13 @@ bool config::SaveConfig() {
   return true;
 }
 
-bool config::ReadINI(const wchar_t* key, const wchar_t* section, wchar_t* buf, wchar_t* file) {
+bool Config::ReadINI(const wchar_t* key, const wchar_t* section, wchar_t* buf, wchar_t* file) {
   int n = GetPrivateProfileString(section, key, NULL, buf, 255, file);
   if (n == 0) return false;
   return true;
 }
 
-bool config::WriteINI(const wchar_t* key, const wchar_t* section, wchar_t* buf, wchar_t* file) {
+bool Config::WriteINI(const wchar_t* key, const wchar_t* section, wchar_t* buf, wchar_t* file) {
   int n = WritePrivateProfileString(section, key, buf, file);
   if (n == 0) return false;
   return true;

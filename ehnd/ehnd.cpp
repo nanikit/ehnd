@@ -17,9 +17,9 @@ bool EhndInit() {
   std::ios::sync_with_stdio(false);
 
   // init ehnd
-  pFilter = new filter();
-  pWatch = new watch();
-  pConfig = new config();
+  pFilter = new Filter();
+  pWatch = new Watch();
+  pConfig = new Config();
 
   SetLogText(L"EhndInit : 이지트랜스 초기화\n");
 

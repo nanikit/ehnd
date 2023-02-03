@@ -2,7 +2,7 @@
 
 void ShowLogWin(bool bShow);
 
-class config {
+class Config {
  private:
   bool firstInit = true;
 
@@ -26,8 +26,8 @@ class config {
   int cfg_console_fontsize = 12;
 
  public:
-  config();
-  ~config();
+  Config();
+  ~Config();
   bool LoadConfig();
   bool SaveConfig();
 

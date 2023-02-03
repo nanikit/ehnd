@@ -1,10 +1,8 @@
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
 #include <string>
-#include <variant>
 
 enum class user_word {
   common = 1,
@@ -56,10 +54,10 @@ struct SKIPLAYERSTRUCT {
     return (layer) < (ss.layer) || ((layer) == (ss.layer) && (g_line < ss.g_line));
   }
 };
-class filter {
+class Filter {
  public:
-  filter();
-  ~filter();
+  Filter();
+  ~Filter();
 
   bool load();
   bool load_dic();

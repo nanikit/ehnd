@@ -1,6 +1,7 @@
 #pragma once
 
-#include <winnt.h>
+#include <Windows.h>
+
 #include <array>
 #include <boost/locale.hpp>
 #include <chrono>
@@ -31,7 +32,7 @@ bool IsShownLogWin(void);
 DWORD WINAPI LogThreadMain(LPVOID lpParam);
 LRESULT CALLBACK LogProc(HWND, UINT, WPARAM, LPARAM);
 
-extern config* pConfig;
+extern Config* pConfig;
 extern int logLine;
 
 template <typename... Args>

@@ -1,13 +1,16 @@
 #pragma once
-class watch {
+
+#include <Windows.h>
+
+class Watch {
  public:
-  watch();
-  ~watch();
+  Watch();
+  ~Watch();
   void TurnOn();
   void TurnOff();
 
  private:
-  static watch* m_pThis;
+  static Watch* m_pThis;
   HANDLE hWatchThread;
 
   bool bWatch = true;

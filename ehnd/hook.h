@@ -1,5 +1,6 @@
 #pragma once
-#include <specstrings.h>
+
+#include <Windows.h>
 
 bool hook();
 bool hook_userdict();

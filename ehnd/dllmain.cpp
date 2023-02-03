@@ -4,9 +4,9 @@
 #include "globals.h"
 
 HINSTANCE g_hInst;
-filter* pFilter;
-watch* pWatch;
-config* pConfig;
+Filter* pFilter;
+Watch* pWatch;
+Config* pConfig;
 HMODULE hEzt, hMsv;
 char g_DicPath[MAX_PATH];
 BOOL g_bAnemone = false;

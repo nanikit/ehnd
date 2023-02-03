@@ -26,15 +26,15 @@ int operator<(USERDICSTRUCT& left, USERDICSTRUCT& right) {
           (left.g_line < right.g_line));
 }
 
-filter::filter() {
+Filter::Filter() {
   hLoadEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
 }
 
-filter::~filter() {
+Filter::~Filter() {
   CloseHandle(hLoadEvent);
 }
 
-bool filter::load() {
+bool Filter::load() {
   WaitForSingleObject(hLoadEvent, INFINITE);
   if (!pre_load() || !post_load() || !userdic_load() || skiplayer_load()) {
     SetEvent(hLoadEvent);
@@ -44,7 +44,7 @@ bool filter::load() {
   return true;
 }
 
-bool filter::load_dic() {
+bool Filter::load_dic() {
   WaitForSingleObject(hLoadEvent, INFINITE);
   if (!userdic_load()) {
     SetEvent(hLoadEvent);
@@ -54,7 +54,7 @@ bool filter::load_dic() {
   return true;
 }
 
-bool filter::pre_load() {
+bool Filter::pre_load() {
   WCHAR lpEztPath[MAX_PATH];
   WIN32_FIND_DATA FindFileData;
   FILTERSTRUCT fs;
@@ -101,7 +101,7 @@ bool filter::pre_load() {
   return true;
 }
 
-bool filter::post_load() {
+bool Filter::post_load() {
   WCHAR lpEztPath[MAX_PATH];
   WIN32_FIND_DATA FindFileData;
   FILTERSTRUCT fs;
@@ -148,7 +148,7 @@ bool filter::post_load() {
   return true;
 }
 
-bool filter::skiplayer_load() {
+bool Filter::skiplayer_load() {
   WCHAR lpEztPath[MAX_PATH];
   WIN32_FIND_DATA FindFileData;
   FILTERSTRUCT fs;
@@ -193,7 +193,7 @@ bool filter::skiplayer_load() {
   Log(log_category::time, L"SkipLayerRead : --- Elasped Time : {}ms ---\n", dwEnd - dwStart);
   return true;
 }
-bool filter::userdic_load() {
+bool Filter::userdic_load() {
   WCHAR lpEztPath[MAX_PATH];
   WIN32_FIND_DATA FindFileData;
   wstring Path;
@@ -244,7 +244,7 @@ bool filter::userdic_load() {
   return true;
 }
 
-bool filter::jkdic_load(int& g_line) {
+bool Filter::jkdic_load(int& g_line) {
   WCHAR lpEztPath[MAX_PATH];
   CHAR Jpn[32], Kor[32], Part[6], Attr[38], Hidden;
   CHAR Buffer[1024];
@@ -345,7 +345,7 @@ bool filter::jkdic_load(int& g_line) {
   return true;
 }
 
-bool filter::ehnddic_cleanup() {
+bool Filter::ehnddic_cleanup() {
   WCHAR lpTmpPath[MAX_PATH];
   WIN32_FIND_DATA FindFileData;
   wstring Path;
@@ -384,7 +384,7 @@ bool filter::ehnddic_cleanup() {
   return true;
 }
 
-bool filter::ehnddic_create() {
+bool Filter::ehnddic_create() {
   WCHAR lpTmpPath[MAX_PATH], lpText[12];
   CHAR Jpn[32], Kor[32], Part[6], Attr[38];
   wstring Path;
@@ -450,7 +450,7 @@ bool filter::ehnddic_create() {
   return true;
 }
 
-bool filter::skiplayer_load2(vector<SKIPLAYERSTRUCT>& SkipLayer, LPCWSTR lpPath, LPCWSTR lpFileName,
+bool Filter::skiplayer_load2(vector<SKIPLAYERSTRUCT>& SkipLayer, LPCWSTR lpPath, LPCWSTR lpFileName,
                              int& g_line) {
   WCHAR Buffer[1024], Context[1024];
   FILE* fp;
@@ -528,7 +528,7 @@ bool filter::skiplayer_load2(vector<SKIPLAYERSTRUCT>& SkipLayer, LPCWSTR lpPath,
   return true;
 }
 
-bool filter::filter_load(vector<FILTERSTRUCT>& Filter, LPCWSTR lpPath, LPCWSTR lpFileName,
+bool Filter::filter_load(vector<FILTERSTRUCT>& Filter, LPCWSTR lpPath, LPCWSTR lpFileName,
                          rule_type rule_type, int& g_line) {
   FILE* fp;
   WCHAR Buffer[1024], Context[1024];
@@ -636,7 +636,7 @@ bool filter::filter_load(vector<FILTERSTRUCT>& Filter, LPCWSTR lpPath, LPCWSTR l
   return true;
 }
 
-bool filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int& g_line) {
+bool Filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int& g_line) {
   FILE* fp;
   WCHAR Buffer[1024], Context[1024];
   wstring Path, Jpn, Kor, Attr;
@@ -748,7 +748,7 @@ bool filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int& g_line) {
 
 // anedic.txt 호환을 위한 함수
 // 필터가 변경이 되면 anedic.txt 파일을 찾아 읽는다
-bool filter::anedic_load(int& g_line) {
+bool Filter::anedic_load(int& g_line) {
   wstring Jpn, Kor, Attr;
   WCHAR lpPathName[MAX_PATH], lpFileName[MAX_PATH];
 
@@ -787,7 +787,7 @@ bool filter::anedic_load(int& g_line) {
   return userdic_load2(lpPathName, lpFileName, g_line);
 }
 
-bool filter::pre(wstring& wsText) {
+bool Filter::pre(wstring& wsText) {
   if (!pConfig->GetPreSwitch()) {
     Log(log_category::normal, L"PreFilter : 전처리가 꺼져 있습니다.\n");
     return false;
@@ -795,7 +795,7 @@ bool filter::pre(wstring& wsText) {
   return filter_proc(PreFilter, rule_type::preprocess, wsText);
 }
 
-bool filter::post(wstring& wsText) {
+bool Filter::post(wstring& wsText) {
   if (!pConfig->GetPostSwitch()) {
     Log(log_category::normal, L"PostFilter : 후처리가 꺼져 있습니다.\n");
     return false;
@@ -803,7 +803,7 @@ bool filter::post(wstring& wsText) {
   return filter_proc(PostFilter, rule_type::postprocess, wsText);
 }
 
-bool filter::filter_proc(vector<FILTERSTRUCT>& Filter, rule_type rule_type, wstring& wsText) {
+bool Filter::filter_proc(vector<FILTERSTRUCT>& Filter, rule_type rule_type, wstring& wsText) {
   DWORD dwStart, dwEnd;
   system_clock::time_point start, end;
   typedef duration<double, milli> doubleMilli;
@@ -923,7 +923,7 @@ bool filter::filter_proc(vector<FILTERSTRUCT>& Filter, rule_type rule_type, wstr
   return true;
 }
 
-bool filter::cmd(wstring& wsText) {
+bool Filter::cmd(wstring& wsText) {
   BOOL bCommand = false;
   BOOL bSaveINI = false;
   if (wsText[0] != L'/') return false;
