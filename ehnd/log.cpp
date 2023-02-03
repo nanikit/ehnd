@@ -13,15 +13,15 @@ void LogStartMsg() {
   GetLoadPath(lpEztPath, MAX_PATH);
   GetExecutePath(lpExePath, MAX_PATH);
 
-  Log(log_category::normal, L"──── ━━\n");
-  Log(log_category::normal, L"Ehnd :: 엔드 - VER. {} :: COMPILE AT {}, {}\n", EHND_VER,
+  Log(LogCategory::kNormal, L"──── ━━\n");
+  Log(LogCategory::kNormal, L"Ehnd :: 엔드 - VER. {} :: COMPILE AT {}, {}\n", EHND_VER,
       _T(__DATE__), _T(__TIME__));
-  Log(log_category::normal, L"──── ━━ Ehnd -- sokcuri.neko.kr --\n");
-  Log(log_category::normal, L"\n");
-  Log(log_category::normal, L"- 제작자 : {}\n", L"소쿠릿");
-  Log(log_category::normal, L"━━━━━━━━━───────────-＊\n");
-  Log(log_category::normal, L"EzTransPath : {}\n", lpEztPath);
-  Log(log_category::normal, L"ExecutePath : {}\n", lpExePath);
+  Log(LogCategory::kNormal, L"──── ━━ Ehnd -- sokcuri.neko.kr --\n");
+  Log(LogCategory::kNormal, L"\n");
+  Log(LogCategory::kNormal, L"- 제작자 : {}\n", L"소쿠릿");
+  Log(LogCategory::kNormal, L"━━━━━━━━━───────────-＊\n");
+  Log(LogCategory::kNormal, L"EzTransPath : {}\n", lpEztPath);
+  Log(LogCategory::kNormal, L"ExecutePath : {}\n", lpExePath);
   return;
 }
 
@@ -85,12 +85,12 @@ bool CreateLogWin(HINSTANCE hInst) {
 
   hLogEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
   if (!hLogEvent) {
-    Log(log_category::error, L"CreateLogWin : Event Init Error");
+    Log(LogCategory::kError, L"CreateLogWin : Event Init Error");
     return 0;
   }
   HANDLE hThread = CreateThread(&thAttr, 0, LogThreadMain, NULL, 0, NULL);
   if (hThread == NULL) {
-    Log(log_category::error, L"CreateLogWin : Log Thread Create Error");
+    Log(LogCategory::kError, L"CreateLogWin : Log Thread Create Error");
   }
 
   // 로그 윈도우가 초기화될때까지 기다림
@@ -107,7 +107,7 @@ DWORD WINAPI LogThreadMain(LPVOID lpParam) {
   hLogWin = CreateWindowEx(0, L"EhndLogWin", wszTitle, WS_OVERLAPPEDWINDOW, 64, 64, 640, 480, 0, 0,
                            hInst, 0);
   if (!hLogWin) {
-    Log(log_category::error, L"LogThreadMain : Log Window Create Failed");
+    Log(LogCategory::kError, L"LogThreadMain : Log Window Create Failed");
     return 0;
   }
 
@@ -116,7 +116,7 @@ DWORD WINAPI LogThreadMain(LPVOID lpParam) {
     WS_VISIBLE | WS_CHILD | WS_VSCROLL | ES_MULTILINE | ES_LEFT | ES_NOHIDESEL | ES_AUTOVSCROLL, 0,
     0, 640, 480, hLogWin, NULL, hInst, NULL);
   if (!hLogRes) {
-    Log(log_category::error, L"LogThreadMain : Log Edit Create Failed");
+    Log(LogCategory::kError, L"LogThreadMain : Log Edit Create Failed");
   }
 
   CHARFORMAT2 cf;

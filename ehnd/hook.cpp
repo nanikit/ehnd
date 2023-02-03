@@ -133,10 +133,10 @@ bool hook_userdict(void) {
   int r = SearchPattern(ptn, _countof(ptn), &addr);
 
   if (r == 0) {
-    Log(log_category::normal, L"HookUserDict : J2KEngine Pattern Search Failed\n");
+    Log(LogCategory::kNormal, L"HookUserDict : J2KEngine Pattern Search Failed\n");
     return false;
   } else if (r > 1) {
-    Log(log_category::normal, L"HookUserDict : J2KEngine Pattern Search Failed\n");
+    Log(LogCategory::kNormal, L"HookUserDict : J2KEngine Pattern Search Failed\n");
     return false;
   } else {
     array<::byte, 14> patch{0x90, 0x90, 0x90, 0x90, 0x90, 0xE9, 0xFF,
@@ -158,7 +158,7 @@ bool hook_userdict(void) {
     hHandle = OpenProcess(PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE, FALSE,
                           GetCurrentProcessId());
     VirtualProtectEx(hHandle, (void*)addr, patch.size(), OldProtect, &OldProtect2);
-    Log(log_category::normal, L"HookUserDict : Success.\n");
+    Log(LogCategory::kNormal, L"HookUserDict : Success.\n");
   }
 
   return true;
@@ -180,10 +180,10 @@ bool hook_userdict2(void) {
   int r = SearchPattern(ptn.data(), ptn.size(), &addr);
 
   if (r == 0) {
-    Log(log_category::normal, L"HookUserDict2 : J2KEngine Pattern Search Failed\n");
+    Log(LogCategory::kNormal, L"HookUserDict2 : J2KEngine Pattern Search Failed\n");
     return false;
   } else if (r > 1) {
-    Log(log_category::normal, L"HookUserDict2 : J2kEngine Pattern Search Failed\n");
+    Log(LogCategory::kNormal, L"HookUserDict2 : J2kEngine Pattern Search Failed\n");
     return false;
   } else {
     addr += 5;
@@ -205,7 +205,7 @@ bool hook_userdict2(void) {
                           GetCurrentProcessId());
     VirtualProtectEx(hHandle, (void*)addr, PatchSize, OldProtect, &OldProtect2);
 
-    Log(log_category::normal, L"HookUserDict2 : Success.\n");
+    Log(LogCategory::kNormal, L"HookUserDict2 : Success.\n");
   }
 
   return true;
@@ -247,10 +247,10 @@ bool hook_getwordinfo(void) {
   int r = SearchPattern(ptn.data(), ptn.size(), &addr);
 
   if (r == 0) {
-    Log(log_category::normal, L"HookGetWordInfo : J2KEngine Pattern Search Failed\n");
+    Log(LogCategory::kNormal, L"HookGetWordInfo : J2KEngine Pattern Search Failed\n");
     return false;
   } else if (r > 1) {
-    Log(log_category::normal, L"HookGetWordInfo : J2kEngine Pattern Search Failed\n");
+    Log(LogCategory::kNormal, L"HookGetWordInfo : J2kEngine Pattern Search Failed\n");
     return false;
   } else {
     lpfnWordInfo = addr;
@@ -292,7 +292,7 @@ bool hook_getwordinfo(void) {
 
     // 0x0D
 
-    Log(log_category::normal, L"HookWordInfo : Success.\n");
+    Log(LogCategory::kNormal, L"HookWordInfo : Success.\n");
   }
 
   return true;
@@ -569,12 +569,12 @@ void userdict_log(char* s) {
   wchar_t* str = (wchar_t*)msvcrt_malloc((len + 1) * 2);
   MultiByteToWideCharWithAral(932, 0, s, -1, str, len);
 
-  Log(log_category::user_dict, L"UserDic_Req : {}\n", str);
+  Log(LogCategory::kUserDict, L"UserDic_Req : {}\n", str);
   msvcrt_free(str);
 }
 
 void userdict_log2(int idx, int num) {
-  Log(log_category::user_dict, L"UserDic ({}) : [{}:{}] {} | {} | ({}) | {}\n", num + 1,
+  Log(LogCategory::kUserDict, L"UserDic ({}) : [{}:{}] {} | {} | ({}) | {}\n", num + 1,
       pFilter->GetDicDB(idx), pFilter->GetDicLine(idx), pFilter->GetDicJPN(idx),
       pFilter->GetDicKOR(idx), pFilter->GetDicTYPE(idx), pFilter->GetDicATTR(idx));
 }

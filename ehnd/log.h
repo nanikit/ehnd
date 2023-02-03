@@ -10,13 +10,13 @@
 
 #include "config.h"
 
-enum class log_category {
-  normal = 0,
-  error = 10,
-  detail = 20,
-  time = 30,
-  skip_layer = 40,
-  user_dict = 50,
+enum class LogCategory {
+  kNormal = 0,
+  kError = 10,
+  kDetail = 20,
+  kTime = 30,
+  kSkipLayer = 40,
+  kUserDict = 50,
 };
 
 void LogStartMsg();
@@ -36,15 +36,15 @@ extern Config* pConfig;
 extern int logLine;
 
 template <typename... Args>
-auto Log(log_category category, const std::_Fmt_wstring<Args...> fmt, Args&&... args) {
+auto Log(LogCategory category, const std::_Fmt_wstring<Args...> fmt, Args&&... args) {
   using namespace std;
   static auto zone = chrono::current_zone();
   static auto loc = boost::locale::generator().generate("UTF-8");
 
-  if (!pConfig->GetLogTime() && category == log_category::time) return;
-  if (!pConfig->GetLogDetail() && category == log_category::detail) return;
-  if (!pConfig->GetLogSkipLayer() && category == log_category::skip_layer) return;
-  if (!pConfig->GetLogUserDic() && category == log_category::user_dict) return;
+  if (!pConfig->GetLogTime() && category == LogCategory::kTime) return;
+  if (!pConfig->GetLogDetail() && category == LogCategory::kDetail) return;
+  if (!pConfig->GetLogSkipLayer() && category == LogCategory::kSkipLayer) return;
+  if (!pConfig->GetLogUserDic() && category == LogCategory::kUserDict) return;
 
   bool doWindowLog = IsShownLogWin();
   bool doFileLog = pConfig->GetFileLogSwitch();
