@@ -465,18 +465,19 @@ __declspec(naked) int __stdcall MultiByteToWideCharWithAral(
 }
 #pragma warning(pop)
 
-std::string WideToMultiByte(const std::wstring_view&& source, UINT codePage) {
+std::string WideToMultiByte(const std::wstring_view&& source, UINT codePage, bool useOriginal) {
   using namespace std;
 
-  int i_len = WideCharToMultiByteWithAral(codePage, 0, source.data(), source.size(), nullptr, 0,
-                                          nullptr, nullptr);
+  auto wc_to_mb = useOriginal ? WideCharToMultiByte : WideCharToMultiByteWithAral;
+
+  int i_len = wc_to_mb(codePage, 0, source.data(), source.size(), nullptr, 0, nullptr, nullptr);
   string dest;
   dest.resize(i_len);
 
   const char replacementChar = 0x01;
   BOOL hasUnconvertible = false;
-  WideCharToMultiByteWithAral(codePage, 0, source.data(), -1, dest.data(), dest.size(),
-                              &replacementChar, &hasUnconvertible);
+  wc_to_mb(codePage, 0, source.data(), -1, dest.data(), dest.size(), &replacementChar,
+           &hasUnconvertible);
   if (hasUnconvertible) {
     for (auto& ch : dest) {
       if (ch == replacementChar) {
@@ -488,13 +489,15 @@ std::string WideToMultiByte(const std::wstring_view&& source, UINT codePage) {
   return dest;
 }
 
-std::wstring MultiByteToWide(const std::string_view&& source, UINT codePage) {
+std::wstring MultiByteToWide(const std::string_view&& source, UINT codePage, bool useOriginal) {
   using namespace std;
 
-  int i_len = MultiByteToWideCharWithAral(codePage, 0, source.data(), source.size(), nullptr, 0);
+  auto mb_to_wc = useOriginal ? MultiByteToWideChar : MultiByteToWideCharWithAral;
+
+  int i_len = mb_to_wc(codePage, 0, source.data(), source.size(), nullptr, 0);
   wstring dest;
   dest.resize(i_len);
-  MultiByteToWideCharWithAral(codePage, 0, source.data(), source.size(), dest.data(), dest.size());
+  mb_to_wc(codePage, 0, source.data(), source.size(), dest.data(), dest.size());
 
   return dest;
 }
