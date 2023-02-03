@@ -432,17 +432,18 @@ bool GetRealMB2WC(void) {
   return true;
 }
 
+#pragma warning(push)
+#pragma warning(disable : 6054)
 __declspec(naked) int __stdcall WideCharToMultiByteWithAral(
   _In_ UINT CodePage, _In_ DWORD dwFlags, _In_NLS_string_(cchWideChar) LPCWCH lpWideCharStr,
   _In_ int cchWideChar, _Out_writes_bytes_to_opt_(cbMultiByte, return) LPSTR lpMultiByteStr,
   _In_ int cbMultiByte, _In_opt_ LPCCH lpDefaultChar, _Out_opt_ LPBOOL lpUsedDefaultChar) {
   if (wc2mb_type == 1) {
-    __asm
-    {
-			MOV EDI, EDI  // kernelbase
-			PUSH EBP
-			MOV EBP, ESP
-			POP EBP
+    __asm {
+      MOV EDI, EDI  // kernelbase
+      PUSH EBP
+      MOV EBP, ESP
+      POP EBP
     }
   }
   __asm JMP lpfnwc2mb
@@ -453,15 +454,49 @@ __declspec(naked) int __stdcall MultiByteToWideCharWithAral(
   _In_ int cbMultiByte, _Out_writes_to_opt_(cchWideChar, return) LPWSTR lpWideCharStr,
   _In_ int cchWideChar) {
   if (mb2wc_type == 1) {
-    __asm
-    {
-			MOV EDI, EDI  // kernelbase
-			PUSH EBP
-			MOV EBP, ESP
-			POP EBP
+    __asm {
+      MOV EDI, EDI  // kernelbase
+      PUSH EBP
+      MOV EBP, ESP
+      POP EBP
     }
   }
   __asm JMP lpfnmb2wc
+}
+#pragma warning(pop)
+
+std::string WideToMultiByte(const std::wstring_view&& source, UINT codePage) {
+  using namespace std;
+
+  int i_len = WideCharToMultiByteWithAral(codePage, 0, source.data(), source.size(), nullptr, 0,
+                                          nullptr, nullptr);
+  string dest;
+  dest.resize(i_len);
+
+  const char replacementChar = 0x01;
+  BOOL hasUnconvertible = false;
+  WideCharToMultiByteWithAral(codePage, 0, source.data(), -1, dest.data(), dest.size(),
+                              &replacementChar, &hasUnconvertible);
+  if (hasUnconvertible) {
+    for (auto& ch : dest) {
+      if (ch == replacementChar) {
+        ch = ' ';
+      }
+    }
+  }
+
+  return dest;
+}
+
+std::wstring MultiByteToWide(const std::string_view&& source, UINT codePage) {
+  using namespace std;
+
+  int i_len = MultiByteToWideCharWithAral(codePage, 0, source.data(), source.size(), nullptr, 0);
+  wstring dest;
+  dest.resize(i_len);
+  MultiByteToWideCharWithAral(codePage, 0, source.data(), source.size(), dest.data(), dest.size());
+
+  return dest;
 }
 
 void* fopen_patch(char* path, char* mode) {

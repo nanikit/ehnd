@@ -2,6 +2,11 @@
 
 #include <Windows.h>
 
+#include <string>
+#include <string_view>
+
+#include "macro.h"
+
 bool hook();
 bool hook_userdict();
 bool hook_userdict2();
@@ -30,3 +35,6 @@ int __stdcall MultiByteToWideCharWithAral(_In_ UINT CodePage, _In_ DWORD dwFlags
                                           _Out_writes_to_opt_(cchWideChar, return)
                                             LPWSTR lpWideCharStr,
                                           _In_ int cchWideChar);
+
+EHND_EXPORT std::string WideToMultiByte(const std::wstring_view&& source, UINT codePage);
+EHND_EXPORT std::wstring MultiByteToWide(const std::string_view&& source, UINT codePage);

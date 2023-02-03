@@ -165,28 +165,12 @@ LPCSTR TranslateMMNT(LPCSTR jpn) {
   return szKor;
 }
 
-void FilterAndTranslate(std::wstring& text) {
+std::wstring FilterAndTranslate(std::wstring& text) {
   using namespace std;
 
   pFilter->pre(text);
-
   Log(LogCategory::kNormal, L"[PRE] {}\n\n", text);
-
-  int i_len = WideCharToMultiByteWithAral(932, 0, text.c_str(), -1, nullptr, 0, nullptr, nullptr);
-  string jpn;
-  jpn.resize(i_len);
-
-  const char replacementChar = 0x01;
-  BOOL hasUnconvertible = false;
-  WideCharToMultiByteWithAral(932, 0, text.c_str(), -1, jpn.data(), jpn.size(), &replacementChar,
-                              &hasUnconvertible);
-  if (hasUnconvertible) {
-    for (auto& ch : jpn) {
-      if (ch == replacementChar) {
-        ch = ' ';
-      }
-    }
-  }
+  auto jpn = WideToMultiByte(text, 932);
 
   if (!pConfig->GetUserDicSwitch()) {
     Log(LogCategory::kNormal, L"UserDic : 사용자 사전이 꺼져 있습니다.\n");
@@ -198,16 +182,12 @@ void FilterAndTranslate(std::wstring& text) {
   Log(LogCategory::kTime, L"J2K_TranslateMMNT : --- Elasped Time : {}ms ---\n",
       tickEnd - tickStart);
 
-  i_len = MultiByteToWideCharWithAral(949, 0, szKor, -1, nullptr, 0);
-  text.resize(i_len);
-  MultiByteToWideCharWithAral(949, 0, szKor, -1, text.data(), text.size());
-  text.resize(max(0, text.size() - 1));
-
-  Log(LogCategory::kNormal, L"[TRANS] {}\n\n", text);
-
+  auto kor = MultiByteToWide(szKor, 949);
+  Log(LogCategory::kNormal, L"[TRANS] {}\n\n", kor);
   pFilter->post(text);
+  Log(LogCategory::kNormal, L"[POST] {}\n\n", kor);
 
-  Log(LogCategory::kNormal, L"[POST] {}\n\n", text);
+  return kor;
 }
 
 wchar_t* AllocateNullTerminatedSharedMemory(std::wstring& text) {
@@ -243,7 +223,7 @@ wchar_t* TranslateMMNTW(LPCWSTR szIn) {
     if (pFilter->cmd(text)) {
       Log(LogCategory::kNormal, L"[COMMAND] {}\n\n", text);
     } else {
-      FilterAndTranslate(text);
+      text = FilterAndTranslate(text);
     }
   }
 
@@ -256,14 +236,8 @@ wchar_t* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
   try {
     return TranslateMMNTW(szIn);
   } catch (exception ex) {
-    mbstate_t state{};
-    auto message = string_view{ex.what()};
-    wstring dest;
-    dest.resize(message.size());
-    auto pt = message.data();
-    size_t count = 0;
-    mbsrtowcs_s(&count, dest.data(), dest.size(), &pt, dest.size(), &state);
-    Log(LogCategory::kError, L"J2K_TranslateMMNT : {}\n", dest);
+    auto message = MultiByteToWide(ex.what(), CP_ACP);
+    Log(LogCategory::kError, L"J2K_TranslateMMNT : {}\n", message);
   } catch (...) {
     Log(LogCategory::kError, L"J2K_TranslateMMNT : Unknown error\n");
   }
