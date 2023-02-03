@@ -7,6 +7,8 @@ FARPROC apfnMsv[100];
 int g_initTick;
 
 bool EhndInit() {
+  using namespace std;
+
   // 중복 초기화 방지
   static bool initOnce = false;
   if (initOnce)
@@ -37,13 +39,16 @@ bool EhndInit() {
 
   // 기존 로그 삭제
   if (pConfig->GetFileLogStartupClear()) {
-    wchar_t lpFileName[MAX_PATH];
-    if (pConfig->GetFileLogEztLoc())
-      GetLoadPath(lpFileName, MAX_PATH);
-    else
-      GetExecutePath(lpFileName, MAX_PATH);
-    wcscat_s(lpFileName, L"\\ehnd_log.log");
-    DeleteFile(lpFileName);
+    wstring file_name;
+    if (pConfig->GetFileLogEztLoc()) {
+      file_name = pConfig->GetEhndPath();
+    } else {
+      file_name.resize(MAX_PATH);
+      GetExecutePath(file_name.data(), file_name.size());
+      file_name.resize(wcsnlen(file_name.data(), file_name.size()));
+    }
+    file_name += L"\\ehnd_log.log";
+    DeleteFile(file_name.c_str());
   }
 
   CreateLogWin(g_hInst);

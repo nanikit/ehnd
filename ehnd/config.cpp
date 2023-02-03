@@ -11,6 +11,79 @@ Config::Config() {
 Config::~Config() {
 }
 
+const std::wstring Config::kEngineDllSubPath = L"\\J2KEngine.dlx";
+
+bool DoesDlxExist(const std::wstring& directory) {
+  auto dll = directory + Config::kEngineDllSubPath;
+  return std::filesystem::exists(dll);
+}
+
+std::wstring GetEztransPathFromRegistry() {
+  using namespace std;
+  using namespace winreg;
+
+  RegKey key;
+  auto openResult = key.TryOpen(HKEY_CURRENT_USER, L"Software\\ChangShin\\ezTrans");
+  if (!openResult) {
+    return {};
+  }
+
+  auto getResult = key.TryGetStringValue(L"FilePath");
+  if (!getResult) {
+    return {};
+  }
+
+  auto& ehndPath = getResult.GetValue();
+  return DoesDlxExist(ehndPath) ? ehndPath : std::wstring{};
+}
+
+std::wstring Config::GetEztransPath() {
+  using namespace std;
+
+  auto ehndPath = GetEhndPath();
+  if (DoesDlxExist(ehndPath)) {
+    return ehndPath;
+  }
+
+  ehndPath = GetEztransPathFromRegistry();
+  if (ehndPath.size()) {
+    return ehndPath;
+  }
+
+  auto defaultPath = LR"(C:\Program Files (x86)\ChangShinSoft\ezTrans XP)";
+  ehndPath = defaultPath;
+  if (DoesDlxExist(ehndPath)) {
+    return ehndPath;
+  }
+
+  return {};
+}
+
+std::wstring Config::GetEhndPath() {
+  using namespace std;
+
+  int flag = GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT;
+  auto address = reinterpret_cast<LPCTSTR>(&ShowLogWin);
+  HMODULE handle;
+  if (!GetModuleHandleEx(flag, address, &handle)) {
+    int ret = GetLastError();
+    Log(LogCategory::kError, L"GetModuleHandleEx failed, error {}\n", ret);
+    return {};
+  }
+
+  wstring path;
+  path.resize(MAX_PATH);
+  int length = GetModuleFileName(handle, path.data(), path.size());
+  if (!length) {
+    int ret = GetLastError();
+    Log(LogCategory::kError, L"GetModuleFileName failed, error {}\n", ret);
+    return {};
+  }
+
+  path.resize(path.rfind(L'\\'));
+  return path;
+}
+
 bool Config::LoadConfig() {
   wchar_t INIPath[MAX_PATH], buf[255];
   GetLoadPath(INIPath, MAX_PATH);

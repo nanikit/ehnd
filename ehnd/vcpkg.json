@@ -5,6 +5,7 @@
   "description": "Eztrans wrapper",
   "dependencies": [
     "boost-locale",
-    "boost-regex"
+    "boost-regex",
+    "winreg"
   ]
 }

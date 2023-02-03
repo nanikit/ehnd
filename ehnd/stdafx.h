@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <filesystem>
 #include <format>
 #include <fstream>
 // cout For debugging
@@ -26,6 +27,7 @@
 #include <string>
 #include <vector>
 
-// Boost
+// Third parties
 #include <boost/locale.hpp>
 #include <boost/regex.hpp>
+#include <winreg/WinReg.hpp>

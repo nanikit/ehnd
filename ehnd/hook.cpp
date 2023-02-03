@@ -8,8 +8,6 @@ LPBYTE lpfnWordInfo;
 int wc2mb_type = 0, mb2wc_type = 0;
 
 bool hook() {
-  HMODULE hDll, hDll2;
-  TCHAR lpEztPath[MAX_PATH], lpDllPath[MAX_PATH];
   LPCSTR aEztFunction[] = {"J2K_Initialize",      "J2K_InitializeEx",
                            "J2K_FreeMem",         "J2K_GetPriorDict",
                            "J2K_GetProperty",     "J2K_ReloadUserDict",
@@ -21,19 +19,16 @@ bool hook() {
                            "J2K_TranslateMM",     "J2K_TranslateMMEx",
                            "J2K_TranslateMMNT",   "?GetJ2KMainDir@@YA?AVCString@@XZ"};
   LPCSTR aMsvFunction[] = {"free", "malloc", "fopen"};
-  int i;
 
-  GetLoadPath(lpEztPath, MAX_PATH);
-
-  wcscpy_s(lpDllPath, lpEztPath);
-  wcscat_s(lpDllPath, L"\\j2kengine.dlx");
-  hDll = LoadLibrary(lpDllPath);
+  auto eztransPath = pConfig->GetEztransPath();
+  auto dllPath = eztransPath + Config::kEngineDllSubPath;
+  auto hDll = LoadLibrary(dllPath.c_str());
   if (!hDll) {
     MessageBox(0, L"J2KEngine.dlx Load Failed", L"EzTransHook", MB_ICONERROR);
     return false;
   }
 
-  for (i = 0; i < _countof(aEztFunction); i++) {
+  for (int i = 0; i < _countof(aEztFunction); i++) {
     apfnEzt[i] = GetProcAddress(hDll, aEztFunction[i]);
     if (!apfnEzt[i]) {
       MessageBox(0, L"J2KEngine.dlx Function Load Failed", L"EzTransHook", MB_ICONERROR);
@@ -41,16 +36,17 @@ bool hook() {
     }
   }
 
-  lpDllPath[0] = 0;
-  GetSystemDirectory(lpDllPath, MAX_PATH);
-  wcscat_s(lpDllPath, L"\\msvcrt.dll");
-  hDll2 = LoadLibrary(lpDllPath);
+  dllPath.resize(MAX_PATH);
+  GetSystemDirectory(dllPath.data(), dllPath.size());
+  dllPath.resize(dllPath.find(L'\0'));
+  dllPath.append(L"\\msvcrt.dll");
+  auto hDll2 = LoadLibrary(dllPath.c_str());
   if (!hDll2) {
     MessageBox(0, L"MSVCRT.DLL Load Failed", L"EzTransHook", MB_ICONERROR);
     return false;
   }
 
-  for (i = 0; i < _countof(aMsvFunction); i++) {
+  for (int i = 0; i < _countof(aMsvFunction); i++) {
     apfnMsv[i] = GetProcAddress(hDll2, aMsvFunction[i]);
     if (!apfnMsv[i]) {
       MessageBox(0, L"MSVCRT.DLL Function Load Failed", L"EzTransHook", MB_ICONERROR);

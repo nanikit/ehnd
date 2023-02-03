@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 void ShowLogWin(bool bShow);
 
 class Config {
@@ -26,6 +28,8 @@ class Config {
   int cfg_console_fontsize = 12;
 
  public:
+  static const std::wstring kEngineDllSubPath;
+
   Config();
   ~Config();
   bool LoadConfig();
@@ -33,6 +37,16 @@ class Config {
 
   bool ReadINI(const wchar_t* key, const wchar_t* section, wchar_t* buf, wchar_t* file);
   bool WriteINI(const wchar_t* key, const wchar_t* section, wchar_t* buf, wchar_t* file);
+
+  /// <summary>
+  /// It returns the directory path of J2KEngine.dlx by searching it in the order of the path where
+  /// this DLL is located, the registry, and the default installation path.
+  /// </summary>
+  std::wstring GetEztransPath();
+  /// <summary>
+  /// It returns the directory path of the current ehnd.dll.
+  /// </summary>
+  std::wstring GetEhndPath();
 
   bool GetPreSwitch() {
     return cfg_prefilter_switch;
