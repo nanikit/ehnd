@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ehnd_conf.ini" />
+    <None Include="cpp.hint" />
     <None Include="ehnd.def">
       <Filter>소스 파일</Filter>
     </None>
