@@ -2,9 +2,11 @@
 
 #include <string>
 
+#include "macro.h"
+
 void ShowLogWin(bool bShow);
 
-class Config {
+class EHND_EXPORT Config {
  private:
   bool firstInit = true;
 
@@ -28,7 +30,7 @@ class Config {
   int cfg_console_fontsize = 12;
 
  public:
-  static const std::wstring kEngineDllSubPath;
+  static const wchar_t* const kEngineDllSubPath;
 
   Config();
   ~Config();

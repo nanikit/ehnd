@@ -1,6 +1,31 @@
 #include "pch.h"
 
+#include "../ehnd/config.h"
 #include "../ehnd/ehnd.h"
+#include "../ehnd/hook.h"
+
+std::string WideToMultiByte(const std::wstring_view&& source, UINT codePage) {
+  using namespace std;
+
+  int i_len =
+    WideCharToMultiByte(codePage, 0, source.data(), source.size(), nullptr, 0, nullptr, nullptr);
+  string dest;
+  dest.resize(i_len);
+
+  const char replacementChar = 0x01;
+  BOOL hasUnconvertible = false;
+  WideCharToMultiByte(codePage, 0, source.data(), -1, dest.data(), dest.size(), &replacementChar,
+                      &hasUnconvertible);
+  if (hasUnconvertible) {
+    for (auto& ch : dest) {
+      if (ch == replacementChar) {
+        ch = ' ';
+      }
+    }
+  }
+
+  return dest;
+}
 
 std::wstring Translate(const wchar_t* szJpn) {
   using namespace std;
@@ -17,10 +42,12 @@ auto simpleJapanese =
   L"話に出る。";
 
 void Initialize() {
+  using namespace std;
+
   auto user = "CSUSER123455";
-  auto path = std::filesystem::current_path().append("Dat").string();
-  auto key = path.c_str();
-  J2K_InitializeEx(user, key);
+  auto wpath = Config{}.GetEztransPath() + L"\\Dat";
+  auto key = WideToMultiByte(wpath, CP_ACP);
+  J2K_InitializeEx(user, key.c_str());
 }
 
 TEST(TranslationTest, TranslateBasic) {

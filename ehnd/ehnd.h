@@ -9,9 +9,9 @@
 #include <Windows.h>
 #include <tchar.h>
 
-constexpr auto EHND_VER = _T("V3.20");
+#include "macro.h"
 
-#define EHND_EXPORT __declspec(dllexport)
+const auto EHND_VER = _T("V3.20");
 
 extern "C" {
 EHND_EXPORT void J2K_Initialize(void);

@@ -11,7 +11,7 @@ Config::Config() {
 Config::~Config() {
 }
 
-const std::wstring Config::kEngineDllSubPath = L"\\J2KEngine.dlx";
+const wchar_t* const Config::kEngineDllSubPath = L"\\J2KEngine.dlx";
 
 bool DoesDlxExist(const std::wstring& directory) {
   auto dll = directory + Config::kEngineDllSubPath;
