@@ -4,14 +4,33 @@
 
 FARPROC apfnEzt[100];
 FARPROC apfnMsv[100];
-bool initOnce = false;
+int g_initTick;
 
-bool EhndInit(void) {
+bool EhndInit() {
   // 중복 초기화 방지
+  static bool initOnce = false;
   if (initOnce)
     return false;
   else
     initOnce = true;
+
+  std::ios::sync_with_stdio(false);
+
+  // init ehnd
+  pFilter = new filter();
+  pWatch = new watch();
+  pConfig = new config();
+
+  SetLogText(L"EhndInit : 이지트랜스 초기화\n");
+
+  char szInitTick[12];
+  g_initTick = GetTickCount() + rand();
+  _itoa_s(g_initTick, szInitTick, 10);
+
+  GetTempPathA(MAX_PATH, g_DicPath);
+  strcat_s(g_DicPath, "UserDict_");
+  strcat_s(g_DicPath, szInitTick);
+  strcat_s(g_DicPath, ".ehnd");
 
   // 설정 로드
   pConfig->LoadConfig();
@@ -52,13 +71,12 @@ bool EhndInit(void) {
 __declspec(naked) void J2K_Initialize(void) {
   __asm JMP apfnEzt[4 * 0];
 }
-void __stdcall J2K_InitializeEx(int data0, LPSTR key) {
-  SetLogText(L"J2K_InitializeEx : 이지트랜스 초기화\n");
-
+void __stdcall J2K_InitializeEx(LPCSTR name, LPCSTR key) {
   EhndInit();
+
   __asm {
 		PUSH DWORD PTR DS : [key]
-		PUSH data0
+		PUSH name
 		CALL apfnEzt[4 * 1]
   }
 }
@@ -125,6 +143,11 @@ __declspec(naked) void* msvcrt_fopen(char* path, char* mode) {
 }
 
 LPCSTR TranslateMMNT(LPCSTR jpn) {
+  using namespace std;
+
+  static mutex mtx;
+  auto lock = lock_guard<mutex>{mtx};
+
   LPCSTR szKor = "";
   // J2KEngine.dll's TranslateMMNT increases ESP by 1 and it matches with no calling convention.
   __asm {
@@ -133,6 +156,7 @@ LPCSTR TranslateMMNT(LPCSTR jpn) {
     CALL apfnEzt[4 * 18]
     MOV DWORD PTR DS : [szKor], EAX
   }
+
   return szKor;
 }
 
@@ -221,7 +245,7 @@ wchar_t* TranslateMMNTW(LPCWSTR szIn) {
   return AllocateNullTerminatedSharedMemory(text);
 }
 
-void* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
+wchar_t* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
   using namespace std;
 
   try {

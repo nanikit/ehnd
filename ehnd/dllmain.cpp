@@ -8,7 +8,6 @@ filter* pFilter;
 watch* pWatch;
 config* pConfig;
 HMODULE hEzt, hMsv;
-int g_initTick;
 char g_DicPath[MAX_PATH];
 BOOL g_bAnemone = false;
 
@@ -16,22 +15,6 @@ BOOL APIENTRY DllMain(HINSTANCE hInstance, DWORD ul_reason_for_call, LPVOID lpRe
   switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
       g_hInst = hInstance;
-      std::ios::sync_with_stdio(false);
-
-      // init ehnd
-      pFilter = new filter();
-      pWatch = new watch();
-      pConfig = new config();
-
-      char szInitTick[12];
-      g_initTick = GetTickCount() + rand();
-      _itoa_s(g_initTick, szInitTick, 10);
-
-      GetTempPathA(MAX_PATH, g_DicPath);
-      strcat_s(g_DicPath, "UserDict_");
-      strcat_s(g_DicPath, szInitTick);
-      strcat_s(g_DicPath, ".ehnd");
-
       break;
     case DLL_THREAD_ATTACH:
       break;

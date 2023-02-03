@@ -6,8 +6,8 @@
 // 이 DLL은 해당 매크로로 정의된 기호가 내보내지는 것으로 봅니다.
 
 #pragma once
+#include <Windows.h>
 #include <tchar.h>
-#include <winnt.h>
 
 #include <string>
 
@@ -17,7 +17,7 @@ constexpr auto EHND_VER = _T("V3.20");
 
 extern "C" {
 EHND_EXPORT void J2K_Initialize(void);
-EHND_EXPORT void __stdcall J2K_InitializeEx(int data0, LPSTR key);
+EHND_EXPORT void __stdcall J2K_InitializeEx(LPCSTR name, LPCSTR key);
 EHND_EXPORT void __stdcall J2K_FreeMem(void*);
 EHND_EXPORT void J2K_GetPriorDict(void);
 EHND_EXPORT void J2K_GetProperty(void);
@@ -35,14 +35,13 @@ EHND_EXPORT void J2K_TranslateFM(void);
 EHND_EXPORT void J2K_TranslateMM(void);
 EHND_EXPORT void J2K_TranslateMMEx(void);
 EHND_EXPORT void* __stdcall J2K_TranslateMMNT(int data0, LPCSTR szText);
-EHND_EXPORT void* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szText);
+EHND_EXPORT wchar_t* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szText);
 EHND_EXPORT void J2K_GetJ2KMainDir(void);
 EHND_EXPORT void* msvcrt_free(void* _Memory);
 EHND_EXPORT void* msvcrt_malloc(size_t _Size);
 EHND_EXPORT void* msvcrt_fopen(char* path, char* mode);
 };
 
-bool EhndInit();
 bool GetLoadPath(LPWSTR Path, int Size);
 bool GetExecutePath(LPWSTR Path, int Size);
 std::wstring replace_all(const std::wstring& str, const std::wstring& pattern,
