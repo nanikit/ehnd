@@ -77,7 +77,9 @@ __declspec(naked) void J2K_Initialize(void) {
   __asm JMP apfnEzt[4 * 0];
 }
 void __stdcall J2K_InitializeEx(LPCSTR name, LPCSTR key) {
-  EhndInit();
+  if (!EhndInit()) {
+    return;
+  }
 
   __asm {
 		PUSH DWORD PTR DS : [key]

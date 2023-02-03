@@ -40,20 +40,20 @@ std::wstring GetEztransPathFromRegistry() {
 std::wstring Config::GetEztransPath() {
   using namespace std;
 
-  auto ehndPath = GetEhndPath();
-  if (DoesDlxExist(ehndPath)) {
-    return ehndPath;
+  auto path = GetEhndPath();
+  if (DoesDlxExist(path)) {
+    return path;
   }
 
-  ehndPath = GetEztransPathFromRegistry();
-  if (ehndPath.size()) {
-    return ehndPath;
+  path = GetEztransPathFromRegistry();
+  if (path.size()) {
+    return path;
   }
 
   auto defaultPath = LR"(C:\Program Files (x86)\ChangShinSoft\ezTrans XP)";
-  ehndPath = defaultPath;
-  if (DoesDlxExist(ehndPath)) {
-    return ehndPath;
+  path = defaultPath;
+  if (DoesDlxExist(path)) {
+    return path;
   }
 
   return {};
