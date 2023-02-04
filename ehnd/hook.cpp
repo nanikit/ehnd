@@ -465,13 +465,14 @@ __declspec(naked) int __stdcall MultiByteToWideCharWithAral(
 }
 #pragma warning(pop)
 
-std::string WideToMultiByte(const std::wstring_view&& source, UINT codePage, bool useOriginal) {
+std::string WideToMultiByte(const std::wstring_view&& source, UINT codePage, bool useOriginal,
+                            std::optional<std::string>&& buffer) {
   using namespace std;
 
   auto wc_to_mb = useOriginal ? WideCharToMultiByte : WideCharToMultiByteWithAral;
 
   int i_len = wc_to_mb(codePage, 0, source.data(), source.size(), nullptr, 0, nullptr, nullptr);
-  string dest;
+  string dest{buffer.value_or(string{})};
   dest.resize(i_len);
 
   const char replacementChar = 0x01;
@@ -489,13 +490,14 @@ std::string WideToMultiByte(const std::wstring_view&& source, UINT codePage, boo
   return dest;
 }
 
-std::wstring MultiByteToWide(const std::string_view&& source, UINT codePage, bool useOriginal) {
+std::wstring MultiByteToWide(const std::string_view&& source, UINT codePage, bool useOriginal,
+                             std::optional<std::wstring>&& buffer) {
   using namespace std;
 
   auto mb_to_wc = useOriginal ? MultiByteToWideChar : MultiByteToWideCharWithAral;
 
   int i_len = mb_to_wc(codePage, 0, source.data(), source.size(), nullptr, 0);
-  wstring dest;
+  wstring dest{buffer.value_or(wstring{})};
   dest.resize(i_len);
   mb_to_wc(codePage, 0, source.data(), source.size(), dest.data(), dest.size());
 

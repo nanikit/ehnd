@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -37,6 +38,8 @@ int __stdcall MultiByteToWideCharWithAral(_In_ UINT CodePage, _In_ DWORD dwFlags
                                           _In_ int cchWideChar);
 
 EHND_EXPORT std::string WideToMultiByte(const std::wstring_view&& source, UINT codePage,
-                                        bool useOriginal = false);
+                                        bool useOriginal = false,
+                                        std::optional<std::string>&& buffer = std::nullopt);
 EHND_EXPORT std::wstring MultiByteToWide(const std::string_view&& source, UINT codePage,
-                                         bool useOriginal = false);
+                                         bool useOriginal = false,
+                                         std::optional<std::wstring>&& buffer = std::nullopt);

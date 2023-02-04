@@ -23,6 +23,7 @@
 // cout For debugging
 #include <iostream>
 #include <mutex>
+#include <optional>
 #include <span>
 #include <string>
 #include <vector>

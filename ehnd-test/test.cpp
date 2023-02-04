@@ -34,6 +34,13 @@ TEST(TranslationTest, TranslateBasic) {
   ASSERT_STRNE(L"", result.c_str());
 }
 
+TEST(TranslationTest, TranslateHdor) {
+  Initialize();
+
+  auto result = Translate(L"乱数生成");
+  ASSERT_STREQ(L"난수 생성", result.c_str());
+}
+
 TEST(TranslationTest, EnsureThreadSafety) {
   using namespace std;
 

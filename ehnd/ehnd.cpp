@@ -149,13 +149,13 @@ __declspec(naked) void* msvcrt_fopen(char* path, char* mode) {
   __asm JMP apfnMsv[4 * 2];
 }
 
-LPCSTR TranslateMMNT(LPCSTR jpn) {
+LPSTR TranslateMMNT(LPCSTR jpn) {
   using namespace std;
 
   static mutex mtx;
   auto lock = lock_guard<mutex>{mtx};
 
-  LPCSTR szKor = "";
+  LPSTR szKor = nullptr;
   // J2KEngine.dll's TranslateMMNT increases ESP by 1 and it matches with no calling convention.
   __asm {
     PUSH DWORD PTR DS : [jpn]
@@ -167,7 +167,7 @@ LPCSTR TranslateMMNT(LPCSTR jpn) {
   return szKor;
 }
 
-std::wstring FilterAndTranslate(std::wstring& text) {
+std::wstring FilterAndTranslate(std::wstring&& text) {
   using namespace std;
 
   pFilter->pre(text);
@@ -179,17 +179,19 @@ std::wstring FilterAndTranslate(std::wstring& text) {
   }
 
   auto tickStart = GetTickCount64();
-  LPCSTR szKor = TranslateMMNT(jpn.c_str());
+  LPSTR szKor = TranslateMMNT(jpn.c_str());
   auto tickEnd = GetTickCount64();
   Log(LogCategory::kTime, L"J2K_TranslateMMNT : --- Elasped Time : {}ms ---\n",
       tickEnd - tickStart);
 
-  auto kor = MultiByteToWide(szKor, 949);
-  Log(LogCategory::kNormal, L"[TRANS] {}\n\n", kor);
-  pFilter->post(text);
-  Log(LogCategory::kNormal, L"[POST] {}\n\n", kor);
+  text = MultiByteToWide(szKor, 949, false, move(text));
+  msvcrt_free(szKor);
 
-  return kor;
+  Log(LogCategory::kNormal, L"[TRANS] {}\n\n", text);
+  pFilter->post(text);
+  Log(LogCategory::kNormal, L"[POST] {}\n\n", text);
+
+  return text;
 }
 
 wchar_t* AllocateNullTerminatedSharedMemory(std::wstring& text) {
@@ -225,7 +227,7 @@ wchar_t* TranslateMMNTW(LPCWSTR szIn) {
     if (pFilter->cmd(text)) {
       Log(LogCategory::kNormal, L"[COMMAND] {}\n\n", text);
     } else {
-      text = FilterAndTranslate(text);
+      text = FilterAndTranslate(move(text));
     }
   }
 
