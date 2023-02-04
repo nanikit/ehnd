@@ -34,6 +34,13 @@ TEST(TranslationTest, TranslateBasic) {
   ASSERT_STRNE(L"", result.c_str());
 }
 
+TEST(TranslationTest, EnsureCrashHandling) {
+  Initialize();
+
+  auto result = Translate(L"亮介(");
+  ASSERT_STRNE(L"", result.c_str());
+}
+
 TEST(TranslationTest, TranslateHdor) {
   Initialize();
 
