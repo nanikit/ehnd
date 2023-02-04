@@ -55,23 +55,17 @@ bool Filter::load_dic() {
 }
 
 bool Filter::pre_load() {
-  WCHAR lpEztPath[MAX_PATH];
   WIN32_FIND_DATA FindFileData;
-  FILTERSTRUCT fs;
-  wstring Path;
 
   DWORD dwStart, dwEnd;
   dwStart = GetTickCount();
-
-  GetLoadPath(lpEztPath, MAX_PATH);
-  Path = lpEztPath;
-  Path += L"\\Ehnd\\PreFilter*.txt";
 
   int pre_line = 1;
 
   vector<FILTERSTRUCT> Filter;
 
-  HANDLE hFind = FindFirstFile(Path.c_str(), &FindFileData);
+  auto filter_path = pConfig->GetEhndPath() + L"\\Ehnd\\";
+  HANDLE hFind = FindFirstFile((filter_path + L"PreFilter*.txt").c_str(), &FindFileData);
 
   do {
     if (hFind == INVALID_HANDLE_VALUE)
@@ -79,11 +73,8 @@ bool Filter::pre_load() {
     else if (FindFileData.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
       continue;
 
-    Path = lpEztPath;
-    Path += L"\\Ehnd\\";
-
-    filter_load(Filter, Path.c_str(), FindFileData.cFileName, rule_type::preprocess, pre_line);
-
+    filter_load(Filter, filter_path.c_str(), FindFileData.cFileName, rule_type::preprocess,
+                pre_line);
   } while (FindNextFile(hFind, &FindFileData));
 
   // 정렬
@@ -102,23 +93,17 @@ bool Filter::pre_load() {
 }
 
 bool Filter::post_load() {
-  WCHAR lpEztPath[MAX_PATH];
   WIN32_FIND_DATA FindFileData;
-  FILTERSTRUCT fs;
-  wstring Path;
 
   DWORD dwStart, dwEnd;
   dwStart = GetTickCount();
-
-  GetLoadPath(lpEztPath, MAX_PATH);
-  Path = lpEztPath;
-  Path += L"\\Ehnd\\PostFilter*.txt";
 
   int post_line = 1;
 
   vector<FILTERSTRUCT> Filter;
 
-  HANDLE hFind = FindFirstFile(Path.c_str(), &FindFileData);
+  auto filter_path = pConfig->GetEhndPath() + L"\\Ehnd\\";
+  HANDLE hFind = FindFirstFile((filter_path + L"PostFilter*.txt").c_str(), &FindFileData);
 
   do {
     if (hFind == INVALID_HANDLE_VALUE)
@@ -126,10 +111,8 @@ bool Filter::post_load() {
     else if (FindFileData.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
       continue;
 
-    Path = lpEztPath;
-    Path += L"\\Ehnd\\";
-
-    filter_load(Filter, Path.c_str(), FindFileData.cFileName, rule_type::postprocess, post_line);
+    filter_load(Filter, filter_path.c_str(), FindFileData.cFileName, rule_type::postprocess,
+                post_line);
 
   } while (FindNextFile(hFind, &FindFileData));
 
@@ -149,22 +132,16 @@ bool Filter::post_load() {
 }
 
 bool Filter::skiplayer_load() {
-  WCHAR lpEztPath[MAX_PATH];
   WIN32_FIND_DATA FindFileData;
-  FILTERSTRUCT fs;
-  wstring Path;
 
   auto dwStart = GetTickCount64();
-
-  GetLoadPath(lpEztPath, MAX_PATH);
-  Path = lpEztPath;
-  Path += L"\\Ehnd\\SkipLayer*.txt";
 
   int skiplayer_line = 1;
 
   vector<SKIPLAYERSTRUCT> _SkipLayer;
 
-  HANDLE hFind = FindFirstFile(Path.c_str(), &FindFileData);
+  auto filter_path = pConfig->GetEhndPath() + L"\\Ehnd\\";
+  HANDLE hFind = FindFirstFile((filter_path + L"SkipLayer*.txt").c_str(), &FindFileData);
 
   do {
     if (hFind == INVALID_HANDLE_VALUE)
@@ -172,10 +149,7 @@ bool Filter::skiplayer_load() {
     else if (FindFileData.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
       continue;
 
-    Path = lpEztPath;
-    Path += L"\\Ehnd\\";
-
-    skiplayer_load2(_SkipLayer, Path.c_str(), FindFileData.cFileName, skiplayer_line);
+    skiplayer_load2(_SkipLayer, filter_path.c_str(), FindFileData.cFileName, skiplayer_line);
 
   } while (FindNextFile(hFind, &FindFileData));
 
@@ -194,15 +168,9 @@ bool Filter::skiplayer_load() {
   return true;
 }
 bool Filter::userdic_load() {
-  WCHAR lpEztPath[MAX_PATH];
   WIN32_FIND_DATA FindFileData;
-  wstring Path;
 
   auto dwStart = GetTickCount64();
-
-  GetLoadPath(lpEztPath, MAX_PATH);
-  Path = lpEztPath;
-  Path += L"\\Ehnd\\UserDict*.txt";
 
   int userdic_line = 1;
   UserDic.clear();
@@ -213,7 +181,8 @@ bool Filter::userdic_load() {
   // load anedic.txt
   anedic_load(userdic_line);
 
-  HANDLE hFind = FindFirstFile(Path.c_str(), &FindFileData);
+  auto dictionary_path = pConfig->GetEhndPath() + L"\\Ehnd\\";
+  HANDLE hFind = FindFirstFile((dictionary_path + L"UserDict*.txt").c_str(), &FindFileData);
 
   do {
     if (hFind == INVALID_HANDLE_VALUE)
@@ -221,10 +190,7 @@ bool Filter::userdic_load() {
     else if (FindFileData.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
       continue;
 
-    Path = lpEztPath;
-    Path += L"\\Ehnd\\";
-
-    userdic_load2(Path.c_str(), FindFileData.cFileName, userdic_line);
+    userdic_load2(dictionary_path.c_str(), FindFileData.cFileName, userdic_line);
 
   } while (FindNextFile(hFind, &FindFileData));
 
@@ -245,25 +211,23 @@ bool Filter::userdic_load() {
 }
 
 bool Filter::jkdic_load(int& g_line) {
-  WCHAR lpEztPath[MAX_PATH];
   CHAR Jpn[32], Kor[32], Part[6], Attr[38], Hidden;
   CHAR Buffer[1024];
   FILE* fp;
-  wstring Path;
   int line = 1;
   wchar_t lpBuffer[128];
 
   auto dwStart = GetTickCount64();
 
-  GetLoadPath(lpEztPath, MAX_PATH);
-  Path = lpEztPath;
-  Path += L"\\Dat\\UserDict.jk";
+  auto user_dict = pConfig->GetEhndPath() + L"\\Dat\\UserDict.jk";
 
-  if (_wfopen_s(&fp, Path.c_str(), L"rb") != 0) {
+  if (_wfopen_s(&fp, user_dict.c_str(), L"rb") != 0) {
     Log(LogCategory::kNormal, L"JkDicLoad : DAT 사용자 사전 파일 \"UserDict.jk\"이 없습니다.\n");
 
     // userdict.jk 파일이 없으면 빈 파일 만듦
-    if (_wfopen_s(&fp, Path.c_str(), L"wb") == 0) fclose(fp);
+    if (_wfopen_s(&fp, user_dict.c_str(), L"wb") == 0) {
+      fclose(fp);
+    }
     return false;
   }
 
@@ -1069,10 +1033,13 @@ bool Filter::cmd(wstring& wsText) {
       FILE* fp;
       wchar_t lpFileName[MAX_PATH];
 
-      if (pConfig->GetFileLogEztLoc())
-        GetLoadPath(lpFileName, MAX_PATH);
-      else
+      if (pConfig->GetFileLogEztLoc()) {
+        auto ehndPath = pConfig->GetEhndPath();
+        ehndPath.copy(lpFileName, ehndPath.size());
+        lpFileName[ehndPath.size()] = L'\0';
+      } else {
         GetExecutePath(lpFileName, MAX_PATH);
+      }
       wcscat_s(lpFileName, L"\\ehnd_eout.log");
 
       if (!_wfopen_s(&fp, lpFileName, L"wt,ccs=UTF-8")) {
