@@ -1,0 +1,9 @@
+{
+  "name": "ehnd-test",
+  "version-string": "1",
+  "port-version": 2,
+  "description": "ehnd tester",
+  "dependencies": [
+    "boost-locale"
+  ]
+}

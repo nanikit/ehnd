@@ -465,8 +465,8 @@ __declspec(naked) int __stdcall MultiByteToWideCharWithAral(
 }
 #pragma warning(pop)
 
-std::string WideToMultiByte(const std::wstring_view&& source, UINT codePage, bool useOriginal,
-                            std::optional<std::string>&& buffer) {
+std::string WideToMultiByte(const std::wstring_view& source, UINT codePage, bool useOriginal,
+                            const std::optional<std::string>& buffer) {
   using namespace std;
 
   auto wc_to_mb = useOriginal ? WideCharToMultiByte : WideCharToMultiByteWithAral;
@@ -490,8 +490,8 @@ std::string WideToMultiByte(const std::wstring_view&& source, UINT codePage, boo
   return dest;
 }
 
-std::wstring MultiByteToWide(const std::string_view&& source, UINT codePage, bool useOriginal,
-                             std::optional<std::wstring>&& buffer) {
+std::wstring MultiByteToWide(const std::string_view& source, UINT codePage, bool useOriginal,
+                             const std::optional<std::wstring>& buffer) {
   using namespace std;
 
   auto mb_to_wc = useOriginal ? MultiByteToWideChar : MultiByteToWideCharWithAral;
