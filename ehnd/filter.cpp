@@ -2,10 +2,6 @@
 
 #include "globals.h"
 
-using namespace std;
-using namespace chrono;
-using namespace boost;
-
 int operator<(USERDICSTRUCT& left, USERDICSTRUCT& right) {
   char buffer1[62], buffer2[62];
   int result =
@@ -55,6 +51,8 @@ bool Filter::load_dic() {
 }
 
 bool Filter::pre_load() {
+  using namespace std;
+
   WIN32_FIND_DATA FindFileData;
 
   DWORD dwStart, dwEnd;
@@ -93,6 +91,8 @@ bool Filter::pre_load() {
 }
 
 bool Filter::post_load() {
+  using namespace std;
+
   WIN32_FIND_DATA FindFileData;
 
   DWORD dwStart, dwEnd;
@@ -132,6 +132,8 @@ bool Filter::post_load() {
 }
 
 bool Filter::skiplayer_load() {
+  using namespace std;
+
   WIN32_FIND_DATA FindFileData;
 
   auto dwStart = GetTickCount64();
@@ -310,6 +312,8 @@ bool Filter::jkdic_load(int& g_line) {
 }
 
 bool Filter::ehnddic_cleanup() {
+  using namespace std;
+
   WCHAR lpTmpPath[MAX_PATH];
   WIN32_FIND_DATA FindFileData;
   wstring Path;
@@ -349,6 +353,8 @@ bool Filter::ehnddic_cleanup() {
 }
 
 bool Filter::ehnddic_create() {
+  using namespace std;
+
   WCHAR lpTmpPath[MAX_PATH], lpText[12];
   CHAR Jpn[32], Kor[32], Part[6], Attr[38];
   wstring Path;
@@ -414,8 +420,10 @@ bool Filter::ehnddic_create() {
   return true;
 }
 
-bool Filter::skiplayer_load2(vector<SKIPLAYERSTRUCT>& SkipLayer, LPCWSTR lpPath, LPCWSTR lpFileName,
-                             int& g_line) {
+bool Filter::skiplayer_load2(std::vector<SKIPLAYERSTRUCT>& SkipLayer, LPCWSTR lpPath,
+                             LPCWSTR lpFileName, int& g_line) {
+  using namespace std;
+
   WCHAR Buffer[1024], Context[1024];
   FILE* fp;
 
@@ -472,8 +480,8 @@ bool Filter::skiplayer_load2(vector<SKIPLAYERSTRUCT>& SkipLayer, LPCWSTR lpPath,
     if (tab < 2) continue;
 
     try {
-      wregex ex(ss.cond);
-    } catch (regex_error ex) {
+      boost::wregex ex(ss.cond);
+    } catch (boost::regex_error ex) {
       WCHAR lpWhat[255];
       int len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
       MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
@@ -492,8 +500,10 @@ bool Filter::skiplayer_load2(vector<SKIPLAYERSTRUCT>& SkipLayer, LPCWSTR lpPath,
   return true;
 }
 
-bool Filter::filter_load(vector<FILTERSTRUCT>& Filter, LPCWSTR lpPath, LPCWSTR lpFileName,
+bool Filter::filter_load(std::vector<FILTERSTRUCT>& Filter, LPCWSTR lpPath, LPCWSTR lpFileName,
                          rule_type rule_type, int& g_line) {
+  using namespace std;
+
   FILE* fp;
   WCHAR Buffer[1024], Context[1024];
 
@@ -566,8 +576,8 @@ bool Filter::filter_load(vector<FILTERSTRUCT>& Filter, LPCWSTR lpPath, LPCWSTR l
     if (tab < 3) continue;
     if (fs.regex == 1) {
       try {
-        wregex ex(fs.src);
-      } catch (regex_error ex) {
+        boost::wregex ex(fs.src);
+      } catch (boost::regex_error ex) {
         WCHAR lpWhat[255];
         int len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
         MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
@@ -601,6 +611,8 @@ bool Filter::filter_load(vector<FILTERSTRUCT>& Filter, LPCWSTR lpPath, LPCWSTR l
 }
 
 bool Filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int& g_line) {
+  using namespace std;
+
   FILE* fp;
   WCHAR Buffer[1024], Context[1024];
   wstring Path, Jpn, Kor, Attr;
@@ -713,6 +725,8 @@ bool Filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int& g_line) {
 // anedic.txt 호환을 위한 함수
 // 필터가 변경이 되면 anedic.txt 파일을 찾아 읽는다
 bool Filter::anedic_load(int& g_line) {
+  using namespace std;
+
   wstring Jpn, Kor, Attr;
   WCHAR lpPathName[MAX_PATH], lpFileName[MAX_PATH];
 
@@ -751,7 +765,7 @@ bool Filter::anedic_load(int& g_line) {
   return userdic_load2(lpPathName, lpFileName, g_line);
 }
 
-bool Filter::pre(wstring& wsText) {
+bool Filter::pre(std::wstring& wsText) {
   if (!pConfig->GetPreSwitch()) {
     Log(LogCategory::kNormal, L"PreFilter : 전처리가 꺼져 있습니다.\n");
     return false;
@@ -759,7 +773,7 @@ bool Filter::pre(wstring& wsText) {
   return filter_proc(PreFilter, rule_type::preprocess, wsText);
 }
 
-bool Filter::post(wstring& wsText) {
+bool Filter::post(std::wstring& wsText) {
   if (!pConfig->GetPostSwitch()) {
     Log(LogCategory::kNormal, L"PostFilter : 후처리가 꺼져 있습니다.\n");
     return false;
@@ -767,7 +781,12 @@ bool Filter::post(wstring& wsText) {
   return filter_proc(PostFilter, rule_type::postprocess, wsText);
 }
 
-bool Filter::filter_proc(vector<FILTERSTRUCT>& Filter, rule_type rule_type, wstring& wsText) {
+bool Filter::filter_proc(std::vector<FILTERSTRUCT>& Filter, rule_type rule_type,
+                         std::wstring& wsText) {
+  using namespace std;
+  using namespace chrono;
+  using namespace boost;
+
   DWORD dwStart, dwEnd;
   system_clock::time_point start, end;
   typedef duration<double, milli> doubleMilli;
@@ -887,7 +906,7 @@ bool Filter::filter_proc(vector<FILTERSTRUCT>& Filter, rule_type rule_type, wstr
   return true;
 }
 
-bool Filter::cmd(wstring& wsText) {
+bool Filter::cmd(std::wstring& wsText) {
   BOOL bCommand = false;
   BOOL bSaveINI = false;
   if (wsText[0] != L'/') return false;
