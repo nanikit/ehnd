@@ -35,10 +35,22 @@ TEST(TranslationTest, TranslateBasic) {
 }
 
 TEST(TranslationTest, EnsureCrashHandling) {
+  using namespace std;
+
   Initialize();
 
-  auto result = Translate(L"亮介(");
-  ASSERT_STRNE(L"", result.c_str());
+  wstring result;
+  result = Translate(L"亮介(");
+  ASSERT_STREQ(L"", result.c_str());
+
+  result = Translate(
+    LR"(往なす。いなす。
+往なす。亮介(
+
+去なす。
+)");
+  wcerr << result << endl;
+  ASSERT_EQ(4, count(begin(result), end(result), L'\n'));
 }
 
 TEST(TranslationTest, TranslateHdor) {

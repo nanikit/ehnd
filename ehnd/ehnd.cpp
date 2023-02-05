@@ -167,25 +167,81 @@ LPSTR TranslateMMNT(LPCSTR jpn) {
   return szKor;
 }
 
-std::wstring FilterAndTranslate(std::wstring&& text) {
+template <typename T>
+class EztransMemory {
+ public:
+  EztransMemory(T memory) : memory_(memory) {
+    static_assert(std::is_pointer<T>::value, "EztransMemory should be a pointer.");
+  }
+
+  T data() {
+    return memory_;
+  }
+
+  virtual ~EztransMemory() {
+    msvcrt_free(memory_);
+  }
+
+ private:
+  T memory_;
+};
+
+// 亮介(같은 문자열은 세그폴트를 일으켜 번역을 중단시킨다.
+// 그런 이유로 줄 수가 부족하면 이어서 번역
+std::string TranslateWithRecovery(const std::string& jpn) {
   using namespace std;
 
-  pFilter->pre(text);
-  Log(LogCategory::kNormal, L"[PRE] {}\n\n", text);
-  auto jpn = WideToMultiByte(text, 932);
+  string kor;
+  auto start = jpn.c_str();
+
+  while (true) {
+    EztransMemory sz_kor{TranslateMMNT(start)};
+
+    string_view span = sz_kor.data();
+    kor += span;
+
+    auto line_feed_count = count(begin(span), end(span), L'\n');
+    auto next_line = boost::find_nth(start, "\n", line_feed_count).end();
+    if (!*next_line) {
+      break;
+    }
+
+    start = next_line;
+    kor += '\n';
+  }
+
+  return kor;
+}
+
+std::wstring TranslateAndMeasureTime(std::wstring&& text) {
+  using namespace std;
 
   if (!pConfig->GetUserDicSwitch()) {
     Log(LogCategory::kNormal, L"UserDic : 사용자 사전이 꺼져 있습니다.\n");
   }
 
-  auto tickStart = GetTickCount64();
-  LPSTR szKor = TranslateMMNT(jpn.c_str());
-  auto tickEnd = GetTickCount64();
-  Log(LogCategory::kTime, L"J2K_TranslateMMNT : --- Elasped Time : {}ms ---\n",
-      tickEnd - tickStart);
+  string jpn = WideToMultiByte(text, 932);
 
-  text = MultiByteToWide(szKor, 949, false, move(text));
-  msvcrt_free(szKor);
+  auto tick_start = GetTickCount64();
+
+  string kor = TranslateWithRecovery(jpn);
+
+  auto tick_end = GetTickCount64();
+
+  Log(LogCategory::kTime, L"J2K_TranslateMMNT : --- Elasped Time : {}ms ---\n",
+      tick_end - tick_start);
+  text = MultiByteToWide(kor.c_str(), 949, false, move(text));
+
+  return text;
+}
+
+std::wstring FilterAndTranslate(std::wstring&& text) {
+  using namespace std;
+
+  pFilter->pre(text);
+  Log(LogCategory::kNormal, L"[PRE] {}\n\n", text);
+
+  text = TranslateAndMeasureTime(move(text));
 
   Log(LogCategory::kNormal, L"[TRANS] {}\n\n", text);
   pFilter->post(text);
