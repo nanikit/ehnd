@@ -35,6 +35,8 @@ std::string WideToMultiByte(std::wstring_view source, UINT codePage,
 void Initialize() {
   using namespace std;
 
+  locale::global(locale{".65001"});
+
   auto user = "CSUSER123455";
   auto wpath = Config{}.GetEztransPath() + L"\\Dat";
   auto key = WideToMultiByte(wpath, CP_ACP);
@@ -138,7 +140,6 @@ void TestTranslationWithSnapshot(std::wistream& original, std::wistream& expecte
 void TestTranslationWithFileSnapshot(std::wstring_view file_name) {
   using namespace std;
 
-  auto utf8 = boost::locale::generator().generate("UTF-8");
   auto original = wifstream{wstring{L"..\\ehnd-test\\hdor\\"}.append_range(file_name)};
   auto expected = wifstream{wstring{L"..\\ehnd-test\\hdor_expected\\"}.append_range(file_name)};
   auto actual = wofstream{wstring{L"hdor_actual\\"}.append_range(file_name)};
@@ -152,10 +153,6 @@ void TestTranslationWithFileSnapshot(std::wstring_view file_name) {
   if (!actual) {
     FAIL() << "actual open failed.";
   }
-
-  actual.imbue(utf8);
-  original.imbue(utf8);
-  expected.imbue(utf8);
 
   TestTranslationWithSnapshot(original, expected, actual);
 }

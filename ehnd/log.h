@@ -3,7 +3,6 @@
 #include <Windows.h>
 
 #include <array>
-#include <boost/locale.hpp>
 #include <chrono>
 #include <format>
 #include <fstream>
@@ -39,7 +38,6 @@ template <typename... Args>
 auto Log(LogCategory category, const std::_Fmt_wstring<Args...> fmt, Args&&... args) {
   using namespace std;
   static auto zone = chrono::current_zone();
-  static auto loc = boost::locale::generator().generate("UTF-8");
 
   if (!pConfig->GetLogTime() && category == LogCategory::kTime) return;
   if (!pConfig->GetLogDetail() && category == LogCategory::kDetail) return;
@@ -62,7 +60,6 @@ auto Log(LogCategory category, const std::_Fmt_wstring<Args...> fmt, Args&&... a
       wcscat_s(lpFileName.data(), lpFileName.size(), L"\\ehnd_log.log");
 
       auto file = wofstream{lpFileName.data(), ios::app};
-      file.imbue(loc);
 
       auto const time = zone->to_local(chrono::system_clock::now());
       auto ms = chrono::duration_cast<chrono::milliseconds>(time.time_since_epoch()).count() % 1000;

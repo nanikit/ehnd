@@ -16,7 +16,8 @@ bool EhndInit() {
   else
     initOnce = true;
 
-  std::ios::sync_with_stdio(false);
+  locale::global(locale{".65001"});
+  ios::sync_with_stdio(false);
 
   // init ehnd
   pFilter = new Filter();
