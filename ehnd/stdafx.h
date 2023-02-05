@@ -8,6 +8,9 @@
 
 #include <Windows.h>
 
+#undef min
+#undef max
+
 // Additional windows headers
 #include <Psapi.h>
 #include <Richedit.h>
@@ -24,6 +27,7 @@
 #include <iostream>
 #include <mutex>
 #include <optional>
+#include <ranges>
 #include <span>
 #include <string>
 #include <vector>

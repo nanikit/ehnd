@@ -186,6 +186,99 @@ class EztransMemory {
   T memory_;
 };
 
+std::string WideToMultiByteWithEscape(std::wstring_view source, UINT codePage) {
+  using namespace std;
+
+  string dest;
+  BOOL hasUnconvertible = false;
+  int length = WideCharToMultiByteWithAral(codePage, 0, source.data(), source.size(), nullptr, 0,
+                                           nullptr, &hasUnconvertible);
+
+  if (hasUnconvertible) {
+    dest.reserve(length);
+
+    array<char, 4> buf{};
+    for (auto& ch : source) {
+      length = WideCharToMultiByteWithAral(codePage, 0, &ch, 1, buf.data(), buf.size(), nullptr,
+                                           &hasUnconvertible);
+      if (hasUnconvertible) {
+        // Anemone uses this, so naively followed.
+        dest += format("+x{:04X}", static_cast<int>(ch));
+      } else {
+        dest.append(buf.data(), length);
+      }
+    }
+  } else {
+    dest.resize(length);
+    WideCharToMultiByteWithAral(codePage, 0, source.data(), -1, dest.data(), dest.size(), nullptr,
+                                nullptr);
+  }
+
+  return dest;
+}
+
+std::wstring MultiByteToWide(std::string_view source, UINT codePage, bool useOriginal = false,
+                             const std::optional<std::wstring>& buffer = std::nullopt) {
+  using namespace std;
+
+  auto mb_to_wc = useOriginal ? MultiByteToWideChar : MultiByteToWideCharWithAral;
+
+  int i_len = mb_to_wc(codePage, 0, source.data(), source.size(), nullptr, 0);
+  wstring dest{move(buffer.value_or(wstring{}))};
+  dest.resize(i_len);
+  mb_to_wc(codePage, 0, source.data(), source.size(), dest.data(), dest.size());
+
+  return dest;
+}
+
+const char* FindHexEscape(std::string_view input) {
+  using namespace std;
+
+  auto search_end = end(input) - min(static_cast<int>(input.size()), 5);
+  for (auto iter = begin(input); iter < search_end; iter++) {
+    if (iter[0] == '+' && iter[1] == 'x') {
+      if (all_of(iter + 2, iter + 6, [](char c) { return !!isxdigit(c); })) {
+        return &*iter;
+      }
+    }
+  }
+  return nullptr;
+}
+
+std::wstring MultiByteToWideAndUnescape(std::string_view source, UINT codePage,
+                                        const std::optional<std::wstring>& buffer = std::nullopt) {
+  using namespace std;
+
+  const auto source_end = source.data() + source.size();
+  auto start = source.data();
+  wstring buf;
+  wstring dest{move(buffer.value_or(wstring{}))};
+  dest.clear();
+
+  while (true) {
+    auto text_end = FindHexEscape({start, source_end});
+    if (text_end == nullptr) {
+      text_end = source_end;
+    }
+
+    buf = MultiByteToWide({start, text_end}, codePage, false, move(buf));
+    dest += buf;
+
+    if (text_end == source_end) {
+      break;
+    }
+
+    unsigned short hex;
+    if (from_chars(&text_end[2], &text_end[6], hex, 16).ec == errc{}) {
+      dest += static_cast<wchar_t>(hex);
+    }
+
+    start = text_end + 6;
+  }
+
+  return dest;
+}
+
 // 亮介(같은 문자열은 세그폴트를 일으켜 번역을 중단시킨다.
 // 그런 이유로 줄 수가 부족하면 이어서 번역
 std::string TranslateWithRecovery(const std::string& jpn) {
@@ -220,7 +313,7 @@ std::wstring TranslateAndMeasureTime(std::wstring&& text) {
     Log(LogCategory::kNormal, L"UserDic : 사용자 사전이 꺼져 있습니다.\n");
   }
 
-  string jpn = WideToMultiByte(text, 932);
+  string jpn = WideToMultiByteWithEscape(text, 932);
 
   auto tick_start = GetTickCount64();
 
@@ -230,7 +323,7 @@ std::wstring TranslateAndMeasureTime(std::wstring&& text) {
 
   Log(LogCategory::kTime, L"J2K_TranslateMMNT : --- Elasped Time : {}ms ---\n",
       tick_end - tick_start);
-  text = MultiByteToWide(kor.c_str(), 949, false, move(text));
+  text = MultiByteToWideAndUnescape(kor, 949, move(text));
 
   return text;
 }

@@ -18,12 +18,26 @@ auto simpleJapanese =
   L"シカトしてやろうかとも思ったが、どうしても一言文句を言ってやりたいという氣持ちが勝ってしまい電"
   L"話に出る。";
 
+std::string WideToMultiByte(std::wstring_view source, UINT codePage,
+                            const std::optional<std::string>& buffer = std::nullopt) {
+  using namespace std;
+
+  int i_len =
+    WideCharToMultiByte(codePage, 0, source.data(), source.size(), nullptr, 0, nullptr, nullptr);
+  string dest{buffer.value_or(string{})};
+  dest.resize(i_len);
+
+  WideCharToMultiByte(codePage, 0, source.data(), -1, dest.data(), dest.size(), nullptr, nullptr);
+
+  return dest;
+}
+
 void Initialize() {
   using namespace std;
 
   auto user = "CSUSER123455";
   auto wpath = Config{}.GetEztransPath() + L"\\Dat";
-  auto key = WideToMultiByte(wpath, CP_ACP, true);
+  auto key = WideToMultiByte(wpath, CP_ACP);
   J2K_InitializeEx(user, key.c_str());
 }
 
@@ -51,6 +65,13 @@ TEST(TranslationTest, EnsureCrashHandling) {
 )");
   wcerr << result << endl;
   ASSERT_EQ(4, count(begin(result), end(result), L'\n'));
+}
+
+TEST(TranslationTest, PreserveNon932) {
+  Initialize();
+
+  auto result = Translate(L"乱数㉠生成");
+  ASSERT_STREQ(L"난수㉠ 생성", result.c_str());
 }
 
 TEST(TranslationTest, TranslateHdor) {
@@ -114,20 +135,14 @@ void TestTranslationWithSnapshot(std::wistream& original, std::wistream& expecte
   }
 }
 
-void TestTranslationWithFileSnapshot() {
-}
-
-TEST(TranslationTest, HdorExhaustive) {
+void TestTranslationWithFileSnapshot(std::wstring_view file_name) {
   using namespace std;
-  using namespace filesystem;
-
-  Initialize();
 
   auto utf8 = boost::locale::generator().generate("UTF-8");
-  auto original = wifstream{L"..\\ehnd-test\\hdor\\PreFilter_@Hdor.txt"};
-  auto expected = wifstream{L"..\\ehnd-test\\hdor_expected\\PreFilter_@Hdor.txt"};
-  create_directory(L"hdor_actual");
-  auto actual = wofstream{L"hdor_actual\\PreFilter_@Hdor.txt"};
+  auto original = wifstream{wstring{L"..\\ehnd-test\\hdor\\"}.append_range(file_name)};
+  auto expected = wifstream{wstring{L"..\\ehnd-test\\hdor_expected\\"}.append_range(file_name)};
+  auto actual = wofstream{wstring{L"hdor_actual\\"}.append_range(file_name)};
+
   if (!original) {
     FAIL() << "original open failed.";
   }
@@ -137,9 +152,22 @@ TEST(TranslationTest, HdorExhaustive) {
   if (!actual) {
     FAIL() << "actual open failed.";
   }
+
   actual.imbue(utf8);
   original.imbue(utf8);
   expected.imbue(utf8);
 
   TestTranslationWithSnapshot(original, expected, actual);
+}
+
+TEST(TranslationTest, HdorExhaustive) {
+  using namespace std;
+  using namespace filesystem;
+
+  create_directory(L"hdor_actual");
+
+  Initialize();
+
+  TestTranslationWithFileSnapshot(L"PreFilter_@Hdor.txt");
+  TestTranslationWithFileSnapshot(L"PostFilter_@Hdor.txt");
 }

@@ -465,45 +465,6 @@ __declspec(naked) int __stdcall MultiByteToWideCharWithAral(
 }
 #pragma warning(pop)
 
-std::string WideToMultiByte(const std::wstring_view& source, UINT codePage, bool useOriginal,
-                            const std::optional<std::string>& buffer) {
-  using namespace std;
-
-  auto wc_to_mb = useOriginal ? WideCharToMultiByte : WideCharToMultiByteWithAral;
-
-  int i_len = wc_to_mb(codePage, 0, source.data(), source.size(), nullptr, 0, nullptr, nullptr);
-  string dest{buffer.value_or(string{})};
-  dest.resize(i_len);
-
-  const char replacementChar = 0x01;
-  BOOL hasUnconvertible = false;
-  wc_to_mb(codePage, 0, source.data(), -1, dest.data(), dest.size(), &replacementChar,
-           &hasUnconvertible);
-  if (hasUnconvertible) {
-    for (auto& ch : dest) {
-      if (ch == replacementChar) {
-        ch = ' ';
-      }
-    }
-  }
-
-  return dest;
-}
-
-std::wstring MultiByteToWide(const std::string_view& source, UINT codePage, bool useOriginal,
-                             const std::optional<std::wstring>& buffer) {
-  using namespace std;
-
-  auto mb_to_wc = useOriginal ? MultiByteToWideChar : MultiByteToWideCharWithAral;
-
-  int i_len = mb_to_wc(codePage, 0, source.data(), source.size(), nullptr, 0);
-  wstring dest{buffer.value_or(wstring{})};
-  dest.resize(i_len);
-  mb_to_wc(codePage, 0, source.data(), source.size(), dest.data(), dest.size());
-
-  return dest;
-}
-
 void* fopen_patch(char* path, char* mode) {
   if (strstr(path, "UserDict.jk")) {
     path = g_DicPath;
