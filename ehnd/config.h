@@ -159,7 +159,7 @@ class EHND_EXPORT Config {
   wchar_t* GetConsoleFontName() {
     return cfg_console_fontname;
   }
-  void SetConsoleFontName(wchar_t* str) {
+  void SetConsoleFontName(const wchar_t* str) {
     wcscpy_s(cfg_console_fontname, str);
   }
 

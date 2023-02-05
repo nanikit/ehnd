@@ -29,6 +29,7 @@
 #include <vector>
 
 // Third parties
+#include <boost/algorithm/string.hpp>
 #include <boost/locale.hpp>
 #include <boost/regex.hpp>
 #include <winreg/WinReg.hpp>

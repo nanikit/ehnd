@@ -767,20 +767,6 @@ bool Filter::post(wstring& wsText) {
   return filter_proc(PostFilter, rule_type::postprocess, wsText);
 }
 
-std::wstring replace_all(const std::wstring& str, const std::wstring& pattern,
-                         const std::wstring& replace) {
-  using namespace std;
-
-  wstring result = str;
-  wstring::size_type pos = 0, offset = 0;
-
-  while ((pos = result.find(pattern, offset)) != wstring::npos) {
-    result.replace(result.begin() + pos, result.begin() + pos + pattern.size(), replace);
-    offset = pos + replace.size();
-  }
-  return result;
-}
-
 bool Filter::filter_proc(vector<FILTERSTRUCT>& Filter, rule_type rule_type, wstring& wsText) {
   DWORD dwStart, dwEnd;
   system_clock::time_point start, end;
@@ -831,7 +817,7 @@ bool Filter::filter_proc(vector<FILTERSTRUCT>& Filter, rule_type rule_type, wstr
       Filter[i]._ecount++;
 
       Str = wsText;
-      wsText = replace_all(wsText, Filter[i].src, Filter[i].dest);
+      replace_all(wsText, Filter[i].src, Filter[i].dest);
       if (Str.compare(wsText)) {
         if (rule_type == rule_type::preprocess)
           Log(LogCategory::kDetail, L"PreFilter : [{}:{}] | {} | {} | {} | {}\n", Filter[i].db,

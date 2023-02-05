@@ -85,56 +85,48 @@ std::wstring Config::GetEhndPath() {
 }
 
 bool Config::LoadConfig() {
-  wchar_t INIPath[MAX_PATH], buf[255];
-  GetLoadPath(INIPath, MAX_PATH);
-  wcscat_s(INIPath, L"\\Ehnd\\ehnd_conf.ini");
+  using namespace std;
 
-  ReadINI(L"PREFILTER_SWITCH", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL) (_wcsicmp(buf, L"OFF") != 0) ? SetPreSwitch(true) : SetPreSwitch(false);
-  ReadINI(L"POSTFILTER_SWITCH", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL) (_wcsicmp(buf, L"OFF") != 0) ? SetPostSwitch(true) : SetPostSwitch(false);
-  ReadINI(L"JKDIC_SWITCH", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL) (_wcsicmp(buf, L"OFF") != 0) ? SetJKDICSwitch(true) : SetJKDICSwitch(false);
-  ReadINI(L"USERDIC_SWITCH", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL)
-    (_wcsicmp(buf, L"OFF") != 0) ? SetUserDicSwitch(true) : SetUserDicSwitch(false);
-  ReadINI(L"EHNDWATCH_SWITCH", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL)
-    (_wcsicmp(buf, L"OFF") != 0) ? SetEhndWatchSwitch(true) : SetEhndWatchSwitch(false);
-  ReadINI(L"COMMAND_SWITCH", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL)
-    (_wcsicmp(buf, L"OFF") != 0) ? SetCommandSwitch(true) : SetCommandSwitch(false);
+  array<wchar_t, 255> buf{};
+  auto ini_path = GetEhndPath() + L"\\Ehnd\\ehnd_conf.ini";
 
-  ReadINI(L"LOG_DETAIL", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL) (_wcsicmp(buf, L"OFF") != 0) ? SetLogDetail(true) : SetLogDetail(false);
-  ReadINI(L"LOG_TIME", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL) (_wcsicmp(buf, L"OFF") != 0) ? SetLogTime(true) : SetLogTime(false);
-  ReadINI(L"LOG_SKIPLAYER", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL) (_wcsicmp(buf, L"OFF") != 0) ? SetLogSkipLayer(true) : SetLogSkipLayer(false);
-  ReadINI(L"LOG_USERDIC", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL) (_wcsicmp(buf, L"OFF") != 0) ? SetLogUserDic(true) : SetLogUserDic(false);
+  auto get_config = [&](LPCWSTR key) -> optional<wstring_view> {
+    int length =
+      GetPrivateProfileStringW(L"CONFIG", key, nullptr, buf.data(), buf.size(), ini_path.c_str());
+    return length ? make_optional(wstring_view(buf.data(), length)) : nullopt;
+  };
 
-  ReadINI(L"FILELOG_SWITCH", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL)
-    (_wcsicmp(buf, L"OFF") != 0) ? SetFileLogSwitch(true) : SetFileLogSwitch(false);
-  ReadINI(L"FILELOG_SIZE", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL) SetFileLogSize(_wtoi(buf));
-  ReadINI(L"FILELOG_EZTRANS_LOC", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL)
-    (_wcsicmp(buf, L"OFF") != 0) ? SetFileLogEztLoc(true) : SetFileLogEztLoc(false);
-  ReadINI(L"FILELOG_STARTUP_CLEAR", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL)
-    (_wcsicmp(buf, L"OFF") != 0) ? SetFileLogStartupClear(true) : SetFileLogStartupClear(false);
+  auto get_switch = [&](LPCWSTR key) -> bool {
+    return !boost::iequals(get_config(key).value_or(L""), L"OFF");
+  };
 
-  ReadINI(L"CONSOLE_SWITCH", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL)
-    (_wcsicmp(buf, L"OFF") != 0) ? SetConsoleSwitch(true) : SetConsoleSwitch(false);
-  ReadINI(L"CONSOLE_MAXLINE", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL) SetConsoleMaxLine(_wtoi(buf));
-  ReadINI(L"CONSOLE_FONTNAME", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL) SetConsoleFontName(buf);
-  ReadINI(L"CONSOLE_FONTSIZE", L"CONFIG", buf, (wchar_t*)INIPath);
-  if (buf[0] != NULL) SetConsoleFontSize(_wtoi(buf));
+  SetPreSwitch(get_switch(L"PREFILTER_SWITCH"));
+  SetPostSwitch(get_switch(L"POSTFILTER_SWITCH"));
+  SetJKDICSwitch(get_switch(L"JKDIC_SWITCH"));
+
+  SetUserDicSwitch(get_switch(L"USERDIC_SWITCH"));
+  SetEhndWatchSwitch(get_switch(L"EHNDWATCH_SWITCH"));
+  SetCommandSwitch(get_switch(L"COMMAND_SWITCH"));
+
+  SetLogDetail(get_switch(L"LOG_DETAIL"));
+  SetLogTime(get_switch(L"LOG_TIME"));
+  SetLogSkipLayer(get_switch(L"LOG_SKIPLAYER"));
+  SetLogUserDic(get_switch(L"LOG_USERDIC"));
+
+  auto get_int = [&](LPCWSTR key) -> optional<int> {
+    return get_config(key).transform(&wstring_view::data).transform(_wtoi);
+  };
+
+  SetFileLogSwitch(get_switch(L"FILELOG_SWITCH"));
+  SetFileLogSize(get_int(L"FILELOG_SIZE").value_or(300));
+  SetFileLogEztLoc(get_switch(L"FILELOG_EZTRANS_LOC"));
+  SetFileLogStartupClear(get_switch(L"FILELOG_STARTUP_CLEAR"));
+
+  SetConsoleSwitch(get_switch(L"CONSOLE_SWITCH"));
+  SetConsoleMaxLine(get_int(L"CONSOLE_MAXLINE").value_or(300));
+  SetConsoleFontName(
+    get_config(L"CONSOLE_FONTNAME").transform(&wstring_view::data).value_or(L"굴림"));
+  SetConsoleFontSize(get_int(L"CONSOLE_FONTSIZE").value_or(12));
 
   if (!firstInit)
     Log(LogCategory::kNormal, L"LoadConfig : Success.\n");
@@ -185,12 +177,6 @@ bool Config::SaveConfig() {
   WriteINI(L"CONSOLE_FONTSIZE", L"CONFIG", buf, (wchar_t*)INIPath);
 
   Log(LogCategory::kNormal, L"SaveConfig : Success.\n");
-  return true;
-}
-
-bool Config::ReadINI(const wchar_t* key, const wchar_t* section, wchar_t* buf, wchar_t* file) {
-  int n = GetPrivateProfileString(section, key, NULL, buf, 255, file);
-  if (n == 0) return false;
   return true;
 }
 

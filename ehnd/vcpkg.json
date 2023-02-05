@@ -4,6 +4,7 @@
   "port-version": 2,
   "description": "Eztrans wrapper",
   "dependencies": [
+    "boost-algorithm",
     "boost-locale",
     "boost-regex",
     "winreg"
