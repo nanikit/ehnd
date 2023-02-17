@@ -313,37 +313,30 @@ bool Filter::jkdic_load(int& g_line) {
 
 bool Filter::ehnddic_cleanup() {
   using namespace std;
-
-  WCHAR lpTmpPath[MAX_PATH];
-  WIN32_FIND_DATA FindFileData;
-  wstring Path;
+  using namespace filesystem;
 
   auto dwStart = GetTickCount64();
 
-  GetTempPath(MAX_PATH, lpTmpPath);
-  Path = lpTmpPath;
-  Path += L"\\UserDict*.ehnd";
+  wstring temp;
+  temp.resize(MAX_PATH);
+  GetTempPath2(temp.size(), temp.data());
+  temp.resize(temp.find(L'\0'));
+  directory_iterator entries{temp};
 
-  HANDLE hFind = FindFirstFile(Path.c_str(), &FindFileData);
-
-  do {
-    if (hFind == INVALID_HANDLE_VALUE)
-      break;
-    else if (FindFileData.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
+  for (auto& entry : entries) {
+    if (!entry.is_regular_file()) {
       continue;
-    Log(LogCategory::kNormal, L"EhndDicCleanUp : {}\n", FindFileData.cFileName);
-
-    int i = wcslen(FindFileData.cFileName) - 1;
-    while (i--) {
-      if (FindFileData.cFileName[i] == L'.' && !wcscmp(FindFileData.cFileName + i, L".ehnd")) {
-        wstring DelFile = lpTmpPath;
-        DelFile += FindFileData.cFileName;
-        DeleteFile(DelFile.c_str());
-        break;
-      }
     }
 
-  } while (FindNextFile(hFind, &FindFileData));
+    auto name = entry.path().filename().generic_wstring();
+    bool is_ehnd_dict = name.starts_with(L"UserDict") && name.ends_with(L".ehnd");
+    if (!is_ehnd_dict) {
+      continue;
+    }
+
+    Log(LogCategory::kNormal, L"EhndDicCleanUp : {}\n", name);
+    remove(entry);
+  }
 
   // 소요시간 계산
   auto dwEnd = GetTickCount64();
