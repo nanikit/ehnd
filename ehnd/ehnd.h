@@ -15,7 +15,7 @@ const auto EHND_VER = _T("V3.20");
 
 extern "C" {
 EHND_EXPORT void J2K_Initialize(void);
-EHND_EXPORT void __stdcall J2K_InitializeEx(LPCSTR name, LPCSTR key);
+EHND_EXPORT bool __stdcall J2K_InitializeEx(LPCSTR name, LPCSTR key);
 EHND_EXPORT void __stdcall J2K_FreeMem(void*);
 EHND_EXPORT void J2K_GetPriorDict(void);
 EHND_EXPORT void J2K_GetProperty(void);

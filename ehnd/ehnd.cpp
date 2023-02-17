@@ -77,15 +77,16 @@ bool EhndInit() {
 __declspec(naked) void J2K_Initialize(void) {
   __asm JMP apfnEzt[4 * 0];
 }
-void __stdcall J2K_InitializeEx(LPCSTR name, LPCSTR key) {
+
+bool __stdcall J2K_InitializeEx(LPCSTR name, LPCSTR key) {
   if (!EhndInit()) {
-    return;
+    return false;
   }
 
   __asm {
-		PUSH DWORD PTR DS : [key]
-		PUSH name
-		CALL apfnEzt[4 * 1]
+    PUSH DWORD PTR DS : [key]
+    PUSH name
+    CALL apfnEzt[4 * 1]
   }
 }
 
