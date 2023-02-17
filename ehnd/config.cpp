@@ -84,6 +84,22 @@ std::wstring Config::GetEhndPath() {
   return path;
 }
 
+std::wstring Config::GetExecutablePath() {
+  using namespace std;
+
+  wstring path;
+  path.resize(MAX_PATH);
+  int length = GetModuleFileName(GetModuleHandle(nullptr), path.data(), path.size());
+  if (!length) {
+    int ret = GetLastError();
+    Log(LogCategory::kError, L"GetModuleFileName(nullptr) failed, error {}\n", ret);
+    return {};
+  }
+
+  path.resize(path.rfind(L'\\'));
+  return path;
+}
+
 bool Config::LoadConfig() {
   using namespace std;
 

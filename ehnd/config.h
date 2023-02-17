@@ -49,6 +49,10 @@ class EHND_EXPORT Config {
   /// It returns the directory path of the current ehnd.dll.
   /// </summary>
   std::wstring GetEhndPath();
+  /// <summary>
+  /// It returns the directory path of main executable (ex. anemone).
+  /// </summary>
+  std::wstring GetExecutablePath();
 
   bool GetPreSwitch() {
     return cfg_prefilter_switch;
@@ -139,6 +143,9 @@ class EHND_EXPORT Config {
   }
   void SetFileLogEztLoc(bool b) {
     cfg_filelog_eztrans_loc = b;
+  }
+  std::wstring GetFileLogDirectory() {
+    return GetFileLogEztLoc() ? GetEhndPath() : GetExecutablePath();
   }
 
   bool GetFileLogStartupClear() {
