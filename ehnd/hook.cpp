@@ -7,7 +7,14 @@ LPBYTE lpfnwc2mb, lpfnmb2wc;
 LPBYTE lpfnWordInfo;
 int wc2mb_type = 0, mb2wc_type = 0;
 
+FARPROC apfnEzt[100];
+FARPROC apfnMsv[100];
+std::function<decltype(J2K_InitializeEx)> j2k_initialize_ex;
+std::function<decltype(J2K_TranslateMMNT)> j2k_translate_mmnt;
+
 bool hook() {
+  using namespace std;
+
   LPCSTR aEztFunction[] = {"J2K_Initialize",      "J2K_InitializeEx",
                            "J2K_FreeMem",         "J2K_GetPriorDict",
                            "J2K_GetProperty",     "J2K_ReloadUserDict",
@@ -35,6 +42,11 @@ bool hook() {
       return false;
     }
   }
+
+  j2k_initialize_ex =
+    reinterpret_cast<std::add_pointer<decltype(J2K_InitializeEx)>::type>(apfnEzt[1]);
+  j2k_translate_mmnt =
+    reinterpret_cast<std::add_pointer<decltype(J2K_TranslateMMNT)>::type>(apfnEzt[18]);
 
   dllPath.resize(MAX_PATH);
   GetSystemDirectory(dllPath.data(), dllPath.size());

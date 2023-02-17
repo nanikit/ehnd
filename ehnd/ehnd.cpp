@@ -2,8 +2,6 @@
 
 #include "globals.h"
 
-FARPROC apfnEzt[100];
-FARPROC apfnMsv[100];
 int g_initTick;
 
 bool EhndInit() {
@@ -79,15 +77,13 @@ __declspec(naked) void J2K_Initialize(void) {
 }
 
 bool __stdcall J2K_InitializeEx(LPCSTR name, LPCSTR key) {
+  using namespace std;
   if (!EhndInit()) {
     return false;
   }
 
-  __asm {
-    PUSH DWORD PTR DS : [key]
-    PUSH name
-    CALL apfnEzt[4 * 1]
-  }
+  extern function<decltype(J2K_InitializeEx)> j2k_initialize_ex;
+  return j2k_initialize_ex(name, key);
 }
 
 void __stdcall J2K_FreeMem(void* buffer) {
@@ -157,16 +153,8 @@ LPSTR TranslateMMNT(LPCSTR jpn) {
   static mutex mtx;
   auto lock = lock_guard<mutex>{mtx};
 
-  LPSTR szKor = nullptr;
-  // J2KEngine.dll's TranslateMMNT increases ESP by 1 and it matches with no calling convention.
-  __asm {
-    PUSH DWORD PTR DS : [jpn]
-    PUSH 0
-    CALL apfnEzt[4 * 18]
-    MOV DWORD PTR DS : [szKor], EAX
-  }
-
-  return szKor;
+  extern function<decltype(J2K_TranslateMMNT)> j2k_translate_mmnt;
+  return j2k_translate_mmnt(0, jpn);
 }
 
 template <typename T>
@@ -399,7 +387,7 @@ wchar_t* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szIn) {
   return nullptr;
 }
 
-void* __stdcall J2K_TranslateMMNT(int data0, LPCSTR szIn) {
+char* __stdcall J2K_TranslateMMNT(int data0, LPCSTR szIn) {
   using namespace std;
 
   LPSTR szOut;

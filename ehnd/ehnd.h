@@ -32,7 +32,7 @@ EHND_EXPORT void J2K_TranslateChat(void);
 EHND_EXPORT void J2K_TranslateFM(void);
 EHND_EXPORT void J2K_TranslateMM(void);
 EHND_EXPORT void J2K_TranslateMMEx(void);
-EHND_EXPORT void* __stdcall J2K_TranslateMMNT(int data0, LPCSTR szText);
+EHND_EXPORT char* __stdcall J2K_TranslateMMNT(int data0, LPCSTR szText);
 EHND_EXPORT wchar_t* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szText);
 EHND_EXPORT void J2K_GetJ2KMainDir(void);
 EHND_EXPORT void* msvcrt_free(void* _Memory);
@@ -42,6 +42,3 @@ EHND_EXPORT void* msvcrt_fopen(char* path, char* mode);
 
 bool GetLoadPath(LPWSTR Path, int Size);
 bool GetExecutePath(LPWSTR Path, int Size);
-
-extern FARPROC apfnEzt[100];
-extern FARPROC apfnMsv[100];

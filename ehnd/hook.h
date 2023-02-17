@@ -36,3 +36,13 @@ int __stdcall MultiByteToWideCharWithAral(_In_ UINT CodePage, _In_ DWORD dwFlags
                                           _Out_writes_to_opt_(cchWideChar, return)
                                             LPWSTR lpWideCharStr,
                                           _In_ int cchWideChar);
+
+extern LPBYTE lpfnRetn;
+extern LPBYTE lpfnfopen;
+extern LPBYTE lpfnwc2mb;
+extern LPBYTE lpfnmb2wc;
+extern int wc2mb_type;
+extern int mb2wc_type;
+
+extern FARPROC apfnEzt[100];
+extern FARPROC apfnMsv[100];
