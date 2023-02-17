@@ -11,6 +11,7 @@ FARPROC apfnEzt[100];
 FARPROC apfnMsv[100];
 std::function<decltype(J2K_InitializeEx)> j2k_initialize_ex;
 std::function<decltype(J2K_TranslateMMNT)> j2k_translate_mmnt;
+std::string dic_path;
 
 bool hook() {
   using namespace std;
@@ -477,9 +478,9 @@ __declspec(naked) int __stdcall MultiByteToWideCharWithAral(
 }
 #pragma warning(pop)
 
-void* fopen_patch(char* path, char* mode) {
+void* fopen_patch(const char* path, const char* mode) {
   if (strstr(path, "UserDict.jk")) {
-    path = g_DicPath;
+    path = dic_path.c_str();
     // Log(log_category::normal, L"fopen_path\n");
   }
   return msvcrt_fopen(path, mode);
@@ -644,4 +645,18 @@ int userdict_proc(char* word_str, char* base, int cur, int total) {
       return i;
   }
   return total + 1;
+}
+
+std::wstring MultiByteToWide(std::string_view source, UINT codePage, bool useOriginal,
+                             const std::optional<std::wstring>& buffer) {
+  using namespace std;
+
+  auto mb_to_wc = useOriginal ? MultiByteToWideChar : MultiByteToWideCharWithAral;
+
+  int i_len = mb_to_wc(codePage, 0, source.data(), source.size(), nullptr, 0);
+  wstring dest{move(buffer.value_or(wstring{}))};
+  dest.resize(i_len);
+  mb_to_wc(codePage, 0, source.data(), source.size(), dest.data(), dest.size());
+
+  return dest;
 }

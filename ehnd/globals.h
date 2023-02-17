@@ -13,7 +13,6 @@ extern Filter* pFilter;
 extern Watch* pWatch;
 extern Config* pConfig;
 extern int g_initTick;
-extern char g_DicPath[MAX_PATH];
 extern BOOL g_bAnemone;
 
 extern HMODULE hEzt, hMsv;

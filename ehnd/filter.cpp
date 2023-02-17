@@ -355,25 +355,17 @@ bool Filter::ehnddic_cleanup() {
 bool Filter::ehnddic_create() {
   using namespace std;
 
-  WCHAR lpTmpPath[MAX_PATH], lpText[12];
   CHAR Jpn[32], Kor[32], Part[6], Attr[38];
-  wstring Path;
   FILE* fp;
-  DWORD dwStart, dwEnd;
-  _itow_s(g_initTick, lpText, 10);
-  dwStart = GetTickCount();
+  auto dwStart = GetTickCount64();
 
-  GetTempPath(MAX_PATH, lpTmpPath);
-  Path = lpTmpPath;
-  Path += L"\\UserDict_";
-  Path += lpText;
-  Path += L".ehnd";
-
-  if (_wfopen_s(&fp, Path.c_str(), L"wb") != 0)
-    Log(
-      LogCategory::kNormal,
-      L"EhndDicCreate : 사용자사전 바이너리 \"UserDict_{}.ehnd\" 파일을 생성하는데 실패했습니다.\n",
-      lpText);
+  auto file_name =
+    MultiByteToWide(string_view{dic_path | views::drop(dic_path.rfind('\\') + 1)}, CP_ACP);
+  if (fopen_s(&fp, dic_path.c_str(), "wb") != 0) {
+    Log(LogCategory::kNormal,
+        L"EhndDicCreate : 사용자사전 바이너리 \"{}\" 파일을 생성하는데 실패했습니다.\n", file_name);
+    return false;
+  }
 
   for (UINT i = 0; i < UserDic.size(); i++) {
     // 공백 제거
@@ -410,12 +402,11 @@ bool Filter::ehnddic_create() {
     fwrite(L"", sizeof(char), 1, fp);
     fwrite(&i, sizeof(char), 4, fp);
   }
-  Log(LogCategory::kNormal, L"EhndDicCreate : 사용자사전 바이너리 \"UserDict_{}.ehnd\" 생성.\n",
-      lpText);
+  Log(LogCategory::kNormal, L"EhndDicCreate : 사용자사전 바이너리 \"{}\" 생성.\n", file_name);
   fclose(fp);
 
   // 소요시간 계산
-  dwEnd = GetTickCount();
+  auto dwEnd = GetTickCount64();
   Log(LogCategory::kTime, L"EhndDicCreate : --- Elasped Time : {}ms ---\n", dwEnd - dwStart);
   return true;
 }

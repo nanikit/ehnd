@@ -24,14 +24,12 @@ bool EhndInit() {
 
   SetLogText(L"EhndInit : 이지트랜스 초기화\n");
 
-  char szInitTick[12];
   g_initTick = GetTickCount() + rand();
-  _itoa_s(g_initTick, szInitTick, 10);
 
-  GetTempPathA(MAX_PATH, g_DicPath);
-  strcat_s(g_DicPath, "UserDict_");
-  strcat_s(g_DicPath, szInitTick);
-  strcat_s(g_DicPath, ".ehnd");
+  dic_path.resize(MAX_PATH);
+  GetTempPathA(dic_path.size(), dic_path.data());
+  dic_path.resize(dic_path.find('\0'));
+  dic_path += format("UserDict_{:08x}.ehnd", g_initTick);
 
   // 설정 로드
   pConfig->LoadConfig();
@@ -83,7 +81,9 @@ bool __stdcall J2K_InitializeEx(LPCSTR name, LPCSTR key) {
   }
 
   extern function<decltype(J2K_InitializeEx)> j2k_initialize_ex;
-  return j2k_initialize_ex(name, key);
+  bool ret = j2k_initialize_ex(name, key);
+
+  return ret;
 }
 
 void __stdcall J2K_FreeMem(void* buffer) {
@@ -143,7 +143,7 @@ __declspec(naked) void* msvcrt_free(void* _Memory) {
 __declspec(naked) void* msvcrt_malloc(size_t _Size) {
   __asm JMP apfnMsv[4 * 1];
 }
-__declspec(naked) void* msvcrt_fopen(char* path, char* mode) {
+__declspec(naked) void* msvcrt_fopen(const char* path, const char* mode) {
   __asm JMP apfnMsv[4 * 2];
 }
 
@@ -203,20 +203,6 @@ std::string WideToMultiByteWithEscape(std::wstring_view source, UINT codePage) {
     WideCharToMultiByteWithAral(codePage, 0, source.data(), -1, dest.data(), dest.size(), nullptr,
                                 nullptr);
   }
-
-  return dest;
-}
-
-std::wstring MultiByteToWide(std::string_view source, UINT codePage, bool useOriginal = false,
-                             const std::optional<std::wstring>& buffer = std::nullopt) {
-  using namespace std;
-
-  auto mb_to_wc = useOriginal ? MultiByteToWideChar : MultiByteToWideCharWithAral;
-
-  int i_len = mb_to_wc(codePage, 0, source.data(), source.size(), nullptr, 0);
-  wstring dest{move(buffer.value_or(wstring{}))};
-  dest.resize(i_len);
-  mb_to_wc(codePage, 0, source.data(), source.size(), dest.data(), dest.size());
 
   return dest;
 }

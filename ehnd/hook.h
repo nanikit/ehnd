@@ -16,7 +16,7 @@ void user_wordinfo();
 
 bool GetRealWC2MB();
 bool GetRealMB2WC();
-void* fopen_patch(char* path, char* mode);
+void* fopen_patch(const char* path, const char* mode);
 void userdict_patch();
 void userdict_log(char* s);
 void userdict_log2(int idx, int num);
@@ -37,6 +37,9 @@ int __stdcall MultiByteToWideCharWithAral(_In_ UINT CodePage, _In_ DWORD dwFlags
                                             LPWSTR lpWideCharStr,
                                           _In_ int cchWideChar);
 
+std::wstring MultiByteToWide(std::string_view source, UINT codePage, bool useOriginal = false,
+                             const std::optional<std::wstring>& buffer = std::nullopt);
+
 extern LPBYTE lpfnRetn;
 extern LPBYTE lpfnfopen;
 extern LPBYTE lpfnwc2mb;
@@ -46,3 +49,5 @@ extern int mb2wc_type;
 
 extern FARPROC apfnEzt[100];
 extern FARPROC apfnMsv[100];
+
+extern std::string dic_path;

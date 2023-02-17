@@ -8,7 +8,6 @@ Filter* pFilter;
 Watch* pWatch;
 Config* pConfig;
 HMODULE hEzt, hMsv;
-char g_DicPath[MAX_PATH];
 BOOL g_bAnemone = false;
 
 BOOL APIENTRY DllMain(HINSTANCE hInstance, DWORD ul_reason_for_call, LPVOID lpReserved) {

@@ -37,7 +37,7 @@ EHND_EXPORT wchar_t* __stdcall J2K_TranslateMMNTW(int data0, LPCWSTR szText);
 EHND_EXPORT void J2K_GetJ2KMainDir(void);
 EHND_EXPORT void* msvcrt_free(void* _Memory);
 EHND_EXPORT void* msvcrt_malloc(size_t _Size);
-EHND_EXPORT void* msvcrt_fopen(char* path, char* mode);
+EHND_EXPORT void* msvcrt_fopen(const char* path, const char* mode);
 };
 
 bool GetLoadPath(LPWSTR Path, int Size);
