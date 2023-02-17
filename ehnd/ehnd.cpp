@@ -2,7 +2,16 @@
 
 #include "globals.h"
 
-int g_initTick;
+unsigned long long init_tick;
+
+unsigned int GetRandomUnsigned() {
+  using namespace std;
+
+  auto generator = mt19937{random_device{}()};
+  auto unsigned_range =
+    uniform_int_distribution<mt19937::result_type>(0, numeric_limits<unsigned>::max());
+  return unsigned_range(generator);
+}
 
 bool EhndInit() {
   using namespace std;
@@ -24,12 +33,14 @@ bool EhndInit() {
 
   SetLogText(L"EhndInit : 이지트랜스 초기화\n");
 
-  g_initTick = GetTickCount() + rand();
+  init_tick = GetTickCount64();
+  init_tick <<= 32;
+  init_tick |= GetRandomUnsigned();
 
   dic_path.resize(MAX_PATH);
   GetTempPathA(dic_path.size(), dic_path.data());
   dic_path.resize(dic_path.find('\0'));
-  dic_path += format("UserDict_{:08x}.ehnd", g_initTick);
+  dic_path += format("UserDict_{:016x}.ehnd", init_tick);
 
   // 설정 로드
   pConfig->LoadConfig();

@@ -329,8 +329,15 @@ bool Filter::ehnddic_cleanup() {
     }
 
     auto name = entry.path().filename().generic_wstring();
-    bool is_ehnd_dict = name.starts_with(L"UserDict") && name.ends_with(L".ehnd");
+    bool is_ehnd_dict = name.starts_with(L"UserDict_") && name.ends_with(L".ehnd");
     if (!is_ehnd_dict) {
+      continue;
+    }
+
+    auto id = stoull(name.substr(9), nullptr, 16);
+    auto tick = id >> 32;
+    auto milliseconds = static_cast<long long>(dwStart) - static_cast<long long>(tick);
+    if (milliseconds < 5000) {
       continue;
     }
 

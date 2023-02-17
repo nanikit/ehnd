@@ -12,7 +12,7 @@ extern HINSTANCE g_hInst;
 extern Filter* pFilter;
 extern Watch* pWatch;
 extern Config* pConfig;
-extern int g_initTick;
+extern unsigned long long init_tick;
 extern BOOL g_bAnemone;
 
 extern HMODULE hEzt, hMsv;
