@@ -11,8 +11,6 @@
 
 #include "macro.h"
 
-const auto EHND_VER = _T("V3.20");
-
 extern "C" {
 EHND_EXPORT void J2K_Initialize(void);
 EHND_EXPORT bool __stdcall J2K_InitializeEx(LPCSTR name, LPCSTR key);
@@ -39,6 +37,3 @@ EHND_EXPORT void* msvcrt_free(void* _Memory);
 EHND_EXPORT void* msvcrt_malloc(size_t _Size);
 EHND_EXPORT void* msvcrt_fopen(const char* path, const char* mode);
 };
-
-bool GetLoadPath(LPWSTR Path, int Size);
-bool GetExecutePath(LPWSTR Path, int Size);

@@ -1,8 +1,12 @@
-#pragma once
-
+module;
 #include <Windows.h>
+#include <tchar.h>
 
-#include <string>
+export module Filter;
+
+import std.core;
+
+export bool g_bAnemone;
 
 enum class user_word {
   common = 1,
@@ -54,7 +58,8 @@ struct SKIPLAYERSTRUCT {
     return (layer) < (ss.layer) || ((layer) == (ss.layer) && (g_line < ss.g_line));
   }
 };
-class Filter {
+
+export class Filter {
  public:
   Filter();
   ~Filter();

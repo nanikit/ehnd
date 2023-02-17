@@ -1,8 +1,43 @@
-#include "stdafx.h"
+module;
 
-#include "globals.h"
+#include <Windows.h>
 
+#undef min
+#undef max
+
+#include <boost/algorithm/string.hpp>
+
+module Ehnd;
+
+import std.core;
+import Config;
+import Log;
+import LoggedConfig;
+import Filter;
+import Watch;
+import Hook;
+
+HINSTANCE g_hInst;
+Filter* pFilter;
+Watch* pWatch;
 unsigned long long init_tick;
+
+BOOL APIENTRY DllMain(HINSTANCE hInstance, DWORD ul_reason_for_call, LPVOID lpReserved) {
+  switch (ul_reason_for_call) {
+    case DLL_PROCESS_ATTACH:
+      g_hInst = hInstance;
+      break;
+    case DLL_THREAD_ATTACH:
+      break;
+    case DLL_THREAD_DETACH:
+      break;
+    case DLL_PROCESS_DETACH:
+      FreeLibrary(hEzt);
+      FreeLibrary(hMsv);
+      break;
+  }
+  return TRUE;
+}
 
 unsigned int GetRandomUnsigned() {
   using namespace std;
@@ -11,6 +46,62 @@ unsigned int GetRandomUnsigned() {
   auto unsigned_range =
     uniform_int_distribution<mt19937::result_type>(0, numeric_limits<unsigned>::max());
   return unsigned_range(generator);
+}
+
+MMRESULT WatchDirectoryChanges(std::vector<std::wstring>& files) {
+  bool c_prefilter = false;
+  bool c_postfilter = false;
+  bool c_userdic = false;
+  bool c_config = false;
+  bool c_skiplayer = false;
+
+  std::vector<std::wstring>::iterator it = files.begin();
+  for (; it != files.end(); it++) {
+    if ((*it).rfind(L".txt") != -1 && pConfig->GetEhndWatchSwitch()) {
+      if ((*it).find(L"prefilter") != -1)
+        c_prefilter = true;
+      else if ((*it).find(L"postfilter") != -1)
+        c_postfilter = true;
+      else if ((*it).find(L"userdic") != -1)
+        c_userdic = true;
+      else if ((*it).find(L"skiplayer") != -1)
+        c_skiplayer = true;
+    } else if (!(*it).compare(L"ehnd_conf.ini"))
+      c_config = true;
+  }
+
+  if (c_prefilter == true) {
+    Log(LogCategory::kNormal, L"PreFilter : 전처리 필터 파일 변경사항 감지.\n");
+    pFilter->pre_load();
+  }
+
+  if (c_postfilter == true) {
+    Log(LogCategory::kNormal, L"PostFilter : 후처리 필터 파일 변경사항 감지.\n");
+    pFilter->post_load();
+  }
+
+  if (c_skiplayer == true) {
+    Log(LogCategory::kNormal, L"SkipLayer : 스킵 레이어 파일 변경사항 감지.\n");
+    pFilter->skiplayer_load();
+  }
+
+  if (c_userdic == true) {
+    Log(LogCategory::kNormal, L"UserDic : 사용자 사전 파일 변경사항 감지.\n");
+    J2K_ReloadUserDict();
+  }
+
+  if (c_config == true) {
+    Log(LogCategory::kNormal, L"Config : 설정파일 변경사항 감지.\n");
+    pConfig->LoadConfig();
+  }
+
+  return 0;
+}
+
+void LogUserDictionaryConversion(int idx, int num) {
+  Log(LogCategory::kUserDict, L"UserDic ({}) : [{}:{}] {} | {} | ({}) | {}\n", num + 1,
+      pFilter->GetDicDB(idx), pFilter->GetDicLine(idx), pFilter->GetDicJPN(idx),
+      pFilter->GetDicKOR(idx), pFilter->GetDicTYPE(idx), pFilter->GetDicATTR(idx));
 }
 
 bool EhndInit() {
@@ -28,8 +119,9 @@ bool EhndInit() {
 
   // init ehnd
   pFilter = new Filter();
-  pWatch = new Watch();
-  pConfig = new Config();
+  pConfig = new LoggedConfig();
+  pWatch = new Watch(WatchDirectoryChanges);
+  user_dictionary_conversion_logger = LogUserDictionaryConversion;
 
   SetLogText(L"EhndInit : 이지트랜스 초기화\n");
 
@@ -47,16 +139,9 @@ bool EhndInit() {
 
   // 기존 로그 삭제
   if (pConfig->GetFileLogStartupClear()) {
-    wstring file_name;
-    if (pConfig->GetFileLogEztLoc()) {
-      file_name = pConfig->GetEhndPath();
-    } else {
-      file_name.resize(MAX_PATH);
-      GetExecutePath(file_name.data(), file_name.size());
-      file_name.resize(wcsnlen(file_name.data(), file_name.size()));
-    }
-    file_name += L"\\ehnd_log.log";
-    DeleteFile(file_name.c_str());
+    auto directory = pConfig->GetFileLogDirectory();
+    directory += L"\\ehnd_log.log";
+    filesystem::remove(directory.c_str());
   }
 
   CreateLogWin(g_hInst);
@@ -91,7 +176,6 @@ bool __stdcall J2K_InitializeEx(LPCSTR name, LPCSTR key) {
     return false;
   }
 
-  extern function<decltype(J2K_InitializeEx)> j2k_initialize_ex;
   bool ret = j2k_initialize_ex(name, key);
 
   return ret;
@@ -149,13 +233,13 @@ __declspec(naked) void J2K_TranslateMMEx(void) {
   __asm JMP apfnEzt[4 * 17];
 }
 __declspec(naked) void* msvcrt_free(void* _Memory) {
-  __asm JMP apfnMsv[4 * 0];
+  __asm JMP msvcrt_free_ptr;
 }
 __declspec(naked) void* msvcrt_malloc(size_t _Size) {
-  __asm JMP apfnMsv[4 * 1];
+  __asm JMP msvcrt_malloc_ptr;
 }
 __declspec(naked) void* msvcrt_fopen(const char* path, const char* mode) {
-  __asm JMP apfnMsv[4 * 2];
+  __asm JMP msvcrt_fopen_ptr;
 }
 
 LPSTR TranslateMMNT(LPCSTR jpn) {
@@ -164,7 +248,6 @@ LPSTR TranslateMMNT(LPCSTR jpn) {
   static mutex mtx;
   auto lock = lock_guard<mutex>{mtx};
 
-  extern function<decltype(J2K_TranslateMMNT)> j2k_translate_mmnt;
   return j2k_translate_mmnt(0, jpn);
 }
 

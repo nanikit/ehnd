@@ -15,31 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ehnd.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="hook.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="log.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="filter.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="watch.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="config.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="globals.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="macro.h">
@@ -47,29 +26,47 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="hook.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="filter.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="filter.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ehnd.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="ehnd.ixx">
+      <Filter>헤더 파일</Filter>
     </ClCompile>
-    <ClCompile Include="hook.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="log.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="filter.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="hook.ixx">
+      <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="watch.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="watch.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="log.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="constants.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="log.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="logged_config.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
     <ClCompile Include="config.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="config.ixx">
+      <Filter>헤더 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

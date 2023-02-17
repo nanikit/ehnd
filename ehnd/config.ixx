@@ -1,43 +1,27 @@
-#pragma once
-
-#include <string>
+module;
 
 #include "macro.h"
 
-void ShowLogWin(bool bShow);
+export module Config;
 
-class EHND_EXPORT Config {
- private:
-  bool firstInit = true;
+import std.core;
+import std.filesystem;
 
-  bool cfg_prefilter_switch = true;
-  bool cfg_postfilter_switch = true;
-  bool cfg_userdic_switch = true;
-  bool cfg_jkdic_switch = true;
-  bool cfg_ehndwatch_switch = true;
-  bool cfg_command_switch = true;
-  bool cfg_log_detail = true;
-  bool cfg_log_time = true;
-  bool cfg_log_skiplayer = true;
-  bool cfg_log_userdic = true;
-  bool cfg_filelog_switch = false;
-  int cfg_filelog_size = 300;
-  bool cfg_filelog_eztrans_loc = true;
-  bool cfg_filelog_startup_clear = true;
-  bool cfg_console_switch = true;
-  int cfg_console_maxline = 300;
-  wchar_t cfg_console_fontname[255];
-  int cfg_console_fontsize = 12;
+using namespace std;
 
+export class EHND_EXPORT Config {
  public:
   static const wchar_t* const kEngineDllSubPath;
 
-  Config();
-  ~Config();
-  bool LoadConfig();
-  bool SaveConfig();
+  Config() {
+    wcscpy_s(cfg_console_fontname, L"굴림");
+  }
+  virtual ~Config() {
+  }
 
-  bool ReadINI(const wchar_t* key, const wchar_t* section, wchar_t* buf, wchar_t* file);
+  virtual bool LoadConfig();
+  virtual bool SaveConfig();
+
   bool WriteINI(const wchar_t* key, const wchar_t* section, wchar_t* buf, wchar_t* file);
 
   /// <summary>
@@ -48,11 +32,11 @@ class EHND_EXPORT Config {
   /// <summary>
   /// It returns the directory path of the current ehnd.dll.
   /// </summary>
-  std::wstring GetEhndPath();
+  virtual const std::wstring GetEhndPath();
   /// <summary>
   /// It returns the directory path of main executable (ex. anemone).
   /// </summary>
-  std::wstring GetExecutablePath();
+  virtual const std::wstring GetExecutablePath();
 
   bool GetPreSwitch() {
     return cfg_prefilter_switch;
@@ -144,7 +128,7 @@ class EHND_EXPORT Config {
   void SetFileLogEztLoc(bool b) {
     cfg_filelog_eztrans_loc = b;
   }
-  std::wstring GetFileLogDirectory() {
+  const std::wstring GetFileLogDirectory() {
     return GetFileLogEztLoc() ? GetEhndPath() : GetExecutablePath();
   }
 
@@ -158,9 +142,8 @@ class EHND_EXPORT Config {
   bool GetConsoleSwitch() {
     return cfg_console_switch;
   }
-  void SetConsoleSwitch(bool b) {
+  virtual void SetConsoleSwitch(bool b) {
     cfg_console_switch = b;
-    ShowLogWin(b);
   }
 
   wchar_t* GetConsoleFontName() {
@@ -183,4 +166,28 @@ class EHND_EXPORT Config {
   void SetConsoleFontSize(int n) {
     cfg_console_fontsize = n;
   }
+
+ private:
+  bool cfg_prefilter_switch = true;
+  bool cfg_postfilter_switch = true;
+  bool cfg_userdic_switch = true;
+  bool cfg_jkdic_switch = true;
+  bool cfg_ehndwatch_switch = true;
+  bool cfg_command_switch = true;
+  bool cfg_log_detail = true;
+  bool cfg_log_time = true;
+  bool cfg_log_skiplayer = true;
+  bool cfg_log_userdic = true;
+  bool cfg_filelog_switch = false;
+  int cfg_filelog_size = 300;
+  bool cfg_filelog_eztrans_loc = true;
+  bool cfg_filelog_startup_clear = true;
+  bool cfg_console_switch = true;
+  int cfg_console_maxline = 300;
+  wchar_t cfg_console_fontname[255];
+  int cfg_console_fontsize = 12;
+  wstring ehnd_path_;
+  wstring exe_path_;
 };
+
+export Config* pConfig;

@@ -1,17 +1,18 @@
-#include "stdafx.h"
+module;
+#include <Windows.h>
 
-#include "globals.h"
+#include <Psapi.h>
+
+module Hook;
+
+import std.core;
+import Config;
+import Log;
 
 LPBYTE lpfnRetn, lpfnfopen;
 LPBYTE lpfnwc2mb, lpfnmb2wc;
 LPBYTE lpfnWordInfo;
 int wc2mb_type = 0, mb2wc_type = 0;
-
-FARPROC apfnEzt[100];
-FARPROC apfnMsv[100];
-std::function<decltype(J2K_InitializeEx)> j2k_initialize_ex;
-std::function<decltype(J2K_TranslateMMNT)> j2k_translate_mmnt;
-std::string dic_path;
 
 bool hook() {
   using namespace std;
@@ -26,7 +27,6 @@ bool hook() {
                            "J2K_TranslateChat",   "J2K_TranslateFM",
                            "J2K_TranslateMM",     "J2K_TranslateMMEx",
                            "J2K_TranslateMMNT",   "?GetJ2KMainDir@@YA?AVCString@@XZ"};
-  LPCSTR aMsvFunction[] = {"free", "malloc", "fopen"};
 
   auto eztransPath = pConfig->GetEztransPath();
   auto dllPath = eztransPath + Config::kEngineDllSubPath;
@@ -44,10 +44,8 @@ bool hook() {
     }
   }
 
-  j2k_initialize_ex =
-    reinterpret_cast<std::add_pointer<decltype(J2K_InitializeEx)>::type>(apfnEzt[1]);
-  j2k_translate_mmnt =
-    reinterpret_cast<std::add_pointer<decltype(J2K_TranslateMMNT)>::type>(apfnEzt[18]);
+  j2k_initialize_ex = reinterpret_cast<decltype(j2k_initialize_ex)>(apfnEzt[1]);
+  j2k_translate_mmnt = reinterpret_cast<decltype(j2k_translate_mmnt)>(apfnEzt[18]);
 
   dllPath.resize(MAX_PATH);
   GetSystemDirectory(dllPath.data(), dllPath.size());
@@ -59,9 +57,14 @@ bool hook() {
     return false;
   }
 
-  for (int i = 0; i < _countof(aMsvFunction); i++) {
-    apfnMsv[i] = GetProcAddress(hDll2, aMsvFunction[i]);
-    if (!apfnMsv[i]) {
+  array<tuple<const char*, void**>, 3> runtime_funcs = {
+    make_tuple("malloc", reinterpret_cast<void**>(&msvcrt_malloc_ptr)),
+    make_tuple("free", reinterpret_cast<void**>(&msvcrt_free_ptr)),
+    make_tuple("fopen", reinterpret_cast<void**>(&msvcrt_fopen_ptr)),
+  };
+  for (auto [name, ptr] : runtime_funcs) {
+    *ptr = GetProcAddress(hDll2, name);
+    if (!*ptr) {
       MessageBox(0, L"MSVCRT.DLL Function Load Failed", L"EzTransHook", MB_ICONERROR);
       return false;
     }
@@ -133,6 +136,163 @@ int SearchPattern(LPWORD ptn, size_t ptn_size, LPBYTE* addr) {
   return searchSuccessCount;
 }
 
+bool userdict_check() {
+  return pConfig->GetUserDicSwitch();
+}
+
+inline unsigned int userdict_calhash(const char* str, int count) {
+  unsigned int hash = 5381;
+  int c = 0;
+  int i = 0;
+
+  while (c = *str++) {
+    hash = ((hash << 5) + hash) + c;
+    i++;
+    if (i == count) break;
+  }
+
+  return (hash & 0x7FFFFFFF);
+}
+
+inline bool userdict_compare(const char* src, const char* dest, int len) {
+  return (userdict_calhash(src, len) == userdict_calhash(dest, len));
+}
+
+int userdict_proc(char* word_str, char* base, int cur, int total) {
+  int idx = -1;
+  int s = cur, e = total, m, min, max;
+  char* dic_str;
+
+  // Upper bound로 최대값 산출
+  while (e - s > 0) {
+    m = (s + e) / 2;
+    dic_str = (char*)base + (0x6E * m) + 0x01;
+
+    if (word_str[0] <= dic_str[0])
+      s = m + 1;
+    else
+      e = m;
+  }
+  max = s;
+
+  // Lower bound로 최소값 산출
+  s = cur, e = max;
+  while (e - s > 0) {
+    m = (s + e) / 2;
+    dic_str = (char*)base + (0x6E * m) + 0x01;
+
+    if (word_str[0] < dic_str[0])
+      s = m + 1;
+    else
+      e = m;
+  }
+  min = s;
+
+  for (int i = min; i < max; i++) {
+    dic_str = (char*)base + (0x6E * i) + 0x01;
+
+    if (userdict_compare(dic_str, word_str, strlen(dic_str)) &&
+        !strncmp(word_str, dic_str, strlen(dic_str)))
+      return i;
+  }
+  return total + 1;
+}
+
+std::wstring MultiByteToWide(std::string_view source, UINT codePage, bool useOriginal,
+                             const std::optional<std::wstring>& buffer) {
+  using namespace std;
+
+  auto mb_to_wc = useOriginal ? MultiByteToWideChar : MultiByteToWideCharWithAral;
+
+  int i_len = mb_to_wc(codePage, 0, source.data(), source.size(), nullptr, 0);
+  wstring dest{move(buffer.value_or(wstring{}))};
+  dest.resize(i_len);
+  mb_to_wc(codePage, 0, source.data(), source.size(), dest.data(), dest.size());
+
+  return dest;
+}
+
+void userdict_log(char* s) {
+  int len;
+  len = MultiByteToWideCharWithAral(932, MB_PRECOMPOSED, s, -1, NULL, NULL);
+  wchar_t* str = (wchar_t*)msvcrt_malloc_ptr((len + 1) * 2);
+  MultiByteToWideCharWithAral(932, 0, s, -1, str, len);
+
+  Log(LogCategory::kUserDict, L"UserDic_Req : {}\n", str);
+  msvcrt_free_ptr(str);
+}
+
+__declspec(naked) void userdict_patch(void) {
+  // binary search (lower bound)
+  // [ESP + 0x10]	// current addr (start)
+  // [ESP + 0x18]	// current count (end)
+  // [EBP + 0x08]	// total count
+  // [ESP + 0x38] // word_string
+  //
+  // [EBP + 0x04] + 0x6E * cnt + 0x01 = USERDICT_JPN
+  //
+
+  // UserDic이 켜져있는지 확인. 꺼져있으면 처리를 하지 않는다
+  // clang-format off
+	__asm {
+		CALL userdict_check
+		CMP AL, 0
+		JE lFinish
+	}
+
+	// 일치하는 단어가 나오면 단어 등록을 하고 다시 돌아옴
+	__asm {
+		PUSH DWORD PTR SS : [EBP+0x08] // total count
+		PUSH DWORD PTR SS : [ESP+0x1C] // current_count
+		PUSH DWORD PTR SS : [EBP+0x04] // base
+		PUSH DWORD PTR SS : [ESP+0x44] // word_str
+		CALL userdict_proc
+		ADD ESP, 0x10
+
+		CMP EAX, DWORD PTR SS : [EBP+0x08]
+		JA lFinish
+
+		// word_string 출력
+		// ESP+0x14를 count용으로 사용
+		// count는 자동으로 올라가니 건들 필요가 없다
+		CMP DWORD PTR SS : [ESP+0x18], 0
+		JNZ lNext
+
+		PUSH EAX
+		PUSH DWORD PTR SS : [ESP+0x3C]
+		CALL userdict_log
+		ADD ESP, 0x04
+		POP EAX
+
+	lNext:
+
+		// addr=base+point*0x6E
+		MOV DWORD PTR SS : [ESP+0x18], EAX
+		MOV ECX, 0x6E
+		MUL ECX
+		MOV DWORD PTR SS : [ESP+0x10], EAX
+		ADD EAX, DWORD PTR SS : [EBP+0x04]
+		PUSH EAX
+		ADD EAX, 0x6A
+		PUSH DWORD PTR SS : [ESP+0x18] // ESP+0x14 + 0x04
+		PUSH DWORD PTR DS : [EAX]
+		CALL user_dictionary_conversion_logger
+		ADD ESP, 0x08
+		POP EAX
+		MOV CL, 1
+		TEST CL, CL
+		JMP lpfnRetn
+	lFinish:
+		MOV EDX, DWORD PTR SS : [EBP+0x08]
+		MOV DWORD PTR SS : [ESP+0x18], EDX
+		MOV EBX, DWORD PTR SS:[ESP+0x38]
+		MOV CL, 0
+		TEST CL, CL
+		JMP lpfnRetn
+	}
+  // clang-format on
+}
+
 bool hook_userdict(void) {
   using namespace std;
 
@@ -171,6 +331,14 @@ bool hook_userdict(void) {
   }
 
   return true;
+}
+
+void* fopen_patch(const char* path, const char* mode) {
+  if (strstr(path, "UserDict.jk")) {
+    path = dic_path.c_str();
+    // Log(log_category::normal, L"fopen_path\n");
+  }
+  return msvcrt_fopen_ptr(path, mode);
 }
 
 bool hook_userdict2(void) {
@@ -218,6 +386,22 @@ bool hook_userdict2(void) {
   }
 
   return true;
+}
+
+__declspec(naked) void user_wordinfo() {
+  // clang-format off
+	__asm {
+		MOV EAX, lpfnWordInfo
+		ADD EAX, 0x03
+		PUSH -1
+		PUSH DWORD PTR DS:[EAX]
+		MOV EAX, DWORD PTR DS : [lpfnWordInfo]
+		ADD EAX, 0x0D
+		PUSH EAX
+		MOV EAX, DWORD PTR FS : [0]
+		RETN
+	}
+  // clang-format on
 }
 
 bool hook_getwordinfo(void) {
@@ -477,186 +661,3 @@ __declspec(naked) int __stdcall MultiByteToWideCharWithAral(
   __asm JMP lpfnmb2wc
 }
 #pragma warning(pop)
-
-void* fopen_patch(const char* path, const char* mode) {
-  if (strstr(path, "UserDict.jk")) {
-    path = dic_path.c_str();
-    // Log(log_category::normal, L"fopen_path\n");
-  }
-  return msvcrt_fopen(path, mode);
-}
-
-__declspec(naked) void userdict_patch(void) {
-  // binary search (lower bound)
-  // [ESP + 0x10]	// current addr (start)
-  // [ESP + 0x18]	// current count (end)
-  // [EBP + 0x08]	// total count
-  // [ESP + 0x38] // word_string
-  //
-  // [EBP + 0x04] + 0x6E * cnt + 0x01 = USERDICT_JPN
-  //
-
-  // UserDic이 켜져있는지 확인. 꺼져있으면 처리를 하지 않는다
-  // clang-format off
-	__asm {
-		CALL userdict_check
-		CMP AL, 0
-		JE lFinish
-	}
-
-	// 일치하는 단어가 나오면 단어 등록을 하고 다시 돌아옴
-	__asm {
-		PUSH DWORD PTR SS : [EBP+0x08] // total count
-		PUSH DWORD PTR SS : [ESP+0x1C] // current_count
-		PUSH DWORD PTR SS : [EBP+0x04] // base
-		PUSH DWORD PTR SS : [ESP+0x44] // word_str
-		CALL userdict_proc
-		ADD ESP, 0x10
-
-		CMP EAX, DWORD PTR SS : [EBP+0x08]
-		JA lFinish
-
-		// word_string 출력
-		// ESP+0x14를 count용으로 사용
-		// count는 자동으로 올라가니 건들 필요가 없다
-		CMP DWORD PTR SS : [ESP+0x18], 0
-		JNZ lNext
-
-		PUSH EAX
-		PUSH DWORD PTR SS : [ESP+0x3C]
-		CALL userdict_log
-		ADD ESP, 0x04
-		POP EAX
-
-	lNext:
-
-		// addr=base+point*0x6E
-		MOV DWORD PTR SS : [ESP+0x18], EAX
-		MOV ECX, 0x6E
-		MUL ECX
-		MOV DWORD PTR SS : [ESP+0x10], EAX
-		ADD EAX, DWORD PTR SS : [EBP+0x04]
-		PUSH EAX
-		ADD EAX, 0x6A
-		PUSH DWORD PTR SS : [ESP+0x18] // ESP+0x14 + 0x04
-		PUSH DWORD PTR DS : [EAX]
-		CALL userdict_log2
-		ADD ESP, 0x08
-		POP EAX
-		MOV CL, 1
-		TEST CL, CL
-		JMP lpfnRetn
-	lFinish:
-		MOV EDX, DWORD PTR SS : [EBP+0x08]
-		MOV DWORD PTR SS : [ESP+0x18], EDX
-		MOV EBX, DWORD PTR SS:[ESP+0x38]
-		MOV CL, 0
-		TEST CL, CL
-		JMP lpfnRetn
-	}
-  // clang-format on
-}
-
-__declspec(naked) void user_wordinfo() {
-  // clang-format off
-	__asm {
-		MOV EAX, lpfnWordInfo
-		ADD EAX, 0x03
-		PUSH -1
-		PUSH DWORD PTR DS:[EAX]
-		MOV EAX, DWORD PTR DS : [lpfnWordInfo]
-		ADD EAX, 0x0D
-		PUSH EAX
-		MOV EAX, DWORD PTR FS : [0]
-		RETN
-	}
-  // clang-format on
-}
-
-void userdict_log(char* s) {
-  int len;
-  len = MultiByteToWideCharWithAral(932, MB_PRECOMPOSED, s, -1, NULL, NULL);
-  wchar_t* str = (wchar_t*)msvcrt_malloc((len + 1) * 2);
-  MultiByteToWideCharWithAral(932, 0, s, -1, str, len);
-
-  Log(LogCategory::kUserDict, L"UserDic_Req : {}\n", str);
-  msvcrt_free(str);
-}
-
-void userdict_log2(int idx, int num) {
-  Log(LogCategory::kUserDict, L"UserDic ({}) : [{}:{}] {} | {} | ({}) | {}\n", num + 1,
-      pFilter->GetDicDB(idx), pFilter->GetDicLine(idx), pFilter->GetDicJPN(idx),
-      pFilter->GetDicKOR(idx), pFilter->GetDicTYPE(idx), pFilter->GetDicATTR(idx));
-}
-bool userdict_check() {
-  return pConfig->GetUserDicSwitch();
-}
-inline unsigned int userdict_calhash(const char* str, int count) {
-  unsigned int hash = 5381;
-  int c = 0;
-  int i = 0;
-
-  while (c = *str++) {
-    hash = ((hash << 5) + hash) + c;
-    i++;
-    if (i == count) break;
-  }
-
-  return (hash & 0x7FFFFFFF);
-}
-inline bool userdict_compare(const char* src, const char* dest, int len) {
-  return (userdict_calhash(src, len) == userdict_calhash(dest, len));
-}
-int userdict_proc(char* word_str, char* base, int cur, int total) {
-  int idx = -1;
-  int s = cur, e = total, m, min, max;
-  char* dic_str;
-
-  // Upper bound로 최대값 산출
-  while (e - s > 0) {
-    m = (s + e) / 2;
-    dic_str = (char*)base + (0x6E * m) + 0x01;
-
-    if (word_str[0] <= dic_str[0])
-      s = m + 1;
-    else
-      e = m;
-  }
-  max = s;
-
-  // Lower bound로 최소값 산출
-  s = cur, e = max;
-  while (e - s > 0) {
-    m = (s + e) / 2;
-    dic_str = (char*)base + (0x6E * m) + 0x01;
-
-    if (word_str[0] < dic_str[0])
-      s = m + 1;
-    else
-      e = m;
-  }
-  min = s;
-
-  for (int i = min; i < max; i++) {
-    dic_str = (char*)base + (0x6E * i) + 0x01;
-
-    if (userdict_compare(dic_str, word_str, strlen(dic_str)) &&
-        !strncmp(word_str, dic_str, strlen(dic_str)))
-      return i;
-  }
-  return total + 1;
-}
-
-std::wstring MultiByteToWide(std::string_view source, UINT codePage, bool useOriginal,
-                             const std::optional<std::wstring>& buffer) {
-  using namespace std;
-
-  auto mb_to_wc = useOriginal ? MultiByteToWideChar : MultiByteToWideCharWithAral;
-
-  int i_len = mb_to_wc(codePage, 0, source.data(), source.size(), nullptr, 0);
-  wstring dest{move(buffer.value_or(wstring{}))};
-  dest.resize(i_len);
-  mb_to_wc(codePage, 0, source.data(), source.size(), dest.data(), dest.size());
-
-  return dest;
-}

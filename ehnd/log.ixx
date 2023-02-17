@@ -1,40 +1,40 @@
-#pragma once
-
+module;
 #include <Windows.h>
 
-#include <array>
-#include <chrono>
-#include <format>
-#include <fstream>
+export module Log;
 
-#include "config.h"
+import std.core;
+import std.filesystem;
 
-enum class LogCategory {
-  kNormal = 0,
-  kError = 10,
-  kDetail = 20,
-  kTime = 30,
-  kSkipLayer = 40,
-  kUserDict = 50,
-};
+import Config;
 
-void LogStartMsg();
-void CheckLogSize();
-void CheckConsoleLine();
+export {
+  enum class LogCategory {
+    kNormal = 0,
+    kError = 10,
+    kDetail = 20,
+    kTime = 30,
+    kSkipLayer = 40,
+    kUserDict = 50,
+  };
 
-bool CreateLogWin(HINSTANCE);
-void SetLogText(LPCWSTR);
-void SetLogText(LPCWSTR, COLORREF, COLORREF);
-void ClearLog(void);
-void ShowLogWin(bool bShow);
-bool IsShownLogWin(void);
-DWORD WINAPI LogThreadMain(LPVOID lpParam);
-LRESULT CALLBACK LogProc(HWND, UINT, WPARAM, LPARAM);
+  void LogStartMsg();
+  void CheckLogSize();
+  void CheckConsoleLine();
 
-extern Config* pConfig;
-extern int logLine;
+  bool CreateLogWin(HINSTANCE);
+  void SetLogText(LPCWSTR);
+  void SetLogText(LPCWSTR, COLORREF, COLORREF);
+  void ClearLog(void);
+  void ShowLogWin(bool bShow);
+  bool IsShownLogWin(void);
+  DWORD WINAPI LogThreadMain(LPVOID lpParam);
+  LRESULT CALLBACK LogProc(HWND, UINT, WPARAM, LPARAM);
+}
 
-template <typename... Args>
+int logLine = 0;
+
+export template <typename... Args>
 auto Log(LogCategory category, const std::wformat_string<Args...> fmt, Args&&... args) {
   using namespace std;
   static auto zone = chrono::current_zone();
@@ -52,14 +52,7 @@ auto Log(LogCategory category, const std::wformat_string<Args...> fmt, Args&&...
 
     if (doWindowLog) SetLogText(message.c_str());
     if (doFileLog) {
-      array<wchar_t, MAX_PATH> lpFileName;
-      if (pConfig->GetFileLogEztLoc())
-        GetLoadPath(lpFileName.data(), MAX_PATH);
-      else
-        GetExecutePath(lpFileName.data(), MAX_PATH);
-      wcscat_s(lpFileName.data(), lpFileName.size(), L"\\ehnd_log.log");
-
-      auto file = wofstream{lpFileName.data(), ios::app};
+      auto file = wofstream{pConfig->GetFileLogDirectory() + L"\\ehnd_log.log", ios::app};
 
       auto const time = zone->to_local(chrono::system_clock::now());
       auto ms = chrono::duration_cast<chrono::milliseconds>(time.time_since_epoch()).count() % 1000;

@@ -1,15 +1,15 @@
-#include "stdafx.h"
+module;
 
-#include "config.h"
-#include "ehnd.h"
-#include "log.h"
+#include <boost/algorithm/string.hpp>
+#include <boost/regex.hpp>
+#include <winreg/WinReg.hpp>
 
-Config::Config() {
-  wcscpy_s(cfg_console_fontname, L"굴림");
-}
+module Config;
 
-Config::~Config() {
-}
+import std.core;
+import std.filesystem;
+
+using namespace std;
 
 const wchar_t* const Config::kEngineDllSubPath = L"\\J2KEngine.dlx";
 
@@ -19,7 +19,6 @@ bool DoesDlxExist(const std::wstring& directory) {
 }
 
 std::wstring GetEztransPathFromRegistry() {
-  using namespace std;
   using namespace winreg;
 
   RegKey key;
@@ -34,7 +33,7 @@ std::wstring GetEztransPathFromRegistry() {
   }
 
   auto& ehndPath = getResult.GetValue();
-  return DoesDlxExist(ehndPath) ? ehndPath : std::wstring{};
+  return DoesDlxExist(ehndPath) ? ehndPath : wstring{};
 }
 
 std::wstring Config::GetEztransPath() {
@@ -59,15 +58,13 @@ std::wstring Config::GetEztransPath() {
   return {};
 }
 
-std::wstring Config::GetEhndPath() {
+std::wstring GetEhndPath() {
   using namespace std;
 
   int flag = GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT;
-  auto address = reinterpret_cast<LPCTSTR>(&ShowLogWin);
+  auto address = reinterpret_cast<LPCTSTR>(&Config::kEngineDllSubPath);
   HMODULE handle;
   if (!GetModuleHandleEx(flag, address, &handle)) {
-    int ret = GetLastError();
-    Log(LogCategory::kError, L"GetModuleHandleEx failed, error {}\n", ret);
     return {};
   }
 
@@ -75,8 +72,6 @@ std::wstring Config::GetEhndPath() {
   path.resize(MAX_PATH);
   int length = GetModuleFileName(handle, path.data(), path.size());
   if (!length) {
-    int ret = GetLastError();
-    Log(LogCategory::kError, L"GetModuleFileName failed, error {}\n", ret);
     return {};
   }
 
@@ -84,20 +79,26 @@ std::wstring Config::GetEhndPath() {
   return path;
 }
 
-std::wstring Config::GetExecutablePath() {
+const std::wstring Config::GetEhndPath() {
+  return ehnd_path_.size() ? ehnd_path_ : (ehnd_path_ = ::GetEhndPath());
+}
+
+std::wstring GetExecutablePath() {
   using namespace std;
 
   wstring path;
   path.resize(MAX_PATH);
   int length = GetModuleFileName(GetModuleHandle(nullptr), path.data(), path.size());
   if (!length) {
-    int ret = GetLastError();
-    Log(LogCategory::kError, L"GetModuleFileName(nullptr) failed, error {}\n", ret);
     return {};
   }
 
   path.resize(path.rfind(L'\\'));
   return path;
+}
+
+const std::wstring Config::GetExecutablePath() {
+  return exe_path_.size() ? exe_path_ : (exe_path_ = ::GetExecutablePath());
 }
 
 bool Config::LoadConfig() {
@@ -144,17 +145,13 @@ bool Config::LoadConfig() {
     get_config(L"CONSOLE_FONTNAME").transform(&wstring_view::data).value_or(L"굴림"));
   SetConsoleFontSize(get_int(L"CONSOLE_FONTSIZE").value_or(12));
 
-  if (!firstInit)
-    Log(LogCategory::kNormal, L"LoadConfig : Success.\n");
-  else
-    firstInit = false;
   return true;
 }
 
 bool Config::SaveConfig() {
-  wchar_t INIPath[MAX_PATH], buf[255];
-  GetLoadPath(INIPath, MAX_PATH);
-  wcscat_s(INIPath, L"\\Ehnd\\ehnd_conf.ini");
+  wchar_t buf[255];
+  auto ini_path = GetEhndPath() + L"\\Ehnd\\ehnd_conf.ini";
+  wchar_t* INIPath = ini_path.data();
 
   // wcscpy_s(buf, (GetPreSwitch() ? L"ON" : L"OFF"));
   // WriteINI(L"PREFILTER_SWITCH", L"CONFIG", buf, (wchar_t*)INIPath);
@@ -192,7 +189,6 @@ bool Config::SaveConfig() {
   wsprintf(buf, L"%d", GetConsoleFontSize());
   WriteINI(L"CONSOLE_FONTSIZE", L"CONFIG", buf, (wchar_t*)INIPath);
 
-  Log(LogCategory::kNormal, L"SaveConfig : Success.\n");
   return true;
 }
 

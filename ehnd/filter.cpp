@@ -1,6 +1,19 @@
-#include "stdafx.h"
+module;
 
-#include "globals.h"
+#include <Windows.h>
+#include <tchar.h>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/regex.hpp>
+
+module Filter;
+
+import std.core;
+import std.filesystem;
+import Constants;
+import Config;
+import Log;
+import Hook;
 
 int operator<(USERDICSTRUCT& left, USERDICSTRUCT& right) {
   char buffer1[62], buffer2[62];
@@ -23,7 +36,7 @@ int operator<(USERDICSTRUCT& left, USERDICSTRUCT& right) {
 }
 
 Filter::Filter() {
-  hLoadEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
+  hLoadEvent = CreateEvent(nullptr, true, true, nullptr);
 }
 
 Filter::~Filter() {
@@ -275,15 +288,15 @@ bool Filter::jkdic_load(int& g_line) {
     if (!fread(Buffer, sizeof(char), 5, fp)) break;
 
     int len;
-    len = MultiByteToWideCharWithAral(932, MB_PRECOMPOSED, Jpn, -1, NULL, NULL);
+    len = MultiByteToWideCharWithAral(932, MB_PRECOMPOSED, Jpn, -1, nullptr, 0);
     MultiByteToWideCharWithAral(932, 0, Jpn, -1, lpBuffer, len);
     wcsncpy_s(us._jpn, lpBuffer, len);
 
-    len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, Kor, -1, NULL, NULL);
+    len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, Kor, -1, nullptr, 0);
     MultiByteToWideCharWithAral(949, 0, Kor, -1, lpBuffer, len);
     wcsncpy_s(us._kor, lpBuffer, len);
 
-    len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, Attr, -1, NULL, NULL);
+    len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, Attr, -1, nullptr, 0);
     MultiByteToWideCharWithAral(949, 0, Attr, -1, lpBuffer, len);
     wcsncpy_s(us._attr, lpBuffer, len);
 
@@ -378,12 +391,12 @@ bool Filter::ehnddic_create() {
     int len;
 
     // 유니코드 -> 932/949
-    len = WideCharToMultiByteWithAral(932, 0, UserDic[i]._jpn, -1, NULL, NULL, NULL, NULL);
-    WideCharToMultiByteWithAral(932, 0, UserDic[i]._jpn, -1, Jpn, len, NULL, NULL);
-    len = WideCharToMultiByteWithAral(949, 0, UserDic[i]._kor, -1, NULL, NULL, NULL, NULL);
-    WideCharToMultiByteWithAral(949, 0, UserDic[i]._kor, -1, Kor, len, NULL, NULL);
-    len = WideCharToMultiByteWithAral(949, 0, UserDic[i]._attr, -1, NULL, NULL, NULL, NULL);
-    WideCharToMultiByteWithAral(949, 0, UserDic[i]._attr, -1, Attr, len, NULL, NULL);
+    len = WideCharToMultiByteWithAral(932, 0, UserDic[i]._jpn, -1, nullptr, 0, nullptr, nullptr);
+    WideCharToMultiByteWithAral(932, 0, UserDic[i]._jpn, -1, Jpn, len, nullptr, nullptr);
+    len = WideCharToMultiByteWithAral(949, 0, UserDic[i]._kor, -1, nullptr, 0, nullptr, nullptr);
+    WideCharToMultiByteWithAral(949, 0, UserDic[i]._kor, -1, Kor, len, nullptr, nullptr);
+    len = WideCharToMultiByteWithAral(949, 0, UserDic[i]._attr, -1, nullptr, 0, nullptr, nullptr);
+    WideCharToMultiByteWithAral(949, 0, UserDic[i]._attr, -1, Attr, len, nullptr, nullptr);
 
     // 단어 타입
     if (UserDic[i]._type == user_word::common)
@@ -397,7 +410,7 @@ bool Filter::ehnddic_create() {
     fwrite(Part, sizeof(char), 5, fp);
     fwrite(Attr, sizeof(char), 37, fp);
 
-    // UserDic_Log 구현을 위해 NULL+attr 끝 네자리를 활용
+    // UserDic_Log 구현을 위해 nullptr+attr 끝 네자리를 활용
     // 기존 attr 배열은 42자까지 허용되었으나 끝자리를 사용하는 관계로 36자까지만 허용 (1자는 여유)
     fwrite(L"", sizeof(char), 1, fp);
     fwrite(&i, sizeof(char), 4, fp);
@@ -429,7 +442,7 @@ bool Filter::skiplayer_load2(std::vector<SKIPLAYERSTRUCT>& SkipLayer, LPCWSTR lp
   }
   // Log(log_category::kNormal, L"SkipLayerRead : 스킵레이어 {} 로드.\n", lpFileName);
 
-  for (int line = 0; fgetws(Buffer, 1000, fp) != NULL; line++, g_line++) {
+  for (int line = 0; fgetws(Buffer, 1000, fp) != nullptr; line++, g_line++) {
     int tab = 0;
     if (Buffer[0] == L'/' && Buffer[1] == L'/') continue;
 
@@ -474,7 +487,7 @@ bool Filter::skiplayer_load2(std::vector<SKIPLAYERSTRUCT>& SkipLayer, LPCWSTR lp
       boost::wregex ex(ss.cond);
     } catch (boost::regex_error ex) {
       WCHAR lpWhat[255];
-      int len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
+      int len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, nullptr, 0);
       MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
 
       Log(LogCategory::kError, L"SkipLayerRead : 정규식 오류! : [{}:{}] {} | {} | {}\n",
@@ -520,7 +533,7 @@ bool Filter::filter_load(std::vector<FILTERSTRUCT>& Filter, LPCWSTR lpPath, LPCW
   lpFileName); else if (rule_type == rule_type::postprocess && !IsUnicode)
   Log(log_category::kNormal, L"PostFilterRead : 후처리 필터 \"{}\" 로드.\n", lpFileName);
   */
-  for (int line = 0; fgetws(Buffer, 1000, fp) != NULL; line++, g_line++) {
+  for (int line = 0; fgetws(Buffer, 1000, fp) != nullptr; line++, g_line++) {
     if (Buffer[0] == L'/' && Buffer[1] == L'/') continue;  // 주석
 
     FILTERSTRUCT fs;
@@ -570,7 +583,7 @@ bool Filter::filter_load(std::vector<FILTERSTRUCT>& Filter, LPCWSTR lpPath, LPCW
         boost::wregex ex(fs.src);
       } catch (boost::regex_error ex) {
         WCHAR lpWhat[255];
-        int len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
+        int len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, nullptr, 0);
         MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
 
         if (rule_type == rule_type::preprocess)
@@ -619,7 +632,7 @@ bool Filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int& g_line) {
   // Log(log_category::kNormal, L"UserDicRead : 사용자 사전 \"{}\" 로드.\n", lpFileName);
 
   count = 0;
-  for (int line = 1; fgetws(Buffer, 1000, fp) != NULL; line++) {
+  for (int line = 1; fgetws(Buffer, 1000, fp) != nullptr; line++) {
     if (!wcsncmp(Buffer, L"//", 2)) continue;
     if (Buffer[wcslen(Buffer) - 1] == 0x0A) Buffer[wcslen(Buffer) - 1] = 0;
     if (Buffer[wcslen(Buffer) - 1] == 0x0D) Buffer[wcslen(Buffer) - 1] = 0;
@@ -663,8 +676,8 @@ bool Filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int& g_line) {
     }
 
     if (t > 1) {
-      if ((len = WideCharToMultiByteWithAral(932, 0, Jpn.c_str(), -1, NULL, NULL, NULL, NULL)) >
-          31) {
+      if ((len = WideCharToMultiByteWithAral(932, 0, Jpn.c_str(), -1, nullptr, 0, nullptr,
+                                             nullptr)) > 31) {
         Log(LogCategory::kNormal,
             L"UserDicRead : 오류 : 원문 단어의 길이는 15자(30Byte)를 초과할 수 없습니다.\n");
         Log(LogCategory::kNormal, L"UserDicRead : 오류 : 다음 단어가 무시됩니다. (현재: {}Byte)\n",
@@ -675,8 +688,8 @@ bool Filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int& g_line) {
         break;
       }
       wcscpy_s(us._jpn, Jpn.c_str());
-      if ((len = WideCharToMultiByteWithAral(949, 0, Kor.c_str(), -1, NULL, NULL, NULL, NULL)) >
-          31) {
+      if ((len = WideCharToMultiByteWithAral(949, 0, Kor.c_str(), -1, nullptr, 0, nullptr,
+                                             nullptr)) > 31) {
         Log(LogCategory::kNormal,
             L"UserDicRead : 오류 : 역문 단어의 길이는 15자(30Byte)를 초과할 수 없습니다.\n");
         Log(LogCategory::kNormal, L"UserDicRead : 오류 : 다음 단어가 무시됩니다. (현재: {}Byte)\n",
@@ -687,8 +700,8 @@ bool Filter::userdic_load2(LPCWSTR lpPath, LPCWSTR lpFileName, int& g_line) {
         break;
       }
       wcscpy_s(us._kor, Kor.c_str());
-      if ((len = WideCharToMultiByteWithAral(949, 0, Attr.c_str(), -1, NULL, NULL, NULL, NULL)) >
-          37) {
+      if ((len = WideCharToMultiByteWithAral(949, 0, Attr.c_str(), -1, nullptr, 0, nullptr,
+                                             nullptr)) > 37) {
         Log(LogCategory::kNormal,
             L"UserDicRead : 오류 : 단어 속성은 36Byte를 초과할 수 없습니다.\n");
         Log(LogCategory::kNormal, L"UserDicRead : 오류 : 다음 단어가 무시됩니다. (현재: {}Byte)\n",
@@ -723,7 +736,7 @@ bool Filter::anedic_load(int& g_line) {
 
   if (!g_bAnemone) {
     DWORD pid;
-    HWND hwnd = FindWindow(L"AneParentClass", NULL);
+    HWND hwnd = FindWindow(L"AneParentClass", nullptr);
     if (hwnd) {
       // Log(log_category::kNormal, L"[AneDicLoad] AneParentClass Found.\n");
 
@@ -733,7 +746,7 @@ bool Filter::anedic_load(int& g_line) {
         return false;
       }
     } else {
-      hwnd = FindWindow(L"AnemoneParentWndClass", NULL);
+      hwnd = FindWindow(L"AnemoneParentWndClass", nullptr);
       if (hwnd) {
         // Log(log_category::kNormal, L"[AneDicLoad] AnemoneParentWndClass Found.\n");
         GetWindowThreadProcessId(hwnd, &pid);
@@ -749,11 +762,8 @@ bool Filter::anedic_load(int& g_line) {
     g_bAnemone = true;
   }
 
-  GetExecutePath(lpPathName, MAX_PATH);
-  wcscat_s(lpPathName, L"\\");
-  wcscpy_s(lpFileName, L"anedic.txt");
-
-  return userdic_load2(lpPathName, lpFileName, g_line);
+  wstring directory = pConfig->GetExecutablePath() + L"\\";
+  return userdic_load2(directory.c_str(), L"anedic.txt", g_line);
 }
 
 bool Filter::pre(std::wstring& wsText) {
@@ -809,7 +819,7 @@ bool Filter::filter_proc(std::vector<FILTERSTRUCT>& Filter, rule_type rule_type,
             }
           } catch (regex_error ex) {
             WCHAR lpWhat[255];
-            int len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
+            int len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, nullptr, 0);
             MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
 
             Log(LogCategory::kError, L"SkipLayerRead : 정규식 오류! : [{}:{}] {} | {} | {}\n",
@@ -854,7 +864,7 @@ bool Filter::filter_proc(std::vector<FILTERSTRUCT>& Filter, rule_type rule_type,
         Filter[i]._etime += duration_cast<doubleMilli>(end - start).count();
       } catch (regex_error ex) {
         WCHAR lpWhat[255];
-        int len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, NULL, NULL);
+        int len = MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, nullptr, 0);
         MultiByteToWideCharWithAral(949, MB_PRECOMPOSED, ex.what(), -1, lpWhat, len);
 
         if (rule_type == rule_type::preprocess)
@@ -932,7 +942,7 @@ bool Filter::cmd(std::wstring& wsText) {
     bCommand = true;
     bSaveINI = true;
   } else if (!wsText.compare(L"/reload")) {
-    pFilter->load();
+    load();
     bCommand = true;
   } else if (pConfig->GetCommandSwitch()) {
     if (!wsText.compare(L"/log_detail")) {
@@ -1027,18 +1037,9 @@ bool Filter::cmd(std::wstring& wsText) {
 
     else if (!wsText.compare(L"/eout") && pConfig->GetUserDicSwitch()) {
       FILE* fp;
-      wchar_t lpFileName[MAX_PATH];
+      auto file_name = pConfig->GetFileLogDirectory() + L"\\ehnd_eout.log";
 
-      if (pConfig->GetFileLogEztLoc()) {
-        auto ehndPath = pConfig->GetEhndPath();
-        ehndPath.copy(lpFileName, ehndPath.size());
-        lpFileName[ehndPath.size()] = L'\0';
-      } else {
-        GetExecutePath(lpFileName, MAX_PATH);
-      }
-      wcscat_s(lpFileName, L"\\ehnd_eout.log");
-
-      if (!_wfopen_s(&fp, lpFileName, L"wt,ccs=UTF-8")) {
+      if (!_wfopen_s(&fp, file_name.c_str(), L"wt,ccs=UTF-8")) {
         for (size_t i = 0; i < PreFilter.size(); i++) {
           auto& Filter = PreFilter;
           fwprintf_s(fp, L"%s\t%d\t%d\t%f\t%s\t%s\t%d\t%d\n", Filter[i].db.c_str(), Filter[i].line,

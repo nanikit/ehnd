@@ -1,17 +1,23 @@
-#include "stdafx.h"
+module;
+#include <Windows.h>
 
-#include "globals.h"
+#include <Richedit.h>
+#include <tchar.h>
+
+module Log;
+
+import std.core;
+import std.filesystem;
+
+import Constants;
+import Config;
 
 HWND hLogWin, hLogRes;
 HANDLE hLogEvent;
-int logLine = 0;
 
 void LogStartMsg() {
   wchar_t lpEztPath[MAX_PATH];
   wchar_t lpExePath[MAX_PATH];
-
-  GetLoadPath(lpEztPath, MAX_PATH);
-  GetExecutePath(lpExePath, MAX_PATH);
 
   Log(LogCategory::kNormal, L"──── ━━\n");
   Log(LogCategory::kNormal, L"Ehnd :: 엔드 - VER. {} :: COMPILE AT {}, {}\n", EHND_VER,
@@ -20,25 +26,21 @@ void LogStartMsg() {
   Log(LogCategory::kNormal, L"\n");
   Log(LogCategory::kNormal, L"- 제작자 : {}\n", L"소쿠릿");
   Log(LogCategory::kNormal, L"━━━━━━━━━───────────-＊\n");
-  Log(LogCategory::kNormal, L"EzTransPath : {}\n", lpEztPath);
-  Log(LogCategory::kNormal, L"ExecutePath : {}\n", lpExePath);
+  Log(LogCategory::kNormal, L"EzTransPath : {}\n", pConfig->GetEztransPath());
+  Log(LogCategory::kNormal, L"ExecutePath : {}\n", pConfig->GetExecutablePath());
   return;
 }
 
 void CheckLogSize() {
+  using namespace std;
   FILE* fp;
 
   // 로그 사용안할때 끄기
   if (!pConfig->GetFileLogSwitch()) return;
 
-  wchar_t lpFileName[MAX_PATH];
-  if (pConfig->GetFileLogEztLoc())
-    GetLoadPath(lpFileName, MAX_PATH);
-  else
-    GetExecutePath(lpFileName, MAX_PATH);
-  wcscat_s(lpFileName, L"\\ehnd_log.log");
+  auto path = pConfig->GetFileLogDirectory() + L"\\ehnd_log.log";
 
-  if (_wfopen_s(&fp, lpFileName, L"a+t,ccs=UTF-8")) return;
+  if (_wfopen_s(&fp, path.c_str(), L"a+t,ccs=UTF-8")) return;
 
   // fpos = ftell(fp);
   fseek(fp, 0, SEEK_END);
@@ -47,9 +49,10 @@ void CheckLogSize() {
 
   if (cf_size != 0 && cf_size * 1024 < fsize) {
     fclose(fp);
-    DeleteFile(lpFileName);
-  } else
+    filesystem::remove(path);
+  } else {
     fclose(fp);
+  }
 }
 
 void CheckConsoleLine() {
@@ -88,7 +91,7 @@ bool CreateLogWin(HINSTANCE hInst) {
     Log(LogCategory::kError, L"CreateLogWin : Event Init Error");
     return 0;
   }
-  HANDLE hThread = CreateThread(&thAttr, 0, LogThreadMain, NULL, 0, NULL);
+  HANDLE hThread = CreateThread(&thAttr, 0, LogThreadMain, hInst, 0, NULL);
   if (hThread == NULL) {
     Log(LogCategory::kError, L"CreateLogWin : Log Thread Create Error");
   }
@@ -99,7 +102,7 @@ bool CreateLogWin(HINSTANCE hInst) {
 }
 
 DWORD WINAPI LogThreadMain(LPVOID lpParam) {
-  HINSTANCE hInst = g_hInst;
+  auto hInst = static_cast<HINSTANCE>(lpParam);
   wchar_t wszTitle[255];
 
   wsprintf(wszTitle, L"Ehnd Log Window :: VER. %s (%s, %s)", EHND_VER, _T(__DATE__), _T(__TIME__));
