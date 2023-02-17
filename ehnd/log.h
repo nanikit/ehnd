@@ -35,7 +35,7 @@ extern Config* pConfig;
 extern int logLine;
 
 template <typename... Args>
-auto Log(LogCategory category, const std::_Fmt_wstring<Args...> fmt, Args&&... args) {
+auto Log(LogCategory category, const std::wformat_string<Args...> fmt, Args&&... args) {
   using namespace std;
   static auto zone = chrono::current_zone();
 
