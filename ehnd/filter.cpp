@@ -319,7 +319,7 @@ bool Filter::ehnddic_cleanup() {
 
   wstring temp;
   temp.resize(MAX_PATH);
-  GetTempPath2(temp.size(), temp.data());
+  GetTempPath(temp.size(), temp.data());
   temp.resize(temp.find(L'\0'));
   directory_iterator entries{temp};
 
