@@ -1,11 +1,11 @@
-module;
+#pragma once
+
 #include <Windows.h>
 
-export module Watch;
+#include <functional>
+#include <string>
 
-import std.core;
-
-export class Watch {
+class Watch {
  public:
   Watch(std::function<MMRESULT(std::vector<std::wstring>& paths)> callback);
   ~Watch();

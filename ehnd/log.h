@@ -1,40 +1,35 @@
-module;
+#pragma once
 #include <Windows.h>
 
-export module Log;
+#include <format>
 
-import std.core;
-import std.filesystem;
+#include "config.h"
 
-import Config;
+enum class LogCategory {
+  kNormal = 0,
+  kError = 10,
+  kDetail = 20,
+  kTime = 30,
+  kSkipLayer = 40,
+  kUserDict = 50,
+};
 
-export {
-  enum class LogCategory {
-    kNormal = 0,
-    kError = 10,
-    kDetail = 20,
-    kTime = 30,
-    kSkipLayer = 40,
-    kUserDict = 50,
-  };
+void LogStartMsg();
+void CheckLogSize();
+void CheckConsoleLine();
 
-  void LogStartMsg();
-  void CheckLogSize();
-  void CheckConsoleLine();
+bool CreateLogWin(HINSTANCE);
+void SetLogText(LPCWSTR);
+void SetLogText(LPCWSTR, COLORREF, COLORREF);
+void ClearLog(void);
+void ShowLogWin(bool bShow);
+bool IsShownLogWin(void);
+DWORD WINAPI LogThreadMain(LPVOID lpParam);
+LRESULT CALLBACK LogProc(HWND, UINT, WPARAM, LPARAM);
 
-  bool CreateLogWin(HINSTANCE);
-  void SetLogText(LPCWSTR);
-  void SetLogText(LPCWSTR, COLORREF, COLORREF);
-  void ClearLog(void);
-  void ShowLogWin(bool bShow);
-  bool IsShownLogWin(void);
-  DWORD WINAPI LogThreadMain(LPVOID lpParam);
-  LRESULT CALLBACK LogProc(HWND, UINT, WPARAM, LPARAM);
-}
+extern int log_line;
 
-int logLine = 0;
-
-export template <typename... Args>
+template <typename... Args>
 auto Log(LogCategory category, const std::wformat_string<Args...> fmt, Args&&... args) {
   using namespace std;
   static auto zone = chrono::current_zone();
@@ -60,5 +55,5 @@ auto Log(LogCategory category, const std::wformat_string<Args...> fmt, Args&&...
     }
   }
 
-  logLine++;
+  log_line++;
 }

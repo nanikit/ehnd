@@ -1,21 +1,10 @@
-module;
+#include "stdafx.h"
 
-#include <Windows.h>
-
-#undef min
-#undef max
-
-#include <boost/algorithm/string.hpp>
-
-module Ehnd;
-
-import std.core;
-import Config;
-import Log;
-import LoggedConfig;
-import Filter;
-import Watch;
-import Hook;
+#include "ehnd.h"
+#include "filter.h"
+#include "hook.h"
+#include "logged_config.h"
+#include "watch.h"
 
 HINSTANCE g_hInst;
 Filter* pFilter;

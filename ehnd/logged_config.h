@@ -1,21 +1,16 @@
-module;
+#pragma once
 #include <Windows.h>
 
-export module LoggedConfig;
+#include <string>
+#include "log.h"
 
-import std.core;
-import Config;
-import Log;
-
-using namespace std;
-
-export class LoggedConfig : public Config {
+class LoggedConfig : public Config {
   void SetConsoleSwitch(bool b) override {
     Config::SetConsoleSwitch(b);
     ShowLogWin(b);
   }
 
-  const wstring GetEhndPath() override {
+  const std::wstring GetEhndPath() override {
     auto path = Config::GetEhndPath();
     if (path.empty()) {
       int ret = GetLastError();
@@ -24,7 +19,7 @@ export class LoggedConfig : public Config {
     return path;
   }
 
-  const wstring GetExecutablePath() override {
+  const std::wstring GetExecutablePath() override {
     auto path = Config::GetExecutablePath();
     if (path.empty()) {
       int ret = GetLastError();

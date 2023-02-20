@@ -1,13 +1,23 @@
-module;
-#include <Windows.h>
+#include "stdafx.h"
 
-#include <Psapi.h>
+#include "config.h"
+#include "hook.h"
+#include "log.h"
 
-module Hook;
+std::string dic_path;
 
-import std.core;
-import Config;
-import Log;
+FARPROC apfnEzt[100];
+HMODULE hEzt, hMsv;
+
+bool(__stdcall* j2k_initialize_ex)(LPCSTR name, LPCSTR key);
+char*(__stdcall* j2k_translate_mmnt)(int data0, LPCSTR szText);
+void* (*msvcrt_fopen_ptr)(const char* path, const char* mode);
+void* (*msvcrt_free_ptr)(void* _Memory);
+void* (*msvcrt_malloc_ptr)(size_t _Size);
+
+void VoidConversionLogger(int idx, int num) {
+}
+void (*user_dictionary_conversion_logger)(int idx, int num) = VoidConversionLogger;
 
 LPBYTE lpfnRetn, lpfnfopen;
 LPBYTE lpfnwc2mb, lpfnmb2wc;

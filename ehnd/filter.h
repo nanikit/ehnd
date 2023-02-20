@@ -1,12 +1,11 @@
-module;
+#pragma once
 #include <Windows.h>
 #include <tchar.h>
 
-export module Filter;
+#include <string>
+#include <vector>
 
-import std.core;
-
-export bool g_bAnemone;
+extern bool g_bAnemone;
 
 enum class user_word {
   common = 1,
@@ -59,7 +58,7 @@ struct SKIPLAYERSTRUCT {
   }
 };
 
-export class Filter {
+class Filter {
  public:
   Filter();
   ~Filter();

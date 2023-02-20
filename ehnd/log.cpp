@@ -1,16 +1,9 @@
-module;
-#include <Windows.h>
+#include "stdafx.h"
 
-#include <Richedit.h>
-#include <tchar.h>
+#include "constants.h"
+#include "log.h"
 
-module Log;
-
-import std.core;
-import std.filesystem;
-
-import Constants;
-import Config;
+int log_line;
 
 HWND hLogWin, hLogRes;
 HANDLE hLogEvent;
@@ -58,9 +51,9 @@ void CheckLogSize() {
 void CheckConsoleLine() {
   int cf_line = pConfig->GetConsoleMaxLine();
 
-  if (cf_line != 0 && logLine > cf_line) {
+  if (cf_line != 0 && log_line > cf_line) {
     ClearLog();
-    logLine = 0;
+    log_line = 0;
   }
 }
 

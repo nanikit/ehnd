@@ -1,15 +1,9 @@
-module;
+#pragma once
+#include <string>
 
 #include "macro.h"
 
-export module Config;
-
-import std.core;
-import std.filesystem;
-
-using namespace std;
-
-export class EHND_EXPORT Config {
+class EHND_EXPORT Config {
  public:
   static const wchar_t* const kEngineDllSubPath;
 
@@ -186,8 +180,8 @@ export class EHND_EXPORT Config {
   int cfg_console_maxline = 300;
   wchar_t cfg_console_fontname[255];
   int cfg_console_fontsize = 12;
-  wstring ehnd_path_;
-  wstring exe_path_;
+  std::wstring ehnd_path_;
+  std::wstring exe_path_;
 };
 
-export Config* pConfig;
+extern Config* pConfig;

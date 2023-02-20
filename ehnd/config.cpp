@@ -1,15 +1,10 @@
-module;
+#include "stdafx.h"
 
-#include <boost/algorithm/string.hpp>
-#include <boost/regex.hpp>
-#include <winreg/WinReg.hpp>
-
-module Config;
-
-import std.core;
-import std.filesystem;
+#include "config.h"
 
 using namespace std;
+
+Config* pConfig;
 
 const wchar_t* const Config::kEngineDllSubPath = L"\\J2KEngine.dlx";
 

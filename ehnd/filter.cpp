@@ -1,19 +1,12 @@
-module;
+#include "stdafx.h"
 
-#include <Windows.h>
-#include <tchar.h>
+#include "config.h"
+#include "constants.h"
+#include "filter.h"
+#include "hook.h"
+#include "log.h"
 
-#include <boost/algorithm/string.hpp>
-#include <boost/regex.hpp>
-
-module Filter;
-
-import std.core;
-import std.filesystem;
-import Constants;
-import Config;
-import Log;
-import Hook;
+bool g_bAnemone;
 
 int operator<(USERDICSTRUCT& left, USERDICSTRUCT& right) {
   char buffer1[62], buffer2[62];

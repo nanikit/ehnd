@@ -1,11 +1,7 @@
-module;
-#include <Windows.h>
+#include "stdafx.h"
 
-module Watch;
-
-import std.core;
-import Config;
-import Log;
+#include "log.h"
+#include "watch.h"
 
 Watch::Watch(std::function<MMRESULT(std::vector<std::wstring>& paths)> callback) {
   callback_ = callback;
