@@ -9,9 +9,6 @@ HWND hLogWin, hLogRes;
 HANDLE hLogEvent;
 
 void LogStartMsg() {
-  wchar_t lpEztPath[MAX_PATH];
-  wchar_t lpExePath[MAX_PATH];
-
   Log(LogCategory::kNormal, L"──── ━━\n");
   Log(LogCategory::kNormal, L"Ehnd :: 엔드 - VER. {} :: COMPILE AT {}, {}\n", EHND_VER,
       _T(__DATE__), _T(__TIME__));
